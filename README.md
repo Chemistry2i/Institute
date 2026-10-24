@@ -1,0 +1,2 @@
+# ACMIS
+Academic Management system 
