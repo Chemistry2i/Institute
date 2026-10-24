@@ -13,9 +13,7 @@ export interface AppShellContext {
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [roleId, setRoleId] = useState<RoleId>('institutionHead')
-  const [theme, setTheme] = useState<'light' | 'dark'>(() =>
-    window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
-  )
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const location = useLocation()
   const visibleNavigation = getNavigationForRole(roleId)
   const activePage = visibleNavigation.find((item) => item.path === location.pathname)
