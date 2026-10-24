@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { getNavigationForRole } from '../../config/access'
 import { roleProfiles, type RoleId } from '../../config/roles'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { SimulationStatusBar } from '../../features/registrar/simulation/SimulationStatusBar'
 import '../../App.css'
 
 export interface AppShellContext {
@@ -123,6 +124,7 @@ export function AppShell() {
             </div>
           </div>
         </header>
+        <SimulationStatusBar />
         <main className="page-content">
           <Outlet context={{ roleId } satisfies AppShellContext} />
         </main>

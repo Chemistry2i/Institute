@@ -26,6 +26,7 @@ describe('Academic Registrar workspace controls', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Admissions review' })).toBeInTheDocument()
     expect(screen.getByText('No applications loaded')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Record decision' })).toBeDisabled()
 
     await user.type(screen.getByRole('searchbox', { name: 'Search Application queue' }), 'app-100')
     expect(screen.getAllByText('No matching records')).toHaveLength(2)

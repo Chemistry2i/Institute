@@ -294,6 +294,13 @@
   max-width: 650px;
 }
 
+.registrar-record-tools {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
 .registrar-search {
   display: flex;
   width: min(100%, 260px);
@@ -406,6 +413,12 @@
 
   .registrar-search {
     width: 100%;
+  }
+
+  .registrar-record-tools {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
   .registrar-pagination {

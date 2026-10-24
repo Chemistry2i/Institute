@@ -6,6 +6,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './components/ui/ui.css'
 import './index.css'
 import App from './App.tsx'
+import { SimulationProvider } from './features/registrar/simulation/SimulationProvider'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,7 +21,9 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <App />
+        <SimulationProvider>
+          <App />
+        </SimulationProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>,

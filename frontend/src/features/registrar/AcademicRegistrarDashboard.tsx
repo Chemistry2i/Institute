@@ -13,6 +13,7 @@ import { getNavigationForRole } from '../../config/access'
 import { roleProfiles } from '../../config/roles'
 import type { AppShellContext } from '../../components/layout/AppShell'
 import { MetricCard } from '../dashboard/MetricCard'
+import { useSimulation } from './simulation/SimulationProvider'
 
 const ActivityChart = lazy(async () => {
   const module = await import('../dashboard/ActivityChart')
@@ -26,7 +27,14 @@ const trendData: Array<{ period: string; value: number }> = []
 export function AcademicRegistrarDashboard() {
   const { roleId } = useOutletContext<AppShellContext>()
   const profile = roleProfiles[roleId]
+  const { state } = useSimulation()
   const registrarLinks = getNavigationForRole(roleId).filter((item) => item.path !== '/')
+  const metrics = [
+    state.applications.filter((application) => ['submitted', 'reviewing', 'offered'].includes(application.status)).length,
+    state.registrations.filter((registration) => registration.status === 'submitted').length,
+    state.results.filter((result) => ['submitted', 'under_review', 'approved'].includes(result.status)).length,
+    state.graduationChecks.filter((check) => ['review', 'eligible', 'ineligible'].includes(check.status)).length,
+  ]
 
   return (
     <section aria-labelledby="registrar-dashboard-title">
@@ -36,7 +44,7 @@ export function AcademicRegistrarDashboard() {
           <h1 className="page-title" id="registrar-dashboard-title">Academic Registrar</h1>
           <p className="page-description">Coordinate records, registration, examination processing and completion reviews.</p>
         </div>
-        <span className="system-status"><span className="status-dot" />API not connected</span>
+        <span className="system-status simulation-data-status"><span className="status-dot" />Synthetic simulation data</span>
       </div>
 
       <div className="overview-grid" aria-label="Registrar metrics unavailable">
@@ -44,7 +52,8 @@ export function AcademicRegistrarDashboard() {
           <MetricCard
             key={label}
             label={label}
-            note="Awaiting academic records API"
+            note="Local demo dataset"
+            value={metrics[index]}
             icon={metricIcons[index]}
             tone={metricTones[index]}
           />
@@ -70,7 +79,13 @@ export function AcademicRegistrarDashboard() {
               <Link className="registrar-queue-link" key={path} to={path}>
                 <span className="quick-action-icon"><Icon size={14} aria-hidden="true" /></span>
                 <span>{label}</span>
-                <span className="queue-value" aria-label="Count unavailable">--</span>
+                <span className="queue-value">{path === '/admissions'
+                  ? state.applications.filter((application) => ['submitted', 'reviewing'].includes(application.status)).length
+                  : path === '/registration'
+                    ? state.registrations.filter((registration) => registration.status === 'submitted').length
+                    : path === '/results'
+                      ? state.results.filter((result) => ['submitted', 'under_review', 'approved'].includes(result.status)).length
+                      : state.graduationChecks.filter((check) => check.status !== 'awarded').length}</span>
                 <ArrowRight className="quick-action-arrow" size={14} aria-hidden="true" />
               </Link>
             ))}
@@ -106,9 +121,9 @@ export function AcademicRegistrarDashboard() {
           <Suspense fallback={<div className="analytics-chart chart-loading" role="status">Loading chart…</div>}>
             <ActivityChart
               data={trendData}
-              accessibleLabel="Academic processing chart has no data because the API is not connected"
-              emptyTitle="No processing data yet"
-              emptyDescription="Activity appears here when connected to academic services."
+              accessibleLabel="Academic processing trend is waiting for dated simulation events"
+              emptyTitle="Trend needs more dated events"
+              emptyDescription="The current local demo records do not yet form a useful time series."
             />
           </Suspense>
         </section>
@@ -131,8 +146,8 @@ export function AcademicRegistrarDashboard() {
       <div className="module-notice" role="note">
         <ClipboardCheck size={18} aria-hidden="true" />
         <p>
-          <strong>Registrar workspace preview</strong>
-          Counts, records and approvals are blank until loaded from permission-checked services. Approval authority must be configured by the institution.
+          <strong>Academic Registrar local simulation</strong>
+          Counts and records use fictional data stored in this browser. This preview does not authenticate users or enforce server-side permissions.
         </p>
       </div>
     </section>

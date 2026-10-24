@@ -14,6 +14,7 @@ The application shell, navigation, role configuration, access helpers and dashbo
 - `frontend/src/config/access.ts` centralizes frontend permission checks and role-scoped navigation.
 - `frontend/src/features/` contains feature-owned pages and tests.
 - `frontend/src/features/settings/` contains the role-scoped settings draft interface.
+- `frontend/src/features/registrar/` contains the Registrar dashboard and academic workspace layouts. Search, filters, sort indicators, workflow dialogs and pagination controls are present; operational records, approvals and exports require backend APIs.
 
 The Student role is included with self-service permissions for the student's own records. Role switching is only a development preview; it does not provide an authenticated student account.
 

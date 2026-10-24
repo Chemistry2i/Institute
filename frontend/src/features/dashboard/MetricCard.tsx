@@ -5,9 +5,10 @@ interface MetricCardProps {
   note: string
   icon: LucideIcon
   tone: 'blue' | 'teal' | 'amber' | 'green'
+  value?: string | number
 }
 
-export function MetricCard({ label, note, icon: Icon, tone }: MetricCardProps) {
+export function MetricCard({ label, note, icon: Icon, tone, value = '--' }: MetricCardProps) {
   return (
     <article className="overview-item metric-card">
       <div className="metric-card-heading">
@@ -16,7 +17,7 @@ export function MetricCard({ label, note, icon: Icon, tone }: MetricCardProps) {
         </span>
         <div className="overview-label">{label}</div>
       </div>
-      <div className="overview-value" aria-label={`${label}: unavailable`}>--</div>
+      <div className="overview-value" aria-label={`${label}: ${value}`}>{value}</div>
       <div className="overview-note">{note}</div>
     </article>
   )
