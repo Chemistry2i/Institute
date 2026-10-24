@@ -5,6 +5,20 @@ export const permissionCatalog = [
   'dashboard.finance.read',
   'system.configure',
   'system.health.read',
+  'institution.settings.read',
+  'institution.profile.manage',
+  'institution.structure.manage',
+  'academics.settings.manage',
+  'finance.settings.manage',
+  'staff.settings.manage',
+  'security.settings.manage',
+  'communications.settings.manage',
+  'library.settings.manage',
+  'accommodation.settings.manage',
+  'internships.settings.manage',
+  'welfare.settings.manage',
+  'procurement.settings.manage',
+  'quality.settings.manage',
   'users.manage',
   'audit.read',
   'admissions.read',
@@ -89,34 +103,37 @@ const studentAccess: Permission[] = [
 export const roleProfiles = {
   superAdministrator: role('Super Administrator', 'Institution-wide system configuration and privileged operations.', 'Institution-wide', [
     'dashboard.open', 'dashboard.institution.read', 'system.configure', 'system.health.read', 'users.manage', 'audit.read',
-    'reports.institution.read', 'notifications.read',
+    'institution.settings.read', 'institution.profile.manage', 'institution.structure.manage', 'academics.settings.manage',
+    'finance.settings.manage', 'staff.settings.manage', 'security.settings.manage', 'communications.settings.manage',
+    'library.settings.manage', 'accommodation.settings.manage', 'internships.settings.manage', 'welfare.settings.manage',
+    'procurement.settings.manage', 'quality.settings.manage', 'reports.institution.read', 'notifications.read',
   ], ['Active accounts', 'Configuration tasks', 'Security events', 'Service health'], [
     'Configure institutional rules, roles and integrations.', 'Review privileged actions and security events.', 'Monitor service health and operational readiness.',
   ]),
   ictAdministrator: role('ICT Administrator', 'Technical account support, access administration and system operations.', 'Assigned technical scope', [
-    'dashboard.open', 'system.health.read', 'users.manage', 'audit.read', 'notifications.read',
+    'dashboard.open', 'system.health.read', 'users.manage', 'security.settings.manage', 'communications.settings.manage', 'audit.read', 'notifications.read',
   ], ['Accounts needing support', 'Access requests', 'System alerts', 'Integration health'], [
     'Manage accounts and access within assigned permissions.', 'Monitor operational errors and integrations.', 'Support recovery and technical service requests.',
   ]),
-  institutionHead: role('Institution Head', 'Read-only overview of approved institutional performance.', 'Institution-wide, read-only', [
+  institutionHead: role('Institution Head', 'Institution-wide oversight with high-level institution profile and structure configuration.', 'Institution-wide; school identity and structure settings', [
     ...institutionRead, 'dashboard.academic.read', 'dashboard.finance.read', 'reports.finance.read',
-    'students.read', 'academics.read', 'results.read',
+    'students.read', 'academics.read', 'results.read', 'institution.settings.read', 'institution.profile.manage', 'institution.structure.manage',
   ], ['Enrolled students', 'New admissions', 'Academic performance', 'Approved financial summary'], [
-    'Review institutional enrolment and academic trends.', 'Review approved financial summaries.', 'Monitor faculty and programme performance.',
+    'Configure institution identity and approved campus or structure details.', 'Review institutional enrolment and academic trends.', 'Review approved financial summaries and faculty performance.',
   ]),
   academicDirector: role('Deputy Head / Academic Director', 'Academic operations oversight and configured review workflows.', 'Institution or assigned academic scope', [
-    ...academicRead, 'admissions.read', 'registration.review', 'results.moderate', 'results.approve', 'graduation.manage',
+    ...academicRead, 'academics.settings.manage', 'admissions.read', 'registration.review', 'results.moderate', 'results.approve', 'graduation.manage',
   ], ['Applications to review', 'Registration progress', 'Results in review', 'Completion checks'], [
     'Monitor academic operations and programme progress.', 'Review examination processing and results.', 'Participate in configured academic approvals.',
   ]),
   academicRegistrar: role('Academic Registrar', 'Academic records, registration and authorised result administration.', 'Institution-wide academic scope', [
     ...academicRead, 'admissions.read', 'admissions.review', 'admissions.decide', 'students.manage', 'academics.manage',
-    'registration.manage', 'registration.review', 'results.approve', 'results.publish', 'results.correct', 'graduation.manage',
+    'registration.manage', 'registration.review', 'academics.settings.manage', 'results.approve', 'results.publish', 'results.correct', 'graduation.manage',
   ], ['Applications pending', 'Registrations pending', 'Results to approve', 'Graduation checks'], [
     'Maintain student records and academic calendars.', 'Supervise registration and result processing.', 'Coordinate progression and graduation checks.',
   ]),
   facultyRegistrar: role('Deputy / Faculty Registrar', 'Faculty-scoped student record and registration administration.', 'Assigned campus, faculty or department', [
-    ...academicRead, 'admissions.review', 'students.manage', 'registration.manage', 'registration.review',
+    ...academicRead, 'admissions.review', 'students.manage', 'registration.manage', 'registration.review', 'academics.settings.manage',
   ], ['Applications assigned', 'Records to verify', 'Registrations to review', 'Faculty progression'], [
     'Verify records and applications within assigned scope.', 'Monitor registration compliance.', 'Prepare faculty-level academic reports.',
   ]),
@@ -126,17 +143,17 @@ export const roleProfiles = {
     'Review applications and verify supporting documents.', 'Request missing information and record recommendations.', 'Process decisions through the configured approval workflow.',
   ]),
   dean: role('Dean / Head of Faculty', 'Faculty-level academic oversight and configured review.', 'Assigned faculty', [
-    ...academicRead, 'admissions.read', 'academics.manage', 'registration.review', 'results.moderate',
+    ...academicRead, 'admissions.read', 'academics.manage', 'academics.settings.manage', 'registration.review', 'results.moderate',
   ], ['Faculty enrolment', 'Course offerings', 'Results to moderate', 'Progression indicators'], [
     'Review faculty programmes and student cohorts.', 'Monitor course delivery and academic progress.', 'Participate in faculty approval workflows.',
   ]),
   headOfDepartment: role('Head of Department', 'Department academic coordination and result moderation.', 'Assigned department', [
-    ...academicRead, 'academics.manage', 'timetable.manage', 'results.moderate', 'assignments.manage',
+    ...academicRead, 'academics.manage', 'academics.settings.manage', 'timetable.manage', 'results.moderate', 'assignments.manage',
   ], ['Department enrolment', 'Teaching allocations', 'Results to moderate', 'Missing marks'], [
     'Coordinate course offerings and lecturer assignments.', 'Review coursework and submitted marks.', 'Monitor department progression and workload.',
   ]),
   programmeCoordinator: role('Programme Coordinator', 'Programme curriculum, registration and completion monitoring.', 'Assigned programme', [
-    ...academicRead, 'academics.manage', 'registration.review', 'results.moderate',
+    ...academicRead, 'academics.manage', 'academics.settings.manage', 'registration.review', 'results.moderate',
   ], ['Programme cohort', 'Course registration', 'Curriculum coverage', 'Completion requirements'], [
     'Monitor curriculum delivery and course registration.', 'Track assigned student progress.', 'Coordinate programme teaching and assessment schedules.',
   ]),
@@ -157,7 +174,7 @@ export const roleProfiles = {
     'Review permitted attendance and performance summaries.', 'Record authorised academic advising notes.', 'Refer students through approved support workflows.',
   ]),
   financeManager: role('Finance Manager / Bursar', 'Student accounts, reconciliations and authorised financial approvals.', 'Assigned finance scope', [
-    'dashboard.open', 'dashboard.finance.read', 'finance.read', 'finance.manage', 'payments.verify', 'finance.approve',
+    'dashboard.open', 'dashboard.finance.read', 'finance.read', 'finance.manage', 'finance.settings.manage', 'payments.verify', 'finance.approve',
     'reports.finance.read', 'notifications.read',
   ], ['Total invoiced', 'Confirmed receipts', 'Outstanding balances', 'Reconciliation exceptions'], [
     'Manage approved fee structures and student accounts.', 'Review reconciliation and financial reports.', 'Approve adjustments and refunds within delegated authority.',
@@ -173,37 +190,37 @@ export const roleProfiles = {
     'Review scholarship applications and approved awards.', 'Track award periods, limits and funding allocations.', 'Prepare authorised sponsor reports.',
   ]),
   humanResourcesOfficer: role('Human Resources Officer', 'Restricted staff profile, employment and leave administration.', 'Assigned HR scope', [
-    'dashboard.open', 'staff.manage', 'reports.scope.read', 'notifications.read',
+    'dashboard.open', 'staff.manage', 'staff.settings.manage', 'reports.scope.read', 'notifications.read',
   ], ['Staff records', 'Contracts to review', 'Leave requests', 'Qualifications to verify'], [
     'Maintain staff profiles and employment records.', 'Track qualifications, contracts and leave requests.', 'Access payroll only through separate permissions or integration.',
   ]),
   librarian: role('Librarian', 'Library catalogue, circulation and clearance operations.', 'Assigned library', [
-    'dashboard.open', 'library.manage', 'reports.scope.read', 'notifications.read',
+    'dashboard.open', 'library.manage', 'library.settings.manage', 'reports.scope.read', 'notifications.read',
   ], ['Items on loan', 'Overdue items', 'Reservations', 'Clearance requests'], [
     'Maintain catalogues and circulation records.', 'Track returns, reservations and configured fines.', 'Process authorised library clearance.',
   ]),
   accommodationOfficer: role('Hostel / Accommodation Officer', 'Accommodation allocation, occupancy and check-in operations.', 'Assigned residences', [
-    'dashboard.open', 'accommodation.manage', 'reports.scope.read', 'notifications.read',
+    'dashboard.open', 'accommodation.manage', 'accommodation.settings.manage', 'reports.scope.read', 'notifications.read',
   ], ['Available beds', 'Allocation requests', 'Current occupancy', 'Check-outs due'], [
     'Manage rooms, capacity and allocation requests.', 'Record approved check-ins and check-outs.', 'Report occupancy and authorised accommodation charges.',
   ]),
   internshipCoordinator: role('Industrial Training / Internship Coordinator', 'Placement assignments, supervision and completion tracking.', 'Assigned programmes and placements', [
-    'dashboard.open', 'internships.manage', 'students.read', 'reports.scope.read', 'notifications.read',
+    'dashboard.open', 'internships.manage', 'internships.settings.manage', 'students.read', 'reports.scope.read', 'notifications.read',
   ], ['Active placements', 'Students awaiting placement', 'Logbooks to review', 'Completion reviews'], [
     'Manage placement organisations and supervisors.', 'Track logbooks, assessment submissions and placement dates.', 'Record placement completion and outstanding requirements.',
   ]),
   qualityAssuranceOfficer: role('Quality Assurance Officer', 'Programme evaluation, quality evidence and improvement actions.', 'Assigned quality scope', [
-    'dashboard.open', 'quality.manage', 'reports.scope.read', 'reports.institution.read', 'notifications.read',
+    'dashboard.open', 'quality.manage', 'quality.settings.manage', 'reports.scope.read', 'reports.institution.read', 'notifications.read',
   ], ['Evaluations open', 'Programmes under review', 'Improvement actions', 'Reports due'], [
     'Manage evaluations and quality-assurance records.', 'Review course and programme performance.', 'Track approved improvement actions and reporting.',
   ]),
   studentWelfareOfficer: role('Student Welfare / Counselling Officer', 'Strictly restricted support appointments, referrals and case follow-up.', 'Assigned welfare cases only', [
-    'dashboard.open', 'welfare.manage', 'notifications.read',
+    'dashboard.open', 'welfare.manage', 'welfare.settings.manage', 'notifications.read',
   ], ['Appointments scheduled', 'Referrals to follow up', 'Open support cases', 'Follow-ups due'], [
     'Manage support appointments and approved referrals.', 'Maintain restricted welfare records with access auditing.', 'Do not disclose case details in general academic reports.',
   ]),
   procurementOfficer: role('Procurement / Inventory Officer', 'Inventory, requisitions, assets and approved procurement tracking.', 'Assigned procurement scope', [
-    'dashboard.open', 'procurement.manage', 'reports.scope.read', 'notifications.read',
+    'dashboard.open', 'procurement.manage', 'procurement.settings.manage', 'reports.scope.read', 'notifications.read',
   ], ['Requisitions pending', 'Orders in progress', 'Low-stock alerts', 'Assets to verify'], [
     'Maintain supplier, inventory and asset records.', 'Track requisitions and approved stock movements.', 'Prepare procurement reports within assigned permissions.',
   ]),

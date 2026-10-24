@@ -1,5 +1,4 @@
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons'
+import { CircleHelp } from 'lucide-react'
 
 interface ModulePlaceholderPageProps {
   title: string
@@ -16,7 +15,7 @@ export function ModulePlaceholderPage({ title }: ModulePlaceholderPageProps) {
         </div>
       </div>
       <div className="module-notice" role="status">
-        <FontAwesomeIcon icon={faCircleInfo} aria-hidden="true" />
+        <CircleHelp size={18} aria-hidden="true" />
         <p>
           <strong>Module foundation only</strong>
           This module has a route in the frontend structure. Its workflows and live records will be added in a later implementation phase.

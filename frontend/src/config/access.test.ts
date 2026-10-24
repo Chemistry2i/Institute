@@ -22,4 +22,24 @@ describe('role-based access configuration', () => {
     expect(hasPermission('financeManager', 'finance.approve')).toBe(true)
     expect(hasPermission('financeManager', 'results.correct')).toBe(false)
   })
+
+  it('grants settings access by institutional scope rather than a broad staff role', () => {
+    expect(getNavigationForRole('institutionHead').map((item) => item.path)).toContain('/settings')
+    expect(getNavigationForRole('financeManager').map((item) => item.path)).toContain('/settings')
+    expect(getNavigationForRole('student').map((item) => item.path)).not.toContain('/settings')
+    expect(hasPermission('institutionHead', 'institution.profile.manage')).toBe(true)
+    expect(hasPermission('institutionHead', 'finance.settings.manage')).toBe(false)
+  })
+
+  it('includes registrar academic workspaces without granting them to students', () => {
+    const registrarPaths = getNavigationForRole('academicRegistrar').map((item) => item.path)
+    const studentPaths = getNavigationForRole('student').map((item) => item.path)
+
+    expect(registrarPaths).toContain('/admissions')
+    expect(registrarPaths).toContain('/registration')
+    expect(registrarPaths).toContain('/results')
+    expect(registrarPaths).toContain('/graduation')
+    expect(studentPaths).not.toContain('/admissions')
+    expect(studentPaths).not.toContain('/graduation')
+  })
 })

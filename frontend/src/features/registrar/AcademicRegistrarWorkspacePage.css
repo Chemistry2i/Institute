@@ -1,0 +1,423 @@
+.registrar-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.registrar-dashboard-grid .surface-panel,
+.registrar-process-panel,
+.registrar-record-panel {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+}
+
+.registrar-queue-list,
+.registrar-shortcut-grid {
+  display: grid;
+  margin-top: 12px;
+}
+
+.registrar-queue-link {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-h);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.registrar-queue-link:hover,
+.registrar-shortcut:hover,
+.registrar-related-link:hover {
+  color: var(--accent);
+}
+
+.registrar-queue-link > span:nth-child(2) {
+  flex: 1;
+}
+
+.queue-value {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.registrar-shortcut-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.registrar-shortcut {
+  display: flex;
+  min-width: 0;
+  min-height: 38px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-h);
+  font-size: 10px;
+  text-decoration: none;
+}
+
+.registrar-shortcut > svg:first-child {
+  flex: 0 0 auto;
+  color: var(--accent);
+}
+
+.registrar-shortcut > span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.registrar-trend,
+.registrar-responsibilities {
+  min-height: 220px;
+}
+
+.registrar-workspace-page {
+  display: grid;
+  gap: 12px;
+}
+
+.registrar-workspace-page .page-heading {
+  margin-bottom: 2px;
+}
+
+.registrar-workspace-metrics {
+  margin-bottom: 0;
+}
+
+.registrar-process-panel,
+.registrar-record-panel {
+  margin: 0;
+}
+
+.registrar-workflow-actions,
+.registrar-export-controls,
+.registrar-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.registrar-workflow-actions > .ui-button,
+.registrar-export-controls > .ui-button {
+  white-space: nowrap;
+}
+
+.registrar-export-controls .ui-select-trigger {
+  min-width: 90px;
+  min-height: 30px;
+}
+
+.registrar-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+}
+
+.registrar-filter-bar > .registrar-search {
+  width: min(100%, 260px);
+  margin-right: auto;
+}
+
+.registrar-filter-bar > .ui-select-trigger {
+  min-width: 145px;
+  min-height: 34px;
+}
+
+.registrar-clear-search {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.registrar-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text);
+  font-size: 10px;
+}
+
+.registrar-date-filter input {
+  min-height: 34px;
+  padding: 0 7px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text-h);
+  font-size: 10px;
+}
+
+.registrar-sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.registrar-sort-button:hover { color: var(--accent); }
+.registrar-sort-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.registrar-pagination {
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  color: var(--text);
+  font-size: 10px;
+}
+
+.registrar-pagination-controls > label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.registrar-pagination-controls .ui-select-trigger {
+  min-width: 58px;
+  min-height: 29px;
+  padding: 3px 6px;
+}
+
+.registrar-dialog-workflow {
+  display: grid;
+  gap: 7px;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.registrar-dialog-workflow li {
+  display: flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 9px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-h);
+  font-size: 11px;
+}
+
+.registrar-dialog-workflow li > span {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.registrar-workflow-steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.registrar-workflow-steps li {
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-h);
+  font-size: 10px;
+}
+
+.workflow-step-number {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 21px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.workflow-step-arrow {
+  margin-left: auto;
+  flex: 0 0 auto;
+  color: var(--text);
+}
+
+.registrar-record-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.registrar-record-heading .panel-subtitle {
+  max-width: 650px;
+}
+
+.registrar-search {
+  display: flex;
+  width: min(100%, 260px);
+  min-height: 34px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 9px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+}
+
+.registrar-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 10px;
+}
+
+.registrar-search input::placeholder {
+  color: var(--text);
+}
+
+.registrar-table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.registrar-table {
+  min-width: 720px;
+  margin: 0;
+  color: var(--text-h);
+  font-size: 10px;
+}
+
+.registrar-table thead th {
+  padding: 10px;
+  border-bottom-color: var(--border);
+  background: var(--social-bg);
+  color: var(--text);
+  font-size: 9px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.registrar-table tbody td {
+  padding: 0;
+  border-bottom: 0;
+  background: var(--surface);
+}
+
+.registrar-empty-state {
+  display: grid;
+  min-height: 190px;
+  align-content: center;
+  justify-items: center;
+  gap: 8px;
+  padding: 20px;
+  color: var(--text);
+  text-align: center;
+}
+
+.registrar-empty-state > svg {
+  color: var(--accent);
+}
+
+.registrar-empty-state strong {
+  color: var(--text-h);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.registrar-empty-state span {
+  max-width: 430px;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.registrar-workspace-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text);
+  font-size: 10px;
+}
+
+.registrar-related-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+@media (max-width: 920px) {
+  .registrar-dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .registrar-record-heading,
+  .registrar-workspace-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .registrar-search {
+    width: 100%;
+  }
+
+  .registrar-pagination {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .registrar-pagination-controls {
+    flex-wrap: wrap;
+  }
+
+  .registrar-shortcut-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBell, faGraduationCap, faMoon, faBars, faSun, faXmark } from '@fortawesome/free-solid-svg-icons'
+import { Bell, GraduationCap, Menu, Moon, PanelLeftClose, PanelLeftOpen, Sun, X } from 'lucide-react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { getNavigationForRole } from '../../config/access'
 import { roleProfiles, type RoleId } from '../../config/roles'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import '../../App.css'
 
 export interface AppShellContext {
@@ -12,6 +12,7 @@ export interface AppShellContext {
 
 export function AppShell() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [roleId, setRoleId] = useState<RoleId>('institutionHead')
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const location = useLocation()
@@ -23,10 +24,10 @@ export function AppShell() {
   }, [theme])
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${sidebarCollapsed ? ' is-sidebar-collapsed' : ''}`}>
       <aside className={`sidebar${menuOpen ? ' is-open' : ''}`}>
         <NavLink className="brand" to="/" aria-label="ACMIS overview">
-          <span className="brand-mark"><FontAwesomeIcon icon={faGraduationCap} aria-hidden="true" /></span>
+          <span className="brand-mark"><GraduationCap size={20} aria-hidden="true" /></span>
           <span>
             <span className="brand-name">ACMIS</span>
             <span className="brand-caption">Academic Management</span>
@@ -40,15 +41,17 @@ export function AppShell() {
             return (
               <div className="nav-group" key={group}>
                 <p className="nav-label">{group}</p>
-                {groupItems.map(({ icon, label, path }) => (
-                  <NavLink
+                {groupItems.map(({ icon: Icon, label, path }) => (
+                    <NavLink
                     key={path}
                     className={({ isActive }) => `nav-link${isActive ? ' active' : ''}`}
                     to={path}
                     end={path === '/'}
+                      aria-label={label}
+                      title={sidebarCollapsed ? label : undefined}
                     onClick={() => setMenuOpen(false)}
                   >
-                    <FontAwesomeIcon icon={icon} aria-hidden="true" />
+                    <Icon size={15} aria-hidden="true" />
                     <span>{label}</span>
                   </NavLink>
                 ))}
@@ -67,19 +70,28 @@ export function AppShell() {
         <header className="topbar">
           <div className="topbar-start">
             <button
+              className="desktop-sidebar-toggle icon-button"
+              type="button"
+              aria-label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+              aria-expanded={!sidebarCollapsed}
+              onClick={() => setSidebarCollapsed((collapsed) => !collapsed)}
+            >
+              {sidebarCollapsed ? <PanelLeftOpen size={16} aria-hidden="true" /> : <PanelLeftClose size={16} aria-hidden="true" />}
+            </button>
+            <button
               className="mobile-menu-button"
               type="button"
               aria-label={menuOpen ? 'Close navigation' : 'Open navigation'}
               aria-expanded={menuOpen}
               onClick={() => setMenuOpen((open) => !open)}
             >
-              <FontAwesomeIcon icon={menuOpen ? faXmark : faBars} aria-hidden="true" />
+              {menuOpen ? <X size={18} aria-hidden="true" /> : <Menu size={18} aria-hidden="true" />}
             </button>
             <span className="breadcrumb">ACMIS&nbsp; / &nbsp;{activePage?.label ?? 'Overview'}</span>
           </div>
           <div className="topbar-actions">
             <button className="icon-button" type="button" aria-label="Notifications unavailable until sign in is connected" disabled>
-              <FontAwesomeIcon icon={faBell} aria-hidden="true" />
+              <Bell size={16} aria-hidden="true" />
             </button>
             <button
               className="icon-button"
@@ -87,25 +99,28 @@ export function AppShell() {
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
               onClick={() => setTheme((current) => current === 'light' ? 'dark' : 'light')}
             >
-              <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} aria-hidden="true" />
+              {theme === 'light' ? <Moon size={16} aria-hidden="true" /> : <Sun size={16} aria-hidden="true" />}
             </button>
-            <label className="role-preview">
+            <div className="role-preview">
               <span>Preview role</span>
-              <select
-                aria-label="Preview dashboard as role"
+              <Select
                 value={roleId}
-                onChange={(event) => {
-                  const selectedRoleId = event.target.value
+                onValueChange={(selectedRoleId) => {
                   if (Object.hasOwn(roleProfiles, selectedRoleId)) {
                     setRoleId(selectedRoleId as RoleId)
                   }
                 }}
               >
-                {Object.entries(roleProfiles).map(([id, profile]) => (
-                  <option key={id} value={id}>{profile.label}</option>
-                ))}
-              </select>
-            </label>
+                <SelectTrigger aria-label="Preview dashboard as role">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(roleProfiles).map(([id, profile]) => (
+                    <SelectItem key={id} value={id}>{profile.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </header>
         <main className="page-content">

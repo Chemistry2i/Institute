@@ -1,0 +1,143 @@
+.settings-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin: 0 0 14px;
+  padding: 12px 14px;
+  border: 1px solid var(--accent-border);
+  border-radius: 5px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+}
+
+.settings-notice > svg {
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.settings-notice p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.settings-notice strong {
+  margin-right: 4px;
+}
+
+.settings-sections {
+  display: grid;
+  gap: 10px;
+}
+
+.settings-section {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: var(--surface);
+}
+
+.settings-section-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  margin-bottom: 13px;
+}
+
+.settings-section-icon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--accent-bg);
+  color: var(--accent);
+  font-size: 12px;
+}
+
+.settings-section-heading h2 {
+  margin: 0;
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.settings-section-heading p {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 10px;
+}
+
+.settings-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.settings-field {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: var(--text-h);
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.settings-field.is-wide {
+  grid-column: 1 / -1;
+}
+
+.settings-field input,
+.settings-field .ui-select-trigger,
+.settings-field textarea {
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.settings-field textarea {
+  min-height: 64px;
+  resize: vertical;
+}
+
+.settings-field input::placeholder,
+.settings-field textarea::placeholder {
+  color: var(--text);
+  opacity: 0.8;
+}
+
+.settings-form-footer {
+  display: flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.settings-form-footer [role='status'] {
+  margin-right: auto;
+  color: var(--text);
+  font-size: 10px;
+}
+
+@media (max-width: 640px) {
+  .settings-section {
+    padding: 13px;
+  }
+
+  .settings-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .settings-field.is-wide {
+    grid-column: auto;
+  }
+}

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600&display=swap');
 
 :root {
   --text: #52647d;
@@ -13,12 +13,14 @@
   --social-bg: rgba(241, 245, 249, 0.8);
   --warning: #b45309;
   --shadow: rgba(15, 23, 42, 0.1) 0 10px 15px -3px, rgba(15, 23, 42, 0.05) 0 4px 6px -2px;
-  --sans: 'Poppins', sans-serif;
-  --heading: 'Poppins', sans-serif;
+  --sans: 'Work Sans', sans-serif;
+  --heading: 'Work Sans', sans-serif;
   --mono: ui-monospace, Consolas, monospace;
-  --bs-body-font-family: 'Poppins', sans-serif;
+  --bs-body-font-family: 'Work Sans', sans-serif;
+  --bs-body-font-weight: 400;
 
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 400;
   color: #172b4d;
   background: #f8fafc;
   color-scheme: light;
@@ -47,7 +49,7 @@
 }
 
 * { box-sizing: border-box; }
-body { min-width: 320px; min-height: 100vh; margin: 0; background: var(--bg); font-family: var(--sans); }
+body { min-width: 320px; min-height: 100vh; margin: 0; background: var(--bg); font-family: var(--sans); font-weight: 400; }
 button, input, select, textarea { font: inherit; }
 button { color: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid rgba(23, 105, 170, 0.28); outline-offset: 2px; }
