@@ -1,0 +1,29 @@
+{
+  "routes": [
+    { "path": "/login", "title": "Sign in" },
+    { "path": "/", "title": "Dashboard" },
+    { "path": "/admissions", "title": "Admissions" },
+    { "path": "/students", "title": "Students" },
+    { "path": "/academics", "title": "Academic structure" },
+    { "path": "/registration", "title": "Registration" },
+    { "path": "/timetabling", "title": "Timetabling" },
+    { "path": "/attendance", "title": "Attendance" },
+    { "path": "/examinations", "title": "Examinations" },
+    { "path": "/finance", "title": "Finance" },
+    { "path": "/scholarships", "title": "Scholarships & sponsorships" },
+    { "path": "/learning", "title": "Learning resources" },
+    { "path": "/library", "title": "Library management" },
+    { "path": "/staff", "title": "Staff & HR" },
+    { "path": "/accommodation", "title": "Accommodation" },
+    { "path": "/internship", "title": "Internship & research" },
+    { "path": "/welfare", "title": "Student welfare" },
+    { "path": "/graduation", "title": "Graduation & alumni" },
+    { "path": "/communications", "title": "Communications" },
+    { "path": "/quality", "title": "Quality assurance" },
+    { "path": "/procurement", "title": "Procurement & inventory" },
+    { "path": "/reports", "title": "Reports" },
+    { "path": "/users", "title": "Users & roles" },
+    { "path": "/administration", "title": "System administration & audit" },
+    { "path": "/settings", "title": "Settings" }
+  ]
+}
