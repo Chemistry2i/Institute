@@ -32,7 +32,13 @@ public class BootstrapData {
             "institution:read", "Read institution configuration",
             "institution:write", "Manage institution configuration",
             "user:read", "Read user accounts",
-            "user:write", "Manage user accounts"
+            "user:write", "Manage user accounts",
+            "student:read", "Read student records",
+            "student:write", "Manage student records",
+            "academic:read", "Read academic structure",
+            "academic:write", "Manage academic structure",
+            "registration:read", "Read course registrations",
+            "registration:write", "Manage course registrations"
         );
         permissionDefinitions.forEach((code, description) -> permissions.findById(code).orElseGet(() -> permissions.save(new Permission(code, description))));
 
