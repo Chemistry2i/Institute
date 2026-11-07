@@ -103,6 +103,7 @@ function LoginPage() {
 function Shell() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [modulesOpen, setModulesOpen] = useState(true)
   const { role, setRole, can, mode, setMode } = useAppContext()
   const location = useLocation()
   const navigate = useNavigate()
@@ -115,7 +116,7 @@ function Shell() {
     toast.success(`Previewing ${nextRole} permissions`)
   }
 
-  return <div className="shell">
+  return <div className={`shell ${collapsed ? 'shell-collapsed' : ''}`}>
     <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''} ${mobileOpen ? 'sidebar-mobile-open' : ''}`}>
       <div className="sidebar-brand">
         <div className="brand-mark"><span>T</span><i /></div>
@@ -127,15 +128,21 @@ function Shell() {
         {!collapsed && <div className="institution-details"><strong>{institutionDefaults.shortName} Campus</strong><span>{institutionDefaults.activeTerm}</span></div>}
         {!collapsed && <ChevronDown size={15} className="text-muted" />}
       </div>
-      <div className="sidebar-section-label">Workspace</div>
-      <nav className="sidebar-nav" aria-label="Primary navigation">
-        {visibleMain.map((item) => <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}
-      </nav>
-      {visibleAdmin.length > 0 && <>
-        <div className="sidebar-section-label sidebar-section-admin">Administration</div>
-        <nav className="sidebar-nav">{visibleAdmin.map((item) => <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}</nav>
-      </>}
-      <div className="sidebar-spacer" />
+      <div className="sidebar-scroll">
+        <div className="sidebar-section-toggle-wrap">
+          <button className="sidebar-section-toggle" type="button" aria-expanded={modulesOpen} onClick={() => setModulesOpen((open) => !open)}>
+            <span className="sidebar-section-label">Modules</span>
+            {!collapsed && <ChevronDown size={14} className={modulesOpen ? 'sidebar-chevron-open' : ''} />}
+          </button>
+        </div>
+        {modulesOpen && <nav className="sidebar-nav" aria-label="Module navigation">
+          {visibleMain.map((item) => <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}
+        </nav>}
+        {visibleAdmin.length > 0 && <>
+          <div className="sidebar-section-label sidebar-section-admin">Administration</div>
+          <nav className="sidebar-nav" aria-label="Administration navigation">{visibleAdmin.map((item) => <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}</nav>
+        </>}
+      </div>
       {!collapsed && <div className="sidebar-status"><div className="status-dot" /><div><strong>All systems operational</strong><span>Last checked 2 min ago</span></div></div>}
       <div className="sidebar-profile">
         <div className="profile-avatar">SN</div>
