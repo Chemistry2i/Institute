@@ -28,17 +28,20 @@ public class BootstrapData {
     @Transactional
     void seed(RoleRepository roles, PermissionRepository permissions, UserAccountRepository users,
               PasswordEncoder passwordEncoder, String adminEmail, String adminPassword) {
-        Map<String, String> permissionDefinitions = Map.of(
-            "institution:read", "Read institution configuration",
-            "institution:write", "Manage institution configuration",
-            "user:read", "Read user accounts",
-            "user:write", "Manage user accounts",
-            "student:read", "Read student records",
-            "student:write", "Manage student records",
-            "academic:read", "Read academic structure",
-            "academic:write", "Manage academic structure",
-            "registration:read", "Read course registrations",
-            "registration:write", "Manage course registrations"
+        Map<String, String> permissionDefinitions = Map.ofEntries(
+            Map.entry("institution:read", "Read institution configuration"),
+            Map.entry("institution:write", "Manage institution configuration"),
+            Map.entry("user:read", "Read user accounts"),
+            Map.entry("user:write", "Manage user accounts"),
+            Map.entry("student:read", "Read student records"),
+            Map.entry("student:write", "Manage student records"),
+            Map.entry("academic:read", "Read academic structure"),
+            Map.entry("academic:write", "Manage academic structure"),
+            Map.entry("registration:read", "Read course registrations"),
+            Map.entry("registration:write", "Manage course registrations"),
+            Map.entry("operations:read", "Read operational module records"),
+            Map.entry("operations:write", "Manage operational module records"),
+            Map.entry("reports:read", "Read institutional reports")
         );
         permissionDefinitions.forEach((code, description) -> permissions.findById(code).orElseGet(() -> permissions.save(new Permission(code, description))));
 
