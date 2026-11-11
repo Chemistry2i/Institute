@@ -45,7 +45,7 @@ import { FilterModal, FormModal, ModuleWorkspace } from './components/ModuleWork
 import { ModuleLanding, OperationalModuleRoute } from './components/OperationalModule'
 import { Sidebar } from './components/Sidebar'
 import { SettingsPage as SettingsWorkspace } from './components/SettingsPage'
-import { StudentInformation } from './components/StudentInformation'
+import { StudentDocumentsPage, StudentInformation, StudentLifecyclePage, StudentPlacementPage } from './components/StudentInformation'
 import { UsersRolesPage } from './components/UsersRolesPage'
 import {
   admissionsItems,
