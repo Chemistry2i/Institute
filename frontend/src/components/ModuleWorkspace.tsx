@@ -151,6 +151,7 @@ const academicWorkspaceConfigs: Record<string, AcademicWorkspaceConfig> = {
 }
 
 const academicTableFields: Record<string, string[]> = {
+  '/academics/institutions': ['reference', 'applicant', 'institutionType', 'parentInstitution', 'location', 'status'],
   '/academics/programmes': ['reference', 'applicant', 'awardLevel', 'faculty', 'department', 'status'],
   '/academics/courses': ['reference', 'applicant', 'programme', 'creditUnits', 'yearLevel', 'status'],
   '/academics/curricula': ['reference', 'applicant', 'programme', 'effectiveYear', 'totalCredits', 'status'],
