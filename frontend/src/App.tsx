@@ -133,6 +133,9 @@ function StudentManagementRoute() {
     { label: 'Documents', href: '/students/documents' },
   ]} />
   if (pathname === '/students/directory') return <StudentInformation />
+  if (pathname === '/students/placement') return <StudentPlacementPage />
+  if (pathname === '/students/lifecycle') return <StudentLifecyclePage />
+  if (pathname === '/students/documents') return <StudentDocumentsPage />
 
   return <ModuleWorkspace path={pathname} />
 }
