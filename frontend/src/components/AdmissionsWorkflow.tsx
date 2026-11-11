@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Award, BadgeCheck, BookOpen, Building2, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, Download, Eye, FileText, Filter, Globe2, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X, type LucideIcon } from 'lucide-react'
+import { Award, BadgeCheck, Ban, BookOpen, Building2, CalendarDays, Check, ChevronLeft, ChevronRight, CircleX, ClipboardCheck, Clock3, Download, Eye, FileClock, FileText, Filter, Globe2, GraduationCap, Hourglass, Mail, MapPin, Phone, Plus, ScanSearch, Search, Send, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X, type LucideIcon } from 'lucide-react'
 import { getCountries, getCountryCallingCode, type CountryCode } from 'libphonenumber-js/min'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
@@ -92,6 +92,18 @@ const ugandanDistricts = [
 ]
 const formatPhone = (country: CountryCode, number: string) => `+${getCountryCallingCode(country)} ${number.trim()}`
 const requiredDocuments = ['Identity document', 'Academic certificate', 'Academic transcript']
+const stageIcons: Record<ApplicationStage, LucideIcon> = {
+  Submitted: Send,
+  Screening: ScanSearch,
+  'Faculty review': ClipboardCheck,
+  'Documents pending': FileClock,
+  'Offer issued': BadgeCheck,
+  Accepted: Check,
+  Waitlisted: Hourglass,
+  Declined: CircleX,
+  Rejected: Ban,
+  Enrolled: GraduationCap,
+}
 const initialDocuments = requiredDocuments.map((name) => ({ name, status: 'Received' as const, fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf`, required: true }))
 const splitName = (name: string) => {
   const [firstName = '', ...remaining] = name.trim().split(/\s+/)
@@ -382,11 +394,14 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     <div className="admissions-page-heading"><div><div className="eyebrow">Admissions operations</div><h2>{heading.title}</h2><p>{heading.intro}</p></div></div>
     {isPipeline && <section className="application-pipeline-stage-list" aria-label="Filter applications by stage">
       <button type="button" className={`application-pipeline-stage${stageFilter === 'All' ? ' active' : ''}`} onClick={() => setStageFilter('All')} aria-pressed={stageFilter === 'All'}>
-        <span className="application-pipeline-stage-name">All applications</span><strong>{applications.filter((app) => matchesPipelineSearch(app) && (intakeFilter === 'All' || app.intake === intakeFilter) && (programmeFilter === 'All' || app.programme === programmeFilter)).length}</strong>
+        <span className="application-pipeline-stage-icon"><UsersRound size={15} aria-hidden="true" /></span><span className="application-pipeline-stage-name">All applications</span><strong>{applications.filter((app) => matchesPipelineSearch(app) && (intakeFilter === 'All' || app.intake === intakeFilter) && (programmeFilter === 'All' || app.programme === programmeFilter)).length}</strong>
       </button>
-      {stageCounts.map(({ stage, count }) => <button type="button" className={`application-pipeline-stage${stageFilter === stage ? ' active' : ''}`} key={stage} onClick={() => setStageFilter((current) => current === stage ? 'All' : stage)} aria-pressed={stageFilter === stage}>
-        <span className="application-pipeline-stage-name">{stage}</span><strong>{count}</strong>
-      </button>)}
+      {stageCounts.map(({ stage, count }) => {
+        const StageIcon = stageIcons[stage]
+        return <button type="button" className={`application-pipeline-stage${stageFilter === stage ? ' active' : ''}`} key={stage} onClick={() => setStageFilter((current) => current === stage ? 'All' : stage)} aria-pressed={stageFilter === stage}>
+          <span className="application-pipeline-stage-icon"><StageIcon size={15} aria-hidden="true" /></span><span className="application-pipeline-stage-name">{stage}</span><strong>{count}</strong>
+        </button>
+      })}
     </section>}
     <div className="module-toolbar student-toolbar admissions-workflow-toolbar">
       <label className="toolbar-search"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search applicants, references, programmes" aria-label="Search applications" /></label>
