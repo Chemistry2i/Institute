@@ -1,6 +1,6 @@
 import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Award, BadgeCheck, BookOpen, Building2, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, Download, Eye, FileText, Globe2, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X, type LucideIcon } from 'lucide-react'
+import { Award, BadgeCheck, BookOpen, Building2, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, Download, Eye, FileText, Filter, Globe2, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X, type LucideIcon } from 'lucide-react'
 import { getCountries, getCountryCallingCode, type CountryCode } from 'libphonenumber-js/min'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
@@ -192,6 +192,9 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
   const { can } = useAppContext()
   const [applications, setApplications] = useState(readApplications)
   const [search, setSearch] = useState('')
+  const [stageFilter, setStageFilter] = useState<ApplicationStage | 'All'>('All')
+  const [intakeFilter, setIntakeFilter] = useState('All')
+  const [programmeFilter, setProgrammeFilter] = useState('All')
   const [selected, setSelected] = useState<Application | null>(null)
   const [createOpen, setCreateOpen] = useState(false)
   const [documentsOpen, setDocumentsOpen] = useState<Application | null>(null)
@@ -207,15 +210,27 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
   }
   const heading = headings[path] ?? headings['/admissions/application-pipeline']
   const searchTerm = search.trim().toLowerCase()
+  const isPipeline = path === '/admissions/application-pipeline'
+  const pipelineStages: ApplicationStage[] = ['Submitted', 'Screening', 'Faculty review', 'Documents pending', 'Offer issued', 'Accepted', 'Waitlisted', 'Declined', 'Rejected', 'Enrolled']
+  const intakes = [...new Set(applications.map((application) => application.intake).filter(Boolean))].sort()
+  const programmes = [...new Set(applications.map((application) => application.programme).filter(Boolean))].sort()
+  const matchesPipelineSearch = (app: Application) => `${app.id} ${app.name} ${app.email} ${app.programme} ${app.stage}`.toLowerCase().includes(searchTerm)
+  const stageCounts = pipelineStages.map((stage) => ({
+    stage,
+    count: applications.filter((app) => matchesPipelineSearch(app) && (intakeFilter === 'All' || app.intake === intakeFilter) && (programmeFilter === 'All' || app.programme === programmeFilter) && app.stage === stage).length,
+  }))
   const filtered = applications.filter((app) => {
-    const matchesSearch = `${app.id} ${app.name} ${app.email} ${app.programme} ${app.stage}`.toLowerCase().includes(searchTerm)
-    if (!matchesSearch) return false
+    if (!matchesPipelineSearch(app)) return false
+    if (isPipeline && intakeFilter !== 'All' && app.intake !== intakeFilter) return false
+    if (isPipeline && programmeFilter !== 'All' && app.programme !== programmeFilter) return false
+    if (isPipeline && stageFilter !== 'All' && app.stage !== stageFilter) return false
     if (path === '/admissions/applicant-review') return ['Submitted', 'Screening', 'Faculty review'].includes(app.stage)
     if (path === '/admissions/document-verification') return app.documents.some((doc) => doc.status !== 'Verified') || app.stage === 'Documents pending'
     if (path === '/admissions/offers-decisions') return ['Faculty review', 'Offer issued', 'Accepted', 'Waitlisted', 'Declined'].includes(app.stage)
     if (path === '/admissions/matriculation') return ['Accepted', 'Enrolled'].includes(app.stage)
     return true
   })
+  const needsAction = filtered.filter((app) => ['Submitted', 'Screening', 'Faculty review', 'Documents pending', 'Offer issued', 'Accepted', 'Waitlisted'].includes(app.stage)).length
 
   const persist = (next: Application[]) => {
     try {
@@ -241,6 +256,14 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       }
       toast.success(event)
     }
+  }
+  const changePipelineStage = (application: Application, stage: ApplicationStage) => {
+    if (application.stage === stage) return
+    if (stage === 'Enrolled') {
+      toast.error('Use the matriculation workflow to complete enrollment and create the student record.')
+      return
+    }
+    updateApplication(application.id, { stage }, `Stage changed from ${application.stage} to ${stage}`)
   }
   const submitApplication = (details: Pick<Application, 'firstName' | 'middleName' | 'lastName' | 'email' | 'phone' | 'programme' | 'intake'>) => {
     const id = `APP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`
@@ -315,28 +338,63 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     window.setTimeout(() => URL.revokeObjectURL(url), 0)
     toast.success(`${filtered.length} applications exported.`)
   }
+  const exportPipelineCsv = () => {
+    const escapeCell = (value: string | number) => `"${String(value).replace(/"/g, '""')}"`
+    const rows = [
+      ['Reference', 'Applicant', 'Email', 'Phone', 'Programme', 'Intake', 'Stage', 'Verified documents', 'Required documents'],
+      ...filtered.map((app) => [
+        app.id, app.name, app.email, app.phone, app.programme, app.intake, app.stage,
+        app.documents.filter((document) => document.required && document.status === 'Verified').length,
+        app.documents.filter((document) => document.required).length,
+      ]),
+    ]
+    const csv = `\uFEFF${rows.map((row) => row.map(escapeCell).join(',')).join('\r\n')}`
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'application-pipeline.csv'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    window.setTimeout(() => URL.revokeObjectURL(url), 0)
+    toast.success(`${filtered.length} applications exported as CSV.`)
+  }
 
   return <>
     <section className="stats-grid student-kpi-grid" aria-label={`${heading.title} metrics`}>
       <KpiCard label="In this view" value={`${filtered.length}`} detail="Applications matching this queue" tone="blue" icon={UsersRound} />
-      <KpiCard label="Needs action" value={`${filtered.filter((app) => app.stage !== 'Enrolled').length}`} detail="Pending workflow action" tone="amber" icon={CalendarDays} />
+      <KpiCard label="Needs action" value={`${needsAction}`} detail="Pending workflow action" tone="amber" icon={CalendarDays} />
       <KpiCard label="Documents verified" value={`${filtered.filter((app) => app.documents.filter((doc) => doc.required).every((doc) => doc.status === 'Verified')).length}`} detail="All required documents checked" tone="teal" icon={BadgeCheck} />
       <KpiCard label="Enrolled" value={`${filtered.filter((app) => app.stage === 'Enrolled').length}`} detail="Student record created" tone="purple" icon={GraduationCap} />
     </section>
     <div className="admissions-page-heading"><div><div className="eyebrow">Admissions operations</div><h2>{heading.title}</h2><p>{heading.intro}</p></div></div>
-    <div className="module-toolbar student-toolbar">
+    {isPipeline && <section className="application-pipeline-stage-list" aria-label="Filter applications by stage">
+      <button type="button" className={`application-pipeline-stage${stageFilter === 'All' ? ' active' : ''}`} onClick={() => setStageFilter('All')} aria-pressed={stageFilter === 'All'}>
+        <span className="application-pipeline-stage-name">All applications</span><strong>{applications.filter((app) => matchesPipelineSearch(app) && (intakeFilter === 'All' || app.intake === intakeFilter) && (programmeFilter === 'All' || app.programme === programmeFilter)).length}</strong>
+      </button>
+      {stageCounts.map(({ stage, count }) => <button type="button" className={`application-pipeline-stage${stageFilter === stage ? ' active' : ''}`} key={stage} onClick={() => setStageFilter((current) => current === stage ? 'All' : stage)} aria-pressed={stageFilter === stage}>
+        <span className="application-pipeline-stage-name">{stage}</span><strong>{count}</strong>
+      </button>)}
+    </section>}
+    <div className="module-toolbar student-toolbar admissions-workflow-toolbar">
       <label className="toolbar-search"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search applicants, references, programmes" aria-label="Search applications" /></label>
+      {isPipeline && <div className="application-pipeline-filters">
+        <label><span><Filter size={13} />Intake</span><select value={intakeFilter} onChange={(event) => setIntakeFilter(event.target.value)} aria-label="Filter applications by intake"><option>All</option>{intakes.map((intake) => <option key={intake}>{intake}</option>)}</select></label>
+        <label><span><GraduationCap size={13} />Programme</span><select value={programmeFilter} onChange={(event) => setProgrammeFilter(event.target.value)} aria-label="Filter applications by programme"><option>All</option>{programmes.map((programme) => <option key={programme}>{programme}</option>)}</select></label>
+        {(stageFilter !== 'All' || intakeFilter !== 'All' || programmeFilter !== 'All' || search) && <Button type="button" variant="ghost" size="sm" onClick={() => { setStageFilter('All'); setIntakeFilter('All'); setProgrammeFilter('All'); setSearch('') }}><X size={13} />Clear</Button>}
+      </div>}
       <div className="toolbar-actions">
+        {isPipeline && <Button type="button" variant="outline" size="sm" onClick={exportPipelineCsv}><Download size={14} /> Export CSV</Button>}
         <Button type="button" variant="outline" size="sm" onClick={exportApplications}><Download size={14} /> Export queue</Button>
         {path === '/admissions/application-pipeline' && <Button type="button" size="sm" onClick={() => setCreateOpen(true)}><Plus size={14} /> Add application</Button>}
       </div>
     </div>
-    {filtered.length === 0 ? <EmptyState title="No applications in this queue" description="Try another search or check a different admissions workflow." /> : <Card className="module-table-card student-directory-card">
+    {filtered.length === 0 ? <EmptyState title={isPipeline ? 'No matching applications' : 'No applications in this queue'} description={isPipeline ? 'Adjust your search or filters, or add a new application.' : 'Try another search or check a different admissions workflow.'} actionLabel="Clear filters" onAction={isPipeline ? () => { setStageFilter('All'); setIntakeFilter('All'); setProgrammeFilter('All'); setSearch('') } : undefined} /> : <Card className="module-table-card student-directory-card">
       <div className="table-card-head"><div><div className="module-title"><div className="module-title-icon module-icon-teal"><GraduationCap size={19} /></div><div><h2>{heading.title}</h2><p>{filtered.length} matching applications</p></div></div></div><span className="student-directory-hint">Shared application records</span></div>
       <div className="table-responsive"><table className="data-table student-table">
         <thead><tr><th>Application</th><th>Applicant</th><th>Programme</th><th>Intake</th><th>Documents</th><th>Stage</th><th>Actions</th></tr></thead>
         <tbody>{filtered.map((app) => <tr key={app.id}>
-          <td className="reference-code">{app.id}</td><td><div className="table-person"><div><strong>{app.name}</strong><small>{app.email}</small></div></div></td><td>{app.programme}</td><td>{app.intake}</td><td>{app.documents.filter((doc) => doc.required && doc.status === 'Verified').length}/{app.documents.filter((doc) => doc.required).length} verified</td><td><Badge tone={stageTone(app.stage)}>{app.stage}</Badge></td>
+          <td className="reference-code">{app.id}</td><td><div className="table-person"><div><strong>{app.name}</strong><small>{app.email}</small></div></div></td><td>{app.programme}</td><td>{app.intake}</td><td>{app.documents.filter((doc) => doc.required && doc.status === 'Verified').length}/{app.documents.filter((doc) => doc.required).length} verified</td><td>{isPipeline ? <select className="application-pipeline-row-stage" aria-label={`Change stage for ${app.name}`} title={app.stage === 'Enrolled' ? 'Enrollment is managed through matriculation.' : 'Changing this stage adds an entry to application history.'} value={app.stage} disabled={app.stage === 'Enrolled'} onChange={(event) => changePipelineStage(app, event.target.value as ApplicationStage)}>{pipelineStages.map((stage) => <option key={stage} disabled={stage === 'Enrolled'}>{stage}</option>)}</select> : <Badge tone={stageTone(app.stage)}>{app.stage}</Badge>}</td>
           <td><div className="student-row-actions">
             <button type="button" className="student-action-button" onClick={() => setSelected(app)}><Eye size={12} />Details</button>
             {path === '/admissions/applicant-review' && <button type="button" className="student-action-button" onClick={() => setSelected(app)}><ClipboardCheck size={12} />Review</button>}
