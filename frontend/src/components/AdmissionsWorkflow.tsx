@@ -1,15 +1,17 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BadgeCheck, CalendarDays, Check, ClipboardCheck, Download, Eye, FileText, GraduationCap, Mail, Plus, Search, ShieldCheck, Upload, UserRound, UsersRound, X } from 'lucide-react'
+import { BadgeCheck, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, Download, Eye, FileText, GraduationCap, Mail, Plus, Search, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
+import { type StudentProfileData } from '../data'
 import { addMatriculatedStudent, readMatriculatedStudents } from '../demo-store'
 import { Badge, Button, Card, EmptyState, KpiCard } from './ui'
 import { ModalShell } from './ModuleWorkspace'
 
 type ApplicationStage = 'Submitted' | 'Screening' | 'Faculty review' | 'Documents pending' | 'Offer issued' | 'Accepted' | 'Waitlisted' | 'Declined' | 'Rejected' | 'Enrolled'
 type DocumentState = 'Missing' | 'Received' | 'Verified'
-type ApplicationDocument = { name: string; status: DocumentState; fileName: string }
+type ApplicationDocument = { name: string; status: DocumentState; fileName: string; required: boolean }
+type AcademicResult = { subject: string; grade: string; examinationBody: string }
 type Application = {
   id: string
   name: string
@@ -23,21 +25,51 @@ type Application = {
   feesCleared: boolean
   studentId: string
   history: string[]
+  dateOfBirth?: string
+  gender?: string
+  nationality?: string
+  address?: string
+  nextOfKin?: { name: string; relationship: string; phone: string; email: string }
+  previousEducation?: Array<{ institution: string; qualification: string; completionYear: string }>
+  academicResults?: AcademicResult[]
+  secondChoice?: string
+  studyMode?: string
+}
+
+type ApplicationDraft = Pick<Application, 'name' | 'email' | 'phone' | 'programme' | 'intake'> & {
+  dateOfBirth: string
+  gender: string
+  nationality: string
+  address: string
+  nextOfKin: NonNullable<Application['nextOfKin']>
+  institution: string
+  qualification: string
+  completionYear: string
+  academicResults: AcademicResult[]
+  secondChoice: string
+  studyMode: string
+  documents: ApplicationDocument[]
 }
 
 const storageKey = 'tims-demo-admissions-applications'
-const requiredDocuments = ['Identity document', 'Academic transcript']
+const requiredDocuments = ['Identity document', 'Academic certificate', 'Academic transcript']
+const initialDocuments = requiredDocuments.map((name) => ({ name, status: 'Received' as const, fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf`, required: true }))
 const initialApplications: Application[] = [
-  { id: 'APP-2026-1001', name: 'Annette Muwonge', email: 'annette@example.com', phone: '+256 700 000 101', programme: 'BSc Computer Science', intake: 'August 2026', stage: 'Submitted', documents: requiredDocuments.map((name) => ({ name, status: 'Received', fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf` })), identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online'] },
-  { id: 'APP-2026-1002', name: 'Benard Sserunjogi', email: 'benard@example.com', phone: '+256 700 000 102', programme: 'Bachelor of Business Administration', intake: 'August 2026', stage: 'Faculty review', documents: requiredDocuments.map((name) => ({ name, status: 'Verified', fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf` })), identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Passed initial screening'] },
-  { id: 'APP-2026-1003', name: 'Patricia Kintu', email: 'patricia@example.com', phone: '+256 700 000 103', programme: 'Bachelor of Education', intake: 'August 2026', stage: 'Documents pending', documents: [{ name: requiredDocuments[0], status: 'Verified', fileName: 'national-id.pdf' }, { name: requiredDocuments[1], status: 'Missing', fileName: '' }], identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Documents requested'] },
-  { id: 'APP-2026-1004', name: 'Joseph Kasozi', email: 'joseph@example.com', phone: '+256 700 000 104', programme: 'BSc Information Technology', intake: 'August 2026', stage: 'Accepted', documents: requiredDocuments.map((name) => ({ name, status: 'Verified', fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf` })), identityVerified: true, feesCleared: true, studentId: '', history: ['Application submitted online', 'Offer issued', 'Offer accepted'] },
+  { id: 'APP-2026-1001', name: 'Annette Muwonge', email: 'annette@example.com', phone: '+256 700 000 101', programme: 'BSc Computer Science', intake: 'August 2026', stage: 'Submitted', documents: initialDocuments, identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online'] },
+  { id: 'APP-2026-1002', name: 'Benard Sserunjogi', email: 'benard@example.com', phone: '+256 700 000 102', programme: 'Bachelor of Business Administration', intake: 'August 2026', stage: 'Faculty review', documents: initialDocuments.map((doc) => ({ ...doc, status: 'Verified' })), identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Passed initial screening'] },
+  { id: 'APP-2026-1003', name: 'Patricia Kintu', email: 'patricia@example.com', phone: '+256 700 000 103', programme: 'Bachelor of Education', intake: 'August 2026', stage: 'Documents pending', documents: [...initialDocuments.map((doc, index) => ({ ...doc, status: index === 1 ? 'Missing' as const : 'Verified' as const, fileName: index === 1 ? '' : doc.fileName }))], identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Documents requested'] },
+  { id: 'APP-2026-1004', name: 'Joseph Kasozi', email: 'joseph@example.com', phone: '+256 700 000 104', programme: 'BSc Information Technology', intake: 'August 2026', stage: 'Accepted', documents: initialDocuments.map((doc) => ({ ...doc, status: 'Verified' })), identityVerified: true, feesCleared: true, studentId: '', history: ['Application submitted online', 'Offer issued', 'Offer accepted'] },
 ]
 
 function readApplications(): Application[] {
   try {
     const saved: unknown = JSON.parse(localStorage.getItem(storageKey) ?? 'null')
-    if (Array.isArray(saved) && saved.every((item) => item && typeof item.id === 'string' && Array.isArray(item.documents) && Array.isArray(item.history))) return saved as Application[]
+    if (Array.isArray(saved) && saved.every((item) => item && typeof item.id === 'string' && Array.isArray(item.documents) && Array.isArray(item.history))) {
+      return (saved as Application[]).map((application) => ({
+        ...application,
+        documents: application.documents.map((document) => ({ ...document, required: document.required ?? true })),
+      }))
+    }
   } catch {
     toast.error('Saved admissions data could not be read. Showing the demo records.')
   }
@@ -151,7 +183,7 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     const id = `APP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`
     const nextApp: Application = {
       ...details, id, stage: 'Submitted',
-      documents: requiredDocuments.map((name) => ({ name, status: 'Missing', fileName: '' })),
+      documents: requiredDocuments.map((name) => ({ name, status: 'Missing', fileName: '', required: true })),
       identityVerified: false, feesCleared: false, studentId: '',
       history: ['Application submitted online'],
     }
@@ -161,11 +193,35 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     }
   }
   const matriculate = (app: Application) => {
-    if (!app.identityVerified || !app.feesCleared || !app.documents.every((doc) => doc.status === 'Verified')) {
+    if (!app.identityVerified || !app.feesCleared || !app.documents.filter((doc) => doc.required).every((doc) => doc.status === 'Verified')) {
       toast.error('Complete identity, fee, and document clearance before enrollment.')
       return
     }
-    const created = addMatriculatedStudent({ reference: app.id, applicant: app.name, programme: `${app.programme} · ${app.intake}`, status: 'Enrolled' })
+    const profile: Partial<StudentProfileData> = {
+      campus: 'Main campus',
+      faculty: 'Pending faculty assignment',
+      department: 'Pending department assignment',
+      semester: app.intake,
+      intake: app.intake,
+      email: app.email,
+      phone: app.phone,
+      dateOfBirth: app.dateOfBirth ?? '',
+      gender: app.gender ?? 'Not specified',
+      nationality: app.nationality ?? '',
+      address: app.address ?? '',
+      nextOfKin: app.nextOfKin ?? { name: 'Not provided', relationship: 'Not provided', phone: '', email: '' },
+      previousEducation: app.previousEducation ?? [],
+      academicResults: app.academicResults ?? [],
+      secondChoiceProgramme: app.secondChoice ?? '',
+      studyMode: app.studyMode ?? '',
+      statusHistory: [{ date: new Date().toLocaleDateString('en-GB'), status: 'Active', detail: `Matriculated from application ${app.id}.` }],
+      documents: app.documents.map((document) => ({
+        name: document.name,
+        status: document.status === 'Missing' ? 'Pending' : document.status,
+        updated: document.fileName || 'Not uploaded',
+      })),
+    }
+    const created = addMatriculatedStudent({ reference: app.id, applicant: app.name, programme: `${app.programme} · ${app.intake}`, status: 'Enrolled' }, profile)
     if (!created) {
       toast.error('A student record already exists for this applicant.')
       return
@@ -189,7 +245,7 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     <section className="stats-grid student-kpi-grid" aria-label={`${heading.title} metrics`}>
       <KpiCard label="In this view" value={`${filtered.length}`} detail="Applications matching this queue" tone="blue" icon={UsersRound} />
       <KpiCard label="Needs action" value={`${filtered.filter((app) => app.stage !== 'Enrolled').length}`} detail="Pending workflow action" tone="amber" icon={CalendarDays} />
-      <KpiCard label="Documents verified" value={`${filtered.filter((app) => app.documents.every((doc) => doc.status === 'Verified')).length}`} detail="All required documents checked" tone="teal" icon={BadgeCheck} />
+      <KpiCard label="Documents verified" value={`${filtered.filter((app) => app.documents.filter((doc) => doc.required).every((doc) => doc.status === 'Verified')).length}`} detail="All required documents checked" tone="teal" icon={BadgeCheck} />
       <KpiCard label="Enrolled" value={`${filtered.filter((app) => app.stage === 'Enrolled').length}`} detail="Student record created" tone="purple" icon={GraduationCap} />
     </section>
     <div className="admissions-page-heading"><div><div className="eyebrow">Admissions operations</div><h2>{heading.title}</h2><p>{heading.intro}</p></div></div>
@@ -205,7 +261,7 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       <div className="table-responsive"><table className="data-table student-table">
         <thead><tr><th>Application</th><th>Applicant</th><th>Programme</th><th>Intake</th><th>Documents</th><th>Stage</th><th>Actions</th></tr></thead>
         <tbody>{filtered.map((app) => <tr key={app.id}>
-          <td className="reference-code">{app.id}</td><td><div className="table-person"><div><strong>{app.name}</strong><small>{app.email}</small></div></div></td><td>{app.programme}</td><td>{app.intake}</td><td>{app.documents.filter((doc) => doc.status === 'Verified').length}/{app.documents.length} verified</td><td><Badge tone={stageTone(app.stage)}>{app.stage}</Badge></td>
+          <td className="reference-code">{app.id}</td><td><div className="table-person"><div><strong>{app.name}</strong><small>{app.email}</small></div></div></td><td>{app.programme}</td><td>{app.intake}</td><td>{app.documents.filter((doc) => doc.required && doc.status === 'Verified').length}/{app.documents.filter((doc) => doc.required).length} verified</td><td><Badge tone={stageTone(app.stage)}>{app.stage}</Badge></td>
           <td><div className="student-row-actions">
             <button type="button" className="student-action-button" onClick={() => setSelected(app)}><Eye size={12} />Details</button>
             {path === '/admissions/applicant-review' && <button type="button" className="student-action-button" onClick={() => setSelected(app)}><ClipboardCheck size={12} />Review</button>}
@@ -218,7 +274,7 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     </Card>}
     {selected && <ApplicationActionDialog application={selected} path={path} onClose={() => setSelected(null)} onStageChange={(stage, history) => updateApplication(selected.id, { stage }, history)} onClearanceChange={(patch) => updateApplication(selected.id, patch, 'Matriculation clearance updated', false)} onMatriculate={() => matriculate(selected)} />}
     {documentsOpen && <ApplicationDocumentsDialog application={documentsOpen} onClose={() => setDocumentsOpen(null)} onSave={(documents) => {
-      const allVerified = documents.every((doc) => doc.status === 'Verified')
+      const allVerified = documents.filter((doc) => doc.required).every((doc) => doc.status === 'Verified')
       updateApplication(documentsOpen.id, { documents, stage: allVerified ? 'Faculty review' : 'Documents pending' }, allVerified ? 'All required documents verified' : 'Document verification updated')
     }} />}
     {createOpen && <ApplicationCreateDialog onClose={() => setCreateOpen(false)} onSubmit={submitApplication} />}
@@ -230,16 +286,17 @@ export function OnlineApplicationPage() {
   const [reference, setReference] = useState('')
   const [tracked, setTracked] = useState<Application | null>(null)
   const [mode, setMode] = useState<'apply' | 'track'>('apply')
-  const submit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const form = new FormData(event.currentTarget)
+  const submitApplication = (draft: ApplicationDraft) => {
     const application: Application = {
       id: `APP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
-      name: String(form.get('name')).trim(), email: String(form.get('email')).trim(),
-      phone: String(form.get('phone')).trim(), programme: String(form.get('programme')),
-      intake: String(form.get('intake')), stage: 'Submitted',
-      documents: requiredDocuments.map((name) => ({ name, status: 'Missing', fileName: '' })),
-      identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online'],
+      name: draft.name.trim(), email: draft.email.trim(), phone: draft.phone.trim(),
+      programme: draft.programme, intake: draft.intake, stage: 'Submitted',
+      documents: draft.documents, identityVerified: false, feesCleared: false,
+      studentId: '', history: ['Application submitted online'],
+      dateOfBirth: draft.dateOfBirth, gender: draft.gender, nationality: draft.nationality,
+      address: draft.address, nextOfKin: draft.nextOfKin,
+      previousEducation: [{ institution: draft.institution, qualification: draft.qualification, completionYear: draft.completionYear }],
+      academicResults: draft.academicResults, secondChoice: draft.secondChoice, studyMode: draft.studyMode,
     }
     try {
       const next = [application, ...applications]
@@ -291,21 +348,132 @@ export function OnlineApplicationPage() {
     <Card className="online-application-card">
       <div className="online-application-brand"><span className="online-application-mark"><GraduationCap size={20} /></span><div><div className="eyebrow">Applicant portal · Frontend demo</div><h2>Apply to Peculiar Metropolitan Institute</h2><p>Submit an application or check progress with your reference number.</p></div></div>
       <div className="student-profile-tabs" role="tablist" aria-label="Applicant portal actions"><button type="button" role="tab" aria-selected={mode === 'apply'} className={mode === 'apply' ? 'active' : ''} onClick={() => { setMode('apply'); setTracked(null) }}><Plus size={13} />New application</button><button type="button" role="tab" aria-selected={mode === 'track'} className={mode === 'track' ? 'active' : ''} onClick={() => setMode('track')}><Search size={13} />Track application</button></div>
-      {mode === 'apply' ? <form className="online-application-form" onSubmit={submit}>
-        <label>Full legal name<input name="name" autoComplete="name" required /></label>
-        <label>Email address<input name="email" type="email" autoComplete="email" required /></label>
-        <label>Phone number<input name="phone" type="tel" autoComplete="tel" required /></label>
-        <label>Programme<select name="programme" defaultValue="" required><option value="" disabled>Select a programme</option><option>BSc Computer Science</option><option>BSc Information Technology</option><option>Bachelor of Business Administration</option><option>Bachelor of Education</option><option>Diploma in Business</option></select></label>
-        <label>Intake<select name="intake" defaultValue="August 2026"><option>August 2026</option><option>January 2027</option><option>August 2027</option></select></label>
-        <div className="online-application-info"><ShieldCheck size={14} /><span>Supporting documents can be uploaded after submission. Your reference number is required to track progress.</span></div>
-        <Button type="submit"><Plus size={14} />Submit application</Button>
-      </form> : <form className="online-track-form" onSubmit={track}><label>Application reference<input value={reference} onChange={(event) => setReference(event.target.value)} placeholder="e.g. APP-2026-123456" required /></label><Button type="submit"><Search size={14} />Find application</Button></form>}
+      {mode === 'apply' ? <OnlineApplicationWizard onSubmit={submitApplication} /> : <form className="online-track-form" onSubmit={track}><label>Application reference<input value={reference} onChange={(event) => setReference(event.target.value)} placeholder="e.g. APP-2026-123456" required /></label><Button type="submit"><Search size={14} />Find application</Button></form>}
       {tracked && <div className="online-track-result" role="status"><div className="online-track-result-head"><div><small>APPLICATION REFERENCE</small><strong>{tracked.id}</strong></div><Badge tone={stageTone(tracked.stage)}>{tracked.stage}</Badge></div><p>{tracked.name} · {tracked.programme} · {tracked.intake}</p>
         {tracked.stage === 'Offer issued' && <div className="online-offer-response"><strong>Your admission offer is ready.</strong><div><Button type="button" onClick={() => respondToOffer(true)}><Check size={14} />Accept offer</Button><Button type="button" variant="outline" onClick={() => respondToOffer(false)}><X size={14} />Decline</Button></div></div>}
         {!['Accepted', 'Declined', 'Rejected', 'Enrolled'].includes(tracked.stage) && <div className="online-applicant-documents"><strong>Supporting documents</strong>{tracked.documents.map((doc, index) => <div className="online-applicant-document" key={doc.name}><span><FileText size={14} />{doc.name}<small>{doc.fileName || doc.status}</small></span><label className="student-action-button"><Upload size={12} />Upload<input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => uploadApplicantDocument(index, event)} /></label></div>)}<small>Files are not uploaded to a server in this demo.</small></div>}
         <ol>{tracked.history.slice(0, 5).map((entry, index) => <li key={`${entry}-${index}`}>{entry}</li>)}</ol><p className="online-track-contact"><Mail size={13} /> Updates to {tracked.email}</p></div>}
       <p className="online-demo-disclaimer">Demo only: applications are stored in this browser. No real account, payment, or document upload is processed.</p>
     </Card>
+  </div>
+}
+
+function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDraft) => void }) {
+  const [step, setStep] = useState(0)
+  const [declarationAccepted, setDeclarationAccepted] = useState(false)
+  const formRef = useRef<HTMLFormElement>(null)
+  const [draft, setDraft] = useState<ApplicationDraft>({
+    name: '', email: '', phone: '', programme: '', intake: 'August 2026',
+    dateOfBirth: '', gender: '', nationality: 'Ugandan', address: '',
+    nextOfKin: { name: '', relationship: '', phone: '', email: '' },
+    institution: '', qualification: '', completionYear: '',
+    academicResults: [{ subject: '', grade: '', examinationBody: 'UNEB' }],
+    secondChoice: '', studyMode: 'Day',
+    documents: [...requiredDocuments.map((name) => ({ name, status: 'Missing' as const, fileName: '', required: true })), { name: 'Passport photo', status: 'Missing', fileName: '', required: false }],
+  })
+  const update = <K extends keyof ApplicationDraft>(key: K, value: ApplicationDraft[K]) => setDraft((current) => ({ ...current, [key]: value }))
+  const updateNextOfKin = (key: keyof ApplicationDraft['nextOfKin'], value: string) => setDraft((current) => ({ ...current, nextOfKin: { ...current.nextOfKin, [key]: value } }))
+  const updateResult = (index: number, patch: Partial<AcademicResult>) => setDraft((current) => ({ ...current, academicResults: current.academicResults.map((result, currentIndex) => currentIndex === index ? { ...result, ...patch } : result) }))
+  const updateDocument = (index: number, event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    if (file.size > 10_000_000) {
+      toast.error('Demo uploads must be smaller than 10 MB.')
+      event.target.value = ''
+      return
+    }
+    update('documents', draft.documents.map((document, currentIndex) => currentIndex === index ? { ...document, status: 'Received', fileName: file.name } : document))
+    event.target.value = ''
+    toast.success(`${file.name} attached to your application draft.`)
+  }
+  const continueStep = () => {
+    if (!formRef.current?.reportValidity()) return
+    if (step === 1 && !draft.academicResults.some((result) => result.subject.trim() && result.grade.trim())) {
+      toast.error('Add at least one subject and grade from your prior results.')
+      return
+    }
+    if (step === 3 && draft.documents.some((document) => document.required && !document.fileName)) {
+      toast.error('Attach each required document before continuing.')
+      return
+    }
+    setStep((current) => Math.min(current + 1, 4))
+  }
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!formRef.current?.reportValidity()) return
+    if (!declarationAccepted) {
+      toast.error('Confirm the declaration before submitting your application.')
+      return
+    }
+    onSubmit(draft)
+  }
+  const steps = ['Personal details', 'Education & results', 'Programme choice', 'Documents', 'Review & submit']
+
+  return <div className="application-wizard">
+    <ol className="application-stepper" aria-label="Application steps">
+      {steps.map((label, index) => <li className={`${index === step ? 'current' : ''} ${index < step ? 'complete' : ''}`} key={label}>
+        <button type="button" aria-current={index === step ? 'step' : undefined} disabled={index > step} onClick={() => setStep(index)}><span>{index < step ? <Check size={13} /> : index + 1}</span><small>{label}</small></button>
+      </li>)}
+    </ol>
+    <form ref={formRef} className="online-application-form application-step-form" onSubmit={submit}>
+      {step === 0 && <section className="application-step-content">
+        <div className="application-section-heading"><h3>Personal and contact details</h3><p>Enter your legal identity and a reliable contact address.</p></div>
+        <label className="application-field-wide">Full legal name<input autoComplete="name" value={draft.name} onChange={(event) => update('name', event.target.value)} required /></label>
+        <label>Email address<input type="email" autoComplete="email" value={draft.email} onChange={(event) => update('email', event.target.value)} required /></label>
+        <label>Phone number<input type="tel" autoComplete="tel" value={draft.phone} onChange={(event) => update('phone', event.target.value)} required /></label>
+        <label>Date of birth<input type="date" value={draft.dateOfBirth} onChange={(event) => update('dateOfBirth', event.target.value)} required /></label>
+        <label>Gender<select value={draft.gender} onChange={(event) => update('gender', event.target.value)} required><option value="">Select</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></label>
+        <label>Nationality<input value={draft.nationality} onChange={(event) => update('nationality', event.target.value)} required /></label>
+        <label className="application-field-wide">Residential address<textarea rows={2} autoComplete="street-address" value={draft.address} onChange={(event) => update('address', event.target.value)} required /></label>
+        <div className="application-subsection-heading"><h4>Next of kin / emergency contact</h4></div>
+        <label>Full name<input value={draft.nextOfKin.name} onChange={(event) => updateNextOfKin('name', event.target.value)} required /></label>
+        <label>Relationship<input placeholder="Parent, guardian, spouse…" value={draft.nextOfKin.relationship} onChange={(event) => updateNextOfKin('relationship', event.target.value)} required /></label>
+        <label>Phone number<input type="tel" value={draft.nextOfKin.phone} onChange={(event) => updateNextOfKin('phone', event.target.value)} required /></label>
+        <label>Email address <span className="application-optional">(optional)</span><input type="email" value={draft.nextOfKin.email} onChange={(event) => updateNextOfKin('email', event.target.value)} /></label>
+      </section>}
+      {step === 1 && <section className="application-step-content">
+        <div className="application-section-heading"><h3>Previous education and results</h3><p>Record the qualification you are applying with and your subject grades.</p></div>
+        <label className="application-field-wide">School or examination institution<input value={draft.institution} onChange={(event) => update('institution', event.target.value)} required /></label>
+        <label>Highest qualification<select value={draft.qualification} onChange={(event) => update('qualification', event.target.value)} required><option value="">Select qualification</option><option>Uganda Advanced Certificate of Education (UACE)</option><option>Uganda Certificate of Education (UCE)</option><option>Diploma</option><option>Degree</option><option>Other equivalent qualification</option></select></label>
+        <label>Year completed<input type="number" min="1980" max={new Date().getFullYear()} value={draft.completionYear} onChange={(event) => update('completionYear', event.target.value)} required /></label>
+        <div className="application-subsection-heading application-field-wide"><div><h4>Academic results</h4><p>Add the subjects and grades from your results slip.</p></div><Button type="button" variant="outline" size="sm" onClick={() => update('academicResults', [...draft.academicResults, { subject: '', grade: '', examinationBody: 'UNEB' }])}><Plus size={13} />Add subject</Button></div>
+        {draft.academicResults.map((result, index) => <div className="application-result-row application-field-wide" key={index}>
+          <label>Subject<input value={result.subject} onChange={(event) => updateResult(index, { subject: event.target.value })} required /></label>
+          <label>Grade<input value={result.grade} onChange={(event) => updateResult(index, { grade: event.target.value })} placeholder="e.g. A, B, 4" required /></label>
+          <label>Exam body<input value={result.examinationBody} onChange={(event) => updateResult(index, { examinationBody: event.target.value })} required /></label>
+          <button type="button" className="application-remove-result" aria-label={`Remove result ${index + 1}`} disabled={draft.academicResults.length === 1} onClick={() => update('academicResults', draft.academicResults.filter((_, currentIndex) => currentIndex !== index))}><Trash2 size={14} /></button>
+        </div>)}
+      </section>}
+      {step === 2 && <section className="application-step-content">
+        <div className="application-section-heading"><h3>Programme and intake selection</h3><p>Choose your preferred course and intake. Your first choice is used for admission review.</p></div>
+        <label className="application-field-wide">First-choice programme<select value={draft.programme} onChange={(event) => update('programme', event.target.value)} required><option value="">Select a programme</option><option>BSc Computer Science</option><option>BSc Information Technology</option><option>Bachelor of Business Administration</option><option>Bachelor of Education</option><option>Diploma in Business</option></select></label>
+        <label>Second-choice programme <span className="application-optional">(optional)</span><select value={draft.secondChoice} onChange={(event) => update('secondChoice', event.target.value)}><option value="">No second choice</option><option>BSc Computer Science</option><option>BSc Information Technology</option><option>Bachelor of Business Administration</option><option>Bachelor of Education</option><option>Diploma in Business</option></select></label>
+        <label>Intake<select value={draft.intake} onChange={(event) => update('intake', event.target.value)} required><option>August 2026</option><option>January 2027</option><option>August 2027</option></select></label>
+        <label>Study mode<select value={draft.studyMode} onChange={(event) => update('studyMode', event.target.value)} required><option>Day</option><option>Evening</option><option>Weekend</option><option>Distance</option></select></label>
+      </section>}
+      {step === 3 && <section className="application-step-content">
+        <div className="application-section-heading"><h3>Supporting documents</h3><p>Attach readable scans or photos. Required documents are marked; files are not uploaded to a server in this demo.</p></div>
+        {draft.documents.map((document, index) => <div className="application-upload-row" key={document.name}>
+          <div className="application-upload-label"><FileText size={17} /><span><strong>{document.name}{document.required && <em>Required</em>}</strong><small>{document.fileName || 'PDF, JPG or PNG · max 10 MB'}</small></span></div>
+          <label className="student-action-button application-file-picker"><Upload size={13} />{document.fileName ? 'Replace file' : 'Choose file'}<input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => updateDocument(index, event)} /></label>
+        </div>)}
+        <div className="online-application-info"><ShieldCheck size={14} /><span>Only document names and statuses are saved in your browser. The file contents are not retained; production needs secure document storage.</span></div>
+      </section>}
+      {step === 4 && <section className="application-step-content">
+        <div className="application-section-heading"><h3>Review your application</h3><p>Check your details before sending this application to admissions.</p></div>
+        <div className="application-review-grid">
+          <section><h4>Personal details</h4><dl><dt>Applicant</dt><dd>{draft.name}</dd><dt>Email / phone</dt><dd>{draft.email} · {draft.phone}</dd><dt>Date of birth</dt><dd>{draft.dateOfBirth}</dd><dt>Nationality</dt><dd>{draft.nationality}</dd><dt>Address</dt><dd>{draft.address}</dd><dt>Next of kin</dt><dd>{draft.nextOfKin.name} · {draft.nextOfKin.relationship} · {draft.nextOfKin.phone}</dd></dl></section>
+          <section><h4>Education and programme</h4><dl><dt>Prior qualification</dt><dd>{draft.qualification} · {draft.institution} · {draft.completionYear}</dd><dt>Results recorded</dt><dd>{draft.academicResults.map((result) => `${result.subject}: ${result.grade}`).join(' · ')}</dd><dt>First choice</dt><dd>{draft.programme}</dd><dt>Second choice</dt><dd>{draft.secondChoice || 'None'}</dd><dt>Intake / mode</dt><dd>{draft.intake} · {draft.studyMode}</dd></dl></section>
+          <section className="application-review-documents"><h4>Documents</h4>{draft.documents.map((document) => <p key={document.name}><FileText size={13} />{document.name}: {document.fileName || 'Not attached'}{document.required && !document.fileName && <em>Required</em>}</p>)}</section>
+        </div>
+        <label className="application-declaration"><input type="checkbox" checked={declarationAccepted} onChange={(event) => setDeclarationAccepted(event.target.checked)} required /><span>I confirm that the information and results provided are accurate and authorize the institution to verify them.</span></label>
+      </section>}
+      <div className="application-step-actions">
+        <Button type="button" variant="ghost" disabled={step === 0} onClick={() => setStep((current) => Math.max(current - 1, 0))}><ChevronLeft size={14} />Previous</Button>
+        <span>Step {step + 1} of {steps.length}</span>
+        {step < 4 ? <Button type="button" onClick={continueStep}>Continue<ChevronRight size={14} /></Button> : <Button type="submit"><Check size={14} />Submit application</Button>}
+      </div>
+    </form>
   </div>
 }
 

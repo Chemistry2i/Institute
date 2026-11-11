@@ -147,7 +147,7 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
     if (persistRows(updatedRows)) {
       if (path === '/admissions/matriculation' && bulkStatus === 'Enrolled') {
         const enrolledRows = updatedRows.filter((row) => selected.has(row.reference))
-        const createdCount = enrolledRows.filter(addMatriculatedStudent).length
+        const createdCount = enrolledRows.filter((row) => addMatriculatedStudent(row)).length
         toast.success(`${createdCount} matriculated applicants added to the Student directory.`)
       }
       toast.success(`${selectedCount} records updated.`)

@@ -115,10 +115,15 @@ export interface StudentProfileData {
   phone: string
   dateOfBirth: string
   gender: string
+  nationality?: string
   address: string
   nextOfKin: { name: string; relationship: string; phone: string; email: string }
   statusHistory: Array<{ date: string; status: string; detail: string }>
   documents: Array<{ name: string; status: 'Verified' | 'Received' | 'Pending'; updated: string }>
+  previousEducation?: Array<{ institution: string; qualification: string; completionYear: string }>
+  academicResults?: Array<{ subject: string; grade: string; examinationBody?: string }>
+  secondChoiceProgramme?: string
+  studyMode?: string
 }
 
 export interface ActivityItem {

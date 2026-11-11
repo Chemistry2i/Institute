@@ -39,7 +39,7 @@ export function readMatriculatedStudents(): MatriculatedStudent[] {
   }
 }
 
-export function addMatriculatedStudent(record: DemoRow) {
+export function addMatriculatedStudent(record: DemoRow, applicantProfile?: Partial<StudentProfileData>) {
   const matriculated = readMatriculatedStudents()
   const name = record.applicant?.trim() || 'New student'
   if (matriculated.some((entry) => entry.student.name.toLowerCase() === name.toLowerCase())) return false
@@ -55,7 +55,7 @@ export function addMatriculatedStudent(record: DemoRow) {
     balance: 'UGX 0',
     lastSeen: 'Just enrolled',
   }
-  const profile: StudentProfileData = {
+  const defaultProfile: StudentProfileData = {
     campus: 'Main campus',
     faculty: 'Pending faculty assignment',
     department: 'Pending department assignment',
@@ -70,6 +70,7 @@ export function addMatriculatedStudent(record: DemoRow) {
     statusHistory: [{ date: new Date().toLocaleDateString(), status: 'Active', detail: 'Student record created through enrollment and matriculation.' }],
     documents: [],
   }
+  const profile: StudentProfileData = { ...defaultProfile, ...applicantProfile }
 
   const next = [...matriculated, { student, profile }]
   localStorage.setItem(matriculatedStudentsKey, JSON.stringify(next))
