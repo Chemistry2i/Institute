@@ -1,6 +1,6 @@
-import { useRef, useState, type ChangeEvent, type FormEvent } from 'react'
+import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BadgeCheck, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, Download, Eye, FileText, GraduationCap, Mail, Plus, Search, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X } from 'lucide-react'
+import { Award, BadgeCheck, BookOpen, Building2, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, Download, Eye, FileText, Globe2, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X, type LucideIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
 import { type StudentProfileData } from '../data'
@@ -15,6 +15,9 @@ type AcademicResult = { subject: string; grade: string; examinationBody: string 
 type Application = {
   id: string
   name: string
+  firstName: string
+  middleName: string
+  lastName: string
   email: string
   phone: string
   programme: string
@@ -29,14 +32,17 @@ type Application = {
   gender?: string
   nationality?: string
   address?: string
-  nextOfKin?: { name: string; relationship: string; phone: string; email: string }
+  nextOfKin?: { firstName: string; middleName: string; lastName: string; relationship: string; phone: string; email: string }
   previousEducation?: Array<{ institution: string; qualification: string; completionYear: string }>
   academicResults?: AcademicResult[]
   secondChoice?: string
   studyMode?: string
 }
 
-type ApplicationDraft = Pick<Application, 'name' | 'email' | 'phone' | 'programme' | 'intake'> & {
+type ApplicationDraft = Pick<Application, 'email' | 'phone' | 'programme' | 'intake'> & {
+  firstName: string
+  middleName: string
+  lastName: string
   dateOfBirth: string
   gender: string
   nationality: string
@@ -54,21 +60,45 @@ type ApplicationDraft = Pick<Application, 'name' | 'email' | 'phone' | 'programm
 const storageKey = 'tims-demo-admissions-applications'
 const requiredDocuments = ['Identity document', 'Academic certificate', 'Academic transcript']
 const initialDocuments = requiredDocuments.map((name) => ({ name, status: 'Received' as const, fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf`, required: true }))
+const splitName = (name: string) => {
+  const [firstName = '', ...remaining] = name.trim().split(/\s+/)
+  const lastName = remaining.pop() ?? ''
+  return { firstName, middleName: remaining.join(' '), lastName }
+}
 const initialApplications: Application[] = [
-  { id: 'APP-2026-1001', name: 'Annette Muwonge', email: 'annette@example.com', phone: '+256 700 000 101', programme: 'BSc Computer Science', intake: 'August 2026', stage: 'Submitted', documents: initialDocuments, identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online'] },
-  { id: 'APP-2026-1002', name: 'Benard Sserunjogi', email: 'benard@example.com', phone: '+256 700 000 102', programme: 'Bachelor of Business Administration', intake: 'August 2026', stage: 'Faculty review', documents: initialDocuments.map((doc) => ({ ...doc, status: 'Verified' })), identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Passed initial screening'] },
-  { id: 'APP-2026-1003', name: 'Patricia Kintu', email: 'patricia@example.com', phone: '+256 700 000 103', programme: 'Bachelor of Education', intake: 'August 2026', stage: 'Documents pending', documents: [...initialDocuments.map((doc, index) => ({ ...doc, status: index === 1 ? 'Missing' as const : 'Verified' as const, fileName: index === 1 ? '' : doc.fileName }))], identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Documents requested'] },
-  { id: 'APP-2026-1004', name: 'Joseph Kasozi', email: 'joseph@example.com', phone: '+256 700 000 104', programme: 'BSc Information Technology', intake: 'August 2026', stage: 'Accepted', documents: initialDocuments.map((doc) => ({ ...doc, status: 'Verified' })), identityVerified: true, feesCleared: true, studentId: '', history: ['Application submitted online', 'Offer issued', 'Offer accepted'] },
+  { id: 'APP-2026-1001', name: 'Annette Muwonge', ...splitName('Annette Muwonge'), email: 'annette@example.com', phone: '+256 700 000 101', programme: 'BSc Computer Science', intake: 'August 2026', stage: 'Submitted', documents: initialDocuments, identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online'] },
+  { id: 'APP-2026-1002', name: 'Benard Sserunjogi', ...splitName('Benard Sserunjogi'), email: 'benard@example.com', phone: '+256 700 000 102', programme: 'Bachelor of Business Administration', intake: 'August 2026', stage: 'Faculty review', documents: initialDocuments.map((doc) => ({ ...doc, status: 'Verified' })), identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Passed initial screening'] },
+  { id: 'APP-2026-1003', name: 'Patricia Kintu', ...splitName('Patricia Kintu'), email: 'patricia@example.com', phone: '+256 700 000 103', programme: 'Bachelor of Education', intake: 'August 2026', stage: 'Documents pending', documents: [...initialDocuments.map((doc, index) => ({ ...doc, status: index === 1 ? 'Missing' as const : 'Verified' as const, fileName: index === 1 ? '' : doc.fileName }))], identityVerified: false, feesCleared: false, studentId: '', history: ['Application submitted online', 'Documents requested'] },
+  { id: 'APP-2026-1004', name: 'Joseph Kasozi', ...splitName('Joseph Kasozi'), email: 'joseph@example.com', phone: '+256 700 000 104', programme: 'BSc Information Technology', intake: 'August 2026', stage: 'Accepted', documents: initialDocuments.map((doc) => ({ ...doc, status: 'Verified' })), identityVerified: true, feesCleared: true, studentId: '', history: ['Application submitted online', 'Offer issued', 'Offer accepted'] },
 ]
 
 function readApplications(): Application[] {
   try {
     const saved: unknown = JSON.parse(localStorage.getItem(storageKey) ?? 'null')
     if (Array.isArray(saved) && saved.every((item) => item && typeof item.id === 'string' && Array.isArray(item.documents) && Array.isArray(item.history))) {
-      return (saved as Application[]).map((application) => ({
-        ...application,
-        documents: application.documents.map((document) => ({ ...document, required: document.required ?? true })),
-      }))
+      return (saved as Array<Application & { nextOfKin?: Application['nextOfKin'] & { name?: string } }>).map((application) => {
+        const applicantName = application.name || ''
+        const applicantParts = splitName(applicantName)
+        const kinName = application.nextOfKin?.name ?? ''
+        const kinParts = splitName(kinName)
+        const firstName = application.firstName || applicantParts.firstName
+        const middleName = application.middleName ?? applicantParts.middleName
+        const lastName = application.lastName || applicantParts.lastName
+        return {
+          ...application,
+          firstName,
+          middleName,
+          lastName,
+          name: application.name || [firstName, middleName, lastName].filter(Boolean).join(' '),
+          nextOfKin: application.nextOfKin ? {
+            ...application.nextOfKin,
+            firstName: application.nextOfKin.firstName || kinParts.firstName,
+            middleName: application.nextOfKin.middleName ?? kinParts.middleName,
+            lastName: application.nextOfKin.lastName || kinParts.lastName,
+          } : undefined,
+          documents: application.documents.map((document) => ({ ...document, required: document.required ?? true })),
+        }
+      })
     }
   } catch {
     toast.error('Saved admissions data could not be read. Showing the demo records.')
@@ -179,10 +209,12 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       toast.success(event)
     }
   }
-  const submitApplication = (details: Pick<Application, 'name' | 'email' | 'phone' | 'programme' | 'intake'>) => {
+  const submitApplication = (details: Pick<Application, 'firstName' | 'middleName' | 'lastName' | 'email' | 'phone' | 'programme' | 'intake'>) => {
     const id = `APP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`
     const nextApp: Application = {
-      ...details, id, stage: 'Submitted',
+      ...details,
+      name: [details.firstName, details.middleName, details.lastName].filter(Boolean).join(' '),
+      id, stage: 'Submitted',
       documents: requiredDocuments.map((name) => ({ name, status: 'Missing', fileName: '', required: true })),
       identityVerified: false, feesCleared: false, studentId: '',
       history: ['Application submitted online'],
@@ -205,11 +237,17 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       intake: app.intake,
       email: app.email,
       phone: app.phone,
+      firstName: app.firstName,
+      middleName: app.middleName,
+      lastName: app.lastName,
       dateOfBirth: app.dateOfBirth ?? '',
       gender: app.gender ?? 'Not specified',
       nationality: app.nationality ?? '',
       address: app.address ?? '',
-      nextOfKin: app.nextOfKin ?? { name: 'Not provided', relationship: 'Not provided', phone: '', email: '' },
+      nextOfKin: app.nextOfKin ? {
+        ...app.nextOfKin,
+        name: [app.nextOfKin.firstName, app.nextOfKin.middleName, app.nextOfKin.lastName].filter(Boolean).join(' '),
+      } : { name: 'Not provided', relationship: 'Not provided', phone: '', email: '' },
       previousEducation: app.previousEducation ?? [],
       academicResults: app.academicResults ?? [],
       secondChoiceProgramme: app.secondChoice ?? '',
@@ -289,7 +327,9 @@ export function OnlineApplicationPage() {
   const submitApplication = (draft: ApplicationDraft) => {
     const application: Application = {
       id: `APP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
-      name: draft.name.trim(), email: draft.email.trim(), phone: draft.phone.trim(),
+      firstName: draft.firstName.trim(), middleName: draft.middleName.trim(), lastName: draft.lastName.trim(),
+      name: [draft.firstName, draft.middleName, draft.lastName].filter(Boolean).join(' '),
+      email: draft.email.trim(), phone: draft.phone.trim(),
       programme: draft.programme, intake: draft.intake, stage: 'Submitted',
       documents: draft.documents, identityVerified: false, feesCleared: false,
       studentId: '', history: ['Application submitted online'],
@@ -363,9 +403,9 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
   const [declarationAccepted, setDeclarationAccepted] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const [draft, setDraft] = useState<ApplicationDraft>({
-    name: '', email: '', phone: '', programme: '', intake: 'August 2026',
+    firstName: '', middleName: '', lastName: '', email: '', phone: '', programme: '', intake: 'August 2026',
     dateOfBirth: '', gender: '', nationality: 'Ugandan', address: '',
-    nextOfKin: { name: '', relationship: '', phone: '', email: '' },
+    nextOfKin: { firstName: '', middleName: '', lastName: '', relationship: '', phone: '', email: '' },
     institution: '', qualification: '', completionYear: '',
     academicResults: [{ subject: '', grade: '', examinationBody: 'UNEB' }],
     secondChoice: '', studyMode: 'Day',
@@ -373,6 +413,7 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
   })
   const update = <K extends keyof ApplicationDraft>(key: K, value: ApplicationDraft[K]) => setDraft((current) => ({ ...current, [key]: value }))
   const updateNextOfKin = (key: keyof ApplicationDraft['nextOfKin'], value: string) => setDraft((current) => ({ ...current, nextOfKin: { ...current.nextOfKin, [key]: value } }))
+  const updateName = (key: 'firstName' | 'middleName' | 'lastName', value: string) => setDraft((current) => ({ ...current, [key]: value }))
   const updateResult = (index: number, patch: Partial<AcademicResult>) => setDraft((current) => ({ ...current, academicResults: current.academicResults.map((result, currentIndex) => currentIndex === index ? { ...result, ...patch } : result) }))
   const updateDocument = (index: number, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -415,41 +456,45 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
         <button type="button" aria-current={index === step ? 'step' : undefined} disabled={index > step} onClick={() => setStep(index)}><span>{index < step ? <Check size={13} /> : index + 1}</span><small>{label}</small></button>
       </li>)}
     </ol>
-    <form ref={formRef} className="online-application-form application-step-form" onSubmit={submit}>
+    <form id="online-application-form" ref={formRef} className="online-application-form application-step-form" onSubmit={submit}>
       {step === 0 && <section className="application-step-content">
         <div className="application-section-heading"><h3>Personal and contact details</h3><p>Enter your legal identity and a reliable contact address.</p></div>
-        <label className="application-field-wide">Full legal name<input autoComplete="name" value={draft.name} onChange={(event) => update('name', event.target.value)} required /></label>
-        <label>Email address<input type="email" autoComplete="email" value={draft.email} onChange={(event) => update('email', event.target.value)} required /></label>
-        <label>Phone number<input type="tel" autoComplete="tel" value={draft.phone} onChange={(event) => update('phone', event.target.value)} required /></label>
-        <label>Date of birth<input type="date" value={draft.dateOfBirth} onChange={(event) => update('dateOfBirth', event.target.value)} required /></label>
-        <label>Gender<select value={draft.gender} onChange={(event) => update('gender', event.target.value)} required><option value="">Select</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></label>
-        <label>Nationality<input value={draft.nationality} onChange={(event) => update('nationality', event.target.value)} required /></label>
-        <label className="application-field-wide">Residential address<textarea rows={2} autoComplete="street-address" value={draft.address} onChange={(event) => update('address', event.target.value)} required /></label>
+        <ApplicationField label="First name" icon={UserRound}><input autoComplete="given-name" value={draft.firstName} onChange={(event) => updateName('firstName', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Middle name" icon={UserRound} optional><input autoComplete="additional-name" value={draft.middleName} onChange={(event) => updateName('middleName', event.target.value)} /></ApplicationField>
+        <ApplicationField label="Last name" icon={UserRound}><input autoComplete="family-name" value={draft.lastName} onChange={(event) => updateName('lastName', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Email address" icon={Mail}><input type="email" autoComplete="email" value={draft.email} onChange={(event) => update('email', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Phone number" icon={Phone}><input type="tel" autoComplete="tel" value={draft.phone} onChange={(event) => update('phone', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Date of birth" icon={CalendarDays}><input type="date" value={draft.dateOfBirth} onChange={(event) => update('dateOfBirth', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Gender" icon={UserRound}><select value={draft.gender} onChange={(event) => update('gender', event.target.value)} required><option value="">Select gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></ApplicationField>
+        <ApplicationField label="Nationality" icon={Globe2}><select value={draft.nationality} onChange={(event) => update('nationality', event.target.value)} required><option value="">Select nationality</option><option>Ugandan</option><option>Kenyan</option><option>Tanzanian</option><option>Rwandan</option><option>South Sudanese</option><option>Other</option></select></ApplicationField>
+        <ApplicationField label="Residential address" icon={MapPin} className="application-field-wide"><textarea rows={2} autoComplete="street-address" value={draft.address} onChange={(event) => update('address', event.target.value)} required /></ApplicationField>
         <div className="application-subsection-heading"><h4>Next of kin / emergency contact</h4></div>
-        <label>Full name<input value={draft.nextOfKin.name} onChange={(event) => updateNextOfKin('name', event.target.value)} required /></label>
-        <label>Relationship<input placeholder="Parent, guardian, spouse…" value={draft.nextOfKin.relationship} onChange={(event) => updateNextOfKin('relationship', event.target.value)} required /></label>
-        <label>Phone number<input type="tel" value={draft.nextOfKin.phone} onChange={(event) => updateNextOfKin('phone', event.target.value)} required /></label>
-        <label>Email address <span className="application-optional">(optional)</span><input type="email" value={draft.nextOfKin.email} onChange={(event) => updateNextOfKin('email', event.target.value)} /></label>
+        <ApplicationField label="First name" icon={UsersRound}><input value={draft.nextOfKin.firstName} onChange={(event) => updateNextOfKin('firstName', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Middle name" icon={UsersRound} optional><input value={draft.nextOfKin.middleName} onChange={(event) => updateNextOfKin('middleName', event.target.value)} /></ApplicationField>
+        <ApplicationField label="Last name" icon={UsersRound}><input value={draft.nextOfKin.lastName} onChange={(event) => updateNextOfKin('lastName', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Relationship" icon={UsersRound}><select value={draft.nextOfKin.relationship} onChange={(event) => updateNextOfKin('relationship', event.target.value)} required><option value="">Select relationship</option><option>Parent</option><option>Guardian</option><option>Spouse</option><option>Sibling</option><option>Relative</option><option>Other</option></select></ApplicationField>
+        <ApplicationField label="Phone number" icon={Phone}><input type="tel" value={draft.nextOfKin.phone} onChange={(event) => updateNextOfKin('phone', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Email address" icon={Mail} optional><input type="email" value={draft.nextOfKin.email} onChange={(event) => updateNextOfKin('email', event.target.value)} /></ApplicationField>
       </section>}
       {step === 1 && <section className="application-step-content">
         <div className="application-section-heading"><h3>Previous education and results</h3><p>Record the qualification you are applying with and your subject grades.</p></div>
-        <label className="application-field-wide">School or examination institution<input value={draft.institution} onChange={(event) => update('institution', event.target.value)} required /></label>
-        <label>Highest qualification<select value={draft.qualification} onChange={(event) => update('qualification', event.target.value)} required><option value="">Select qualification</option><option>Uganda Advanced Certificate of Education (UACE)</option><option>Uganda Certificate of Education (UCE)</option><option>Diploma</option><option>Degree</option><option>Other equivalent qualification</option></select></label>
-        <label>Year completed<input type="number" min="1980" max={new Date().getFullYear()} value={draft.completionYear} onChange={(event) => update('completionYear', event.target.value)} required /></label>
+        <ApplicationField label="School or examination institution" icon={Building2} className="application-field-wide"><input value={draft.institution} onChange={(event) => update('institution', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Highest qualification" icon={GraduationCap}><select value={draft.qualification} onChange={(event) => update('qualification', event.target.value)} required><option value="">Select qualification</option><option>Uganda Advanced Certificate of Education (UACE)</option><option>Uganda Certificate of Education (UCE)</option><option>Diploma</option><option>Degree</option><option>Other equivalent qualification</option></select></ApplicationField>
+        <ApplicationField label="Year completed" icon={CalendarDays}><input type="number" min="1980" max={new Date().getFullYear()} value={draft.completionYear} onChange={(event) => update('completionYear', event.target.value)} required /></ApplicationField>
         <div className="application-subsection-heading application-field-wide"><div><h4>Academic results</h4><p>Add the subjects and grades from your results slip.</p></div><Button type="button" variant="outline" size="sm" onClick={() => update('academicResults', [...draft.academicResults, { subject: '', grade: '', examinationBody: 'UNEB' }])}><Plus size={13} />Add subject</Button></div>
         {draft.academicResults.map((result, index) => <div className="application-result-row application-field-wide" key={index}>
-          <label>Subject<input value={result.subject} onChange={(event) => updateResult(index, { subject: event.target.value })} required /></label>
-          <label>Grade<input value={result.grade} onChange={(event) => updateResult(index, { grade: event.target.value })} placeholder="e.g. A, B, 4" required /></label>
-          <label>Exam body<input value={result.examinationBody} onChange={(event) => updateResult(index, { examinationBody: event.target.value })} required /></label>
+          <ApplicationField label="Subject" icon={BookOpen}><input value={result.subject} onChange={(event) => updateResult(index, { subject: event.target.value })} required /></ApplicationField>
+          <ApplicationField label="Grade" icon={Award}><select value={result.grade} onChange={(event) => updateResult(index, { grade: event.target.value })} required><option value="">Select grade</option>{['A', 'B', 'C', 'D', 'E', 'O', 'F', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'Distinction', 'Credit', 'Pass'].map((grade) => <option key={grade}>{grade}</option>)}</select></ApplicationField>
+          <ApplicationField label="Exam body" icon={Building2}><select value={result.examinationBody} onChange={(event) => updateResult(index, { examinationBody: event.target.value })} required><option>UNEB</option><option>KNEC</option><option>NECTA</option><option>Cambridge</option><option>Other</option></select></ApplicationField>
           <button type="button" className="application-remove-result" aria-label={`Remove result ${index + 1}`} disabled={draft.academicResults.length === 1} onClick={() => update('academicResults', draft.academicResults.filter((_, currentIndex) => currentIndex !== index))}><Trash2 size={14} /></button>
         </div>)}
       </section>}
       {step === 2 && <section className="application-step-content">
         <div className="application-section-heading"><h3>Programme and intake selection</h3><p>Choose your preferred course and intake. Your first choice is used for admission review.</p></div>
-        <label className="application-field-wide">First-choice programme<select value={draft.programme} onChange={(event) => update('programme', event.target.value)} required><option value="">Select a programme</option><option>BSc Computer Science</option><option>BSc Information Technology</option><option>Bachelor of Business Administration</option><option>Bachelor of Education</option><option>Diploma in Business</option></select></label>
-        <label>Second-choice programme <span className="application-optional">(optional)</span><select value={draft.secondChoice} onChange={(event) => update('secondChoice', event.target.value)}><option value="">No second choice</option><option>BSc Computer Science</option><option>BSc Information Technology</option><option>Bachelor of Business Administration</option><option>Bachelor of Education</option><option>Diploma in Business</option></select></label>
-        <label>Intake<select value={draft.intake} onChange={(event) => update('intake', event.target.value)} required><option>August 2026</option><option>January 2027</option><option>August 2027</option></select></label>
-        <label>Study mode<select value={draft.studyMode} onChange={(event) => update('studyMode', event.target.value)} required><option>Day</option><option>Evening</option><option>Weekend</option><option>Distance</option></select></label>
+        <ApplicationField label="First-choice programme" icon={GraduationCap} className="application-field-wide"><select value={draft.programme} onChange={(event) => update('programme', event.target.value)} required><option value="">Select a programme</option><option>BSc Computer Science</option><option>BSc Information Technology</option><option>Bachelor of Business Administration</option><option>Bachelor of Education</option><option>Diploma in Business</option></select></ApplicationField>
+        <ApplicationField label="Second-choice programme" icon={GraduationCap} optional><select value={draft.secondChoice} onChange={(event) => update('secondChoice', event.target.value)}><option value="">No second choice</option><option>BSc Computer Science</option><option>BSc Information Technology</option><option>Bachelor of Business Administration</option><option>Bachelor of Education</option><option>Diploma in Business</option></select></ApplicationField>
+        <ApplicationField label="Intake" icon={CalendarDays}><select value={draft.intake} onChange={(event) => update('intake', event.target.value)} required><option>August 2026</option><option>January 2027</option><option>August 2027</option></select></ApplicationField>
+        <ApplicationField label="Study mode" icon={Clock3}><select value={draft.studyMode} onChange={(event) => update('studyMode', event.target.value)} required><option>Day</option><option>Evening</option><option>Weekend</option><option>Distance</option></select></ApplicationField>
       </section>}
       {step === 3 && <section className="application-step-content">
         <div className="application-section-heading"><h3>Supporting documents</h3><p>Attach readable scans or photos. Required documents are marked; files are not uploaded to a server in this demo.</p></div>
@@ -462,29 +507,44 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
       {step === 4 && <section className="application-step-content">
         <div className="application-section-heading"><h3>Review your application</h3><p>Check your details before sending this application to admissions.</p></div>
         <div className="application-review-grid">
-          <section><h4>Personal details</h4><dl><dt>Applicant</dt><dd>{draft.name}</dd><dt>Email / phone</dt><dd>{draft.email} · {draft.phone}</dd><dt>Date of birth</dt><dd>{draft.dateOfBirth}</dd><dt>Nationality</dt><dd>{draft.nationality}</dd><dt>Address</dt><dd>{draft.address}</dd><dt>Next of kin</dt><dd>{draft.nextOfKin.name} · {draft.nextOfKin.relationship} · {draft.nextOfKin.phone}</dd></dl></section>
+          <section><h4>Personal details</h4><dl><dt>First name</dt><dd>{draft.firstName}</dd><dt>Middle name</dt><dd>{draft.middleName || 'Not provided'}</dd><dt>Last name</dt><dd>{draft.lastName}</dd><dt>Email / phone</dt><dd>{draft.email} · {draft.phone}</dd><dt>Date of birth</dt><dd>{draft.dateOfBirth}</dd><dt>Nationality</dt><dd>{draft.nationality}</dd><dt>Address</dt><dd>{draft.address}</dd><dt>Next of kin</dt><dd>{[draft.nextOfKin.firstName, draft.nextOfKin.middleName, draft.nextOfKin.lastName].filter(Boolean).join(' ')} · {draft.nextOfKin.relationship} · {draft.nextOfKin.phone}</dd></dl></section>
           <section><h4>Education and programme</h4><dl><dt>Prior qualification</dt><dd>{draft.qualification} · {draft.institution} · {draft.completionYear}</dd><dt>Results recorded</dt><dd>{draft.academicResults.map((result) => `${result.subject}: ${result.grade}`).join(' · ')}</dd><dt>First choice</dt><dd>{draft.programme}</dd><dt>Second choice</dt><dd>{draft.secondChoice || 'None'}</dd><dt>Intake / mode</dt><dd>{draft.intake} · {draft.studyMode}</dd></dl></section>
           <section className="application-review-documents"><h4>Documents</h4>{draft.documents.map((document) => <p key={document.name}><FileText size={13} />{document.name}: {document.fileName || 'Not attached'}{document.required && !document.fileName && <em>Required</em>}</p>)}</section>
         </div>
         <label className="application-declaration"><input type="checkbox" checked={declarationAccepted} onChange={(event) => setDeclarationAccepted(event.target.checked)} required /><span>I confirm that the information and results provided are accurate and authorize the institution to verify them.</span></label>
       </section>}
-      <div className="application-step-actions">
-        <Button type="button" variant="ghost" disabled={step === 0} onClick={() => setStep((current) => Math.max(current - 1, 0))}><ChevronLeft size={14} />Previous</Button>
-        <span>Step {step + 1} of {steps.length}</span>
-        {step < 4 ? <Button type="button" onClick={continueStep}>Continue<ChevronRight size={14} /></Button> : <Button type="submit"><Check size={14} />Submit application</Button>}
-      </div>
     </form>
+    <div className="application-step-actions">
+      <Button type="button" variant="ghost" disabled={step === 0} onClick={() => setStep((current) => Math.max(current - 1, 0))}><ChevronLeft size={14} />Previous</Button>
+      <span>Step {step + 1} of {steps.length}</span>
+      {step < 4 ? <Button type="button" onClick={continueStep}>Continue<ChevronRight size={14} /></Button> : <Button type="submit" form="online-application-form"><Check size={14} />Submit application</Button>}
+    </div>
   </div>
 }
 
-function ApplicationCreateDialog({ onClose, onSubmit }: { onClose: () => void; onSubmit: (details: Pick<Application, 'name' | 'email' | 'phone' | 'programme' | 'intake'>) => void }) {
+function ApplicationField({ label, icon: Icon, children, className = '', optional = false }: { label: string; icon: LucideIcon; children: ReactNode; className?: string; optional?: boolean }) {
+  return <label className={`application-field ${className}`}>
+    <span className="application-field-label">{label}{optional && <small>Optional</small>}</span>
+    <span className="application-input-control"><Icon size={15} aria-hidden="true" />{children}</span>
+  </label>
+}
+
+function ApplicationCreateDialog({ onClose, onSubmit }: { onClose: () => void; onSubmit: (details: Pick<Application, 'firstName' | 'middleName' | 'lastName' | 'email' | 'phone' | 'programme' | 'intake'>) => void }) {
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    onSubmit({ name: String(data.get('name')).trim(), email: String(data.get('email')).trim(), phone: String(data.get('phone')).trim(), programme: String(data.get('programme')).trim(), intake: String(data.get('intake')) })
+    onSubmit({
+      firstName: String(data.get('firstName')).trim(),
+      middleName: String(data.get('middleName')).trim(),
+      lastName: String(data.get('lastName')).trim(),
+      email: String(data.get('email')).trim(),
+      phone: String(data.get('phone')).trim(),
+      programme: String(data.get('programme')).trim(),
+      intake: String(data.get('intake')),
+    })
   }
   return <ModalShell title="Create application" description="Record an application received by the admissions office." onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Cancel</Button><Button type="submit" form="admissions-create-form"><Plus size={14} />Create application</Button></>}>
-    <form id="admissions-create-form" className="modal-form-grid" onSubmit={submit}><label>Applicant name<input name="name" required /></label><label>Email<input name="email" type="email" required /></label><label>Phone<input name="phone" type="tel" required /></label><label>Programme<input name="programme" required /></label><label className="modal-form-wide">Intake<select name="intake"><option>August 2026</option><option>January 2027</option><option>August 2027</option></select></label></form>
+    <form id="admissions-create-form" className="modal-form-grid" onSubmit={submit}><label>First name<input name="firstName" required /></label><label>Middle name<input name="middleName" /></label><label>Last name<input name="lastName" required /></label><label>Email<input name="email" type="email" required /></label><label>Phone<input name="phone" type="tel" required /></label><label>Programme<input name="programme" required /></label><label className="modal-form-wide">Intake<select name="intake"><option>August 2026</option><option>January 2027</option><option>August 2027</option></select></label></form>
   </ModalShell>
 }
 
