@@ -6,8 +6,10 @@ import {
   academicStructureItems,
   admissionsItems,
   adminNavigationItems,
+  attendanceItems,
   examinationItems,
   financeItems,
+  genericOperationalGroups,
   institutionDefaults,
   navigationItems,
   registrationItems,
@@ -80,12 +82,24 @@ export function Sidebar({ collapsed, mobileOpen, role, onCollapsedChange, onMobi
           if (item.href === '/timetabling') {
             return <ModuleNavigationGroup key={item.href} item={item} items={timetablingItems} collapsed={collapsed} onNavigate={onMobileClose} />
           }
+          if (item.href === '/attendance') {
+            return <ModuleNavigationGroup key={item.href} item={item} items={attendanceItems} collapsed={collapsed} onNavigate={onMobileClose} />
+          }
+          const workflow = genericOperationalGroups.find((group) => group.basePath === item.href)
+          if (workflow) {
+            return <ModuleNavigationGroup key={item.href} item={item} items={workflow.items} collapsed={collapsed} onNavigate={onMobileClose} />
+          }
           return <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={onMobileClose} />
         })}
       </nav>}
       {visibleAdmin.length > 0 && <>
         <div className="sidebar-section-label sidebar-section-admin">Administration</div>
-        <nav className="sidebar-nav" aria-label="Administration navigation">{visibleAdmin.map((item) => <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={onMobileClose} />)}</nav>
+        <nav className="sidebar-nav" aria-label="Administration navigation">{visibleAdmin.map((item) => {
+          const workflow = genericOperationalGroups.find((group) => group.basePath === item.href)
+          return workflow
+            ? <ModuleNavigationGroup key={item.href} item={item} items={workflow.items} collapsed={collapsed} onNavigate={onMobileClose} />
+            : <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={onMobileClose} />
+        })}</nav>
       </>}
     </div>
     {!collapsed && <div className="sidebar-status"><div className="status-dot" /><div><strong>All systems operational</strong><span>Last checked 2 min ago</span></div></div>}

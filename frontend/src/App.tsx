@@ -47,8 +47,10 @@ import { Sidebar } from './components/Sidebar'
 import { StudentInformation } from './components/StudentInformation'
 import {
   admissionsItems,
+  attendanceItems,
   examinationItems,
   financeItems,
+  genericOperationalGroups,
   institutionDefaults,
   moduleIcons,
   moduleRows,
@@ -143,21 +145,9 @@ function RoutesOutlet() {
     <Route path="/examinations/*" element={<OperationalModuleRoute basePath="/examinations" items={examinationItems} />} />
     <Route path="/finance/*" element={<OperationalModuleRoute basePath="/finance" items={financeItems} />} />
     <Route path="/timetabling/*" element={<OperationalModuleRoute basePath="/timetabling" items={timetablingItems} />} />
-    <Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} />
-    <Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} />
-    <Route path="/learning" element={<ModuleWorkspace path="/learning" />} />
-    <Route path="/library" element={<ModuleWorkspace path="/library" />} />
-    <Route path="/staff" element={<ModuleWorkspace path="/staff" />} />
-    <Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} />
-    <Route path="/internship" element={<ModuleWorkspace path="/internship" />} />
-    <Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} />
-    <Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} />
-    <Route path="/communications" element={<ModuleWorkspace path="/communications" />} />
-    <Route path="/quality" element={<ModuleWorkspace path="/quality" />} />
-    <Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} />
-    <Route path="/reports" element={<ModuleWorkspace path="/reports" />} />
+    <Route path="/attendance/*" element={<OperationalModuleRoute basePath="/attendance" items={attendanceItems} />} />
+    {genericOperationalGroups.map(({ basePath, items }) => <Route key={basePath} path={`${basePath}/*`} element={<OperationalModuleRoute basePath={basePath} items={items} />} />)}
     <Route path="/users" element={<UsersPage />} />
-    <Route path="/administration" element={<ModuleWorkspace path="/administration" />} />
     <Route path="/settings" element={<SettingsPage />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></div>

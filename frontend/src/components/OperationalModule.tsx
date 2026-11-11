@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
 import { useAppContext } from '../app-context'
-import { moduleKpis, navigationItems, pageMeta } from '../data'
+import { adminNavigationItems, moduleKpis, navigationItems, pageMeta } from '../data'
 import { ModuleWorkspace } from './ModuleWorkspace'
 import { Card, KpiCard } from './ui'
 
@@ -27,7 +27,7 @@ export function OperationalModuleRoute({ basePath, items, steps }: ModuleLanding
 
 export function ModuleLanding({ basePath, items, steps }: ModuleLandingProps) {
   const { can } = useAppContext()
-  const permission = navigationItems.find((item) => item.href === basePath)?.permission
+  const permission = [...navigationItems, ...adminNavigationItems].find((item) => item.href === basePath)?.permission
   const meta = pageMeta[basePath]
 
   if (permission && !can(permission)) return <Card className="permission-empty"><h2>Permission required</h2><p>Your current role does not have access to this module.</p></Card>

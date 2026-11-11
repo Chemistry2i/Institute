@@ -222,6 +222,134 @@ export const timetablingItems = [
   { label: 'Conflict resolution', href: '/timetabling/conflicts', icon: ShieldCheck, description: 'Resolve room, lecturer, and cohort scheduling clashes.' },
 ] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
 
+export const attendanceItems = [
+  { label: 'Overview', href: '/attendance', icon: LayoutDashboard, description: 'Review attendance activity, thresholds, corrections, and participation trends.' },
+  { label: 'Sessions & registers', href: '/attendance/sessions', icon: ClipboardList, description: 'Track class registers and lecturer submission status by scheduled session.' },
+  { label: 'Attendance alerts', href: '/attendance/alerts', icon: CirclePause, description: 'Follow students and cohorts below the institution attendance threshold.' },
+  { label: 'Correction requests', href: '/attendance/corrections', icon: ArrowRightLeft, description: 'Review authorized requests to correct submitted attendance records.' },
+  { label: 'Reports & trends', href: '/attendance/reports', icon: ChartNoAxesCombined, description: 'Compare participation by course, programme, cohort, and teaching period.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const scholarshipItems = [
+  { label: 'Overview', href: '/scholarships', icon: LayoutDashboard, description: 'Review awards, applications, sponsor balances, and renewal risks.' },
+  { label: 'Awards & eligibility', href: '/scholarships/awards', icon: GraduationCap, description: 'Track active awards, eligibility rules, and student coverage.' },
+  { label: 'Applications', href: '/scholarships/applications', icon: ClipboardList, description: 'Review new funding applications and committee decisions.' },
+  { label: 'Sponsors & allocations', href: '/scholarships/sponsors', icon: Building2, description: 'Monitor sponsor commitments, disbursements, and remaining balances.' },
+  { label: 'Renewals & exceptions', href: '/scholarships/renewals', icon: ShieldCheck, description: 'Manage award renewals, academic conditions, and funding exceptions.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const learningItems = [
+  { label: 'Overview', href: '/learning', icon: LayoutDashboard, description: 'Review course spaces, learning materials, assignments, and submissions.' },
+  { label: 'Course spaces', href: '/learning/courses', icon: BookOpen, description: 'Track active digital course spaces and learner participation.' },
+  { label: 'Learning resources', href: '/learning/resources', icon: FileText, description: 'Organize course materials and resource publication status.' },
+  { label: 'Assignments', href: '/learning/assignments', icon: ClipboardList, description: 'Monitor assignment schedules, due dates, and marking progress.' },
+  { label: 'Submissions', href: '/learning/submissions', icon: ShieldCheck, description: 'Review learner submissions, feedback, and late work.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const libraryItems = [
+  { label: 'Overview', href: '/library', icon: LayoutDashboard, description: 'Monitor catalogue activity, circulation, overdue items, and clearance.' },
+  { label: 'Catalogue', href: '/library/catalogue', icon: Library, description: 'Maintain bibliographic records, copies, and collection locations.' },
+  { label: 'Circulation', href: '/library/circulation', icon: ArrowRightLeft, description: 'Track loans, returns, renewals, and reservations.' },
+  { label: 'Overdue & fines', href: '/library/overdue', icon: CirclePause, description: 'Follow overdue items, fine balances, and borrower reminders.' },
+  { label: 'Clearances', href: '/library/clearances', icon: ShieldCheck, description: 'Process library clearance requests for graduating students.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const staffItems = [
+  { label: 'Overview', href: '/staff', icon: LayoutDashboard, description: 'Review staff records, contracts, leave, and workload exceptions.' },
+  { label: 'Staff directory', href: '/staff/directory', icon: UsersRound, description: 'Find staff profiles, departments, positions, and contact records.' },
+  { label: 'Contracts & credentials', href: '/staff/contracts', icon: FileText, description: 'Track contract dates, qualifications, and credential verification.' },
+  { label: 'Leave management', href: '/staff/leave', icon: CalendarDays, description: 'Review leave balances, requests, and approval queues.' },
+  { label: 'Workload planning', href: '/staff/workload', icon: ListTree, description: 'Monitor teaching and service allocations across faculties.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const accommodationItems = [
+  { label: 'Overview', href: '/accommodation', icon: LayoutDashboard, description: 'Review residence capacity, applications, allocations, and operations.' },
+  { label: 'Residences & rooms', href: '/accommodation/residences', icon: Building2, description: 'Monitor beds, room inventory, occupancy, and maintenance status.' },
+  { label: 'Applications', href: '/accommodation/applications', icon: ClipboardList, description: 'Review housing requests, eligibility, and applicant priorities.' },
+  { label: 'Room allocations', href: '/accommodation/allocations', icon: MapPin, description: 'Assign residents to available rooms and track allocation changes.' },
+  { label: 'Check-in & maintenance', href: '/accommodation/operations', icon: Settings2, description: 'Coordinate check-ins, check-outs, inspections, and repair tasks.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const internshipItems = [
+  { label: 'Overview', href: '/internship', icon: LayoutDashboard, description: 'Track placements, supervisors, logbooks, and research activity.' },
+  { label: 'Student placements', href: '/internship/placements', icon: MapPin, description: 'Monitor placement matching, host organizations, and student progress.' },
+  { label: 'Supervisors', href: '/internship/supervisors', icon: UsersRound, description: 'Manage industry and faculty supervisors and their assigned students.' },
+  { label: 'Logbooks & reviews', href: '/internship/logbooks', icon: FileText, description: 'Review submitted logbooks, supervisor feedback, and approval status.' },
+  { label: 'Research projects', href: '/internship/research', icon: GraduationCap, description: 'Track research proposals, ethics review, and project milestones.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const welfareItems = [
+  { label: 'Overview', href: '/welfare', icon: LayoutDashboard, description: 'Coordinate restricted support cases, appointments, and follow-up.' },
+  { label: 'Support cases', href: '/welfare/cases', icon: ShieldCheck, description: 'Manage confidential cases with role-limited access and audit history.' },
+  { label: 'Appointments', href: '/welfare/appointments', icon: CalendarDays, description: 'Coordinate counselling and student support appointments.' },
+  { label: 'Referrals', href: '/welfare/referrals', icon: ArrowRightLeft, description: 'Track authorized referrals to internal and external services.' },
+  { label: 'Follow-up tasks', href: '/welfare/follow-up', icon: ClipboardList, description: 'Monitor assigned follow-ups without exposing restricted case details.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const graduationItems = [
+  { label: 'Overview', href: '/graduation', icon: LayoutDashboard, description: 'Review candidate eligibility, clearance, ceremony planning, and alumni.' },
+  { label: 'Candidate eligibility', href: '/graduation/eligibility', icon: GraduationCap, description: 'Verify academic completion and identify graduation candidates.' },
+  { label: 'Clearance', href: '/graduation/clearances', icon: ShieldCheck, description: 'Track academic, finance, and library clearance requirements.' },
+  { label: 'Ceremony planning', href: '/graduation/ceremony', icon: CalendarDays, description: 'Coordinate ceremony schedules, awards, and candidate logistics.' },
+  { label: 'Alumni records', href: '/graduation/alumni', icon: UsersRound, description: 'Maintain graduate profiles and alumni engagement records.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const communicationsItems = [
+  { label: 'Overview', href: '/communications', icon: LayoutDashboard, description: 'Review announcements, templates, campaigns, and delivery status.' },
+  { label: 'Announcements', href: '/communications/announcements', icon: ClipboardList, description: 'Draft and publish audience-targeted institutional announcements.' },
+  { label: 'Message templates', href: '/communications/templates', icon: FileText, description: 'Maintain approved templates for email, SMS, and in-app notices.' },
+  { label: 'Campaigns', href: '/communications/campaigns', icon: UsersRound, description: 'Schedule controlled communications for selected audiences.' },
+  { label: 'Delivery logs', href: '/communications/delivery', icon: ChartNoAxesCombined, description: 'Monitor delivery, failures, retries, and recipient responses.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const qualityItems = [
+  { label: 'Overview', href: '/quality', icon: LayoutDashboard, description: 'Track evaluations, programme reviews, actions, and surveys.' },
+  { label: 'Course evaluations', href: '/quality/evaluations', icon: ClipboardList, description: 'Review course feedback response rates and evaluation results.' },
+  { label: 'Programme reviews', href: '/quality/programme-reviews', icon: GraduationCap, description: 'Coordinate periodic programme reviews and evidence submissions.' },
+  { label: 'Improvement actions', href: '/quality/improvement-actions', icon: ShieldCheck, description: 'Track assigned quality actions, owners, deadlines, and outcomes.' },
+  { label: 'Surveys & tracer studies', href: '/quality/surveys', icon: ChartNoAxesCombined, description: 'Manage institutional surveys and graduate tracer studies.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const procurementItems = [
+  { label: 'Overview', href: '/procurement', icon: LayoutDashboard, description: 'Review requisitions, suppliers, stock, and institutional assets.' },
+  { label: 'Requisitions', href: '/procurement/requisitions', icon: ClipboardList, description: 'Track requests, approvals, sourcing, and purchase orders.' },
+  { label: 'Suppliers', href: '/procurement/suppliers', icon: Building2, description: 'Maintain supplier records, compliance documents, and performance.' },
+  { label: 'Inventory & stores', href: '/procurement/inventory', icon: Library, description: 'Monitor stock levels, receipts, issues, and reorder alerts.' },
+  { label: 'Asset register', href: '/procurement/assets', icon: ListTree, description: 'Track institutional assets, assignments, locations, and lifecycle.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const reportsItems = [
+  { label: 'Overview', href: '/reports', icon: LayoutDashboard, description: 'Browse institutional, academic, finance, and operations reporting.' },
+  { label: 'Institutional performance', href: '/reports/institutional', icon: ChartNoAxesCombined, description: 'Review enrolment, retention, completion, and institutional KPIs.' },
+  { label: 'Academic outcomes', href: '/reports/academic-performance', icon: GraduationCap, description: 'Compare results, progression, course outcomes, and attendance.' },
+  { label: 'Finance analytics', href: '/reports/finance-analytics', icon: CreditCard, description: 'Analyze billing, collections, balances, and receivables ageing.' },
+  { label: 'Operations reports', href: '/reports/operations', icon: Settings2, description: 'Review service queues, processing times, and operational exceptions.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const administrationItems = [
+  { label: 'Overview', href: '/administration', icon: LayoutDashboard, description: 'Monitor audit events, jobs, integrations, and data operations.' },
+  { label: 'System health', href: '/administration/system-health', icon: ShieldCheck, description: 'Review service availability, scheduled checks, and system warnings.' },
+  { label: 'Audit log', href: '/administration/audit-log', icon: ClipboardList, description: 'Inspect privileged actions with actor, timestamp, and resource context.' },
+  { label: 'Jobs & integrations', href: '/administration/jobs-integrations', icon: ArrowRightLeft, description: 'Monitor background jobs, connector health, retries, and failures.' },
+  { label: 'Imports & data quality', href: '/administration/imports', icon: FileText, description: 'Validate import batches and resolve data quality exceptions.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const genericOperationalGroups = [
+  { basePath: '/scholarships', items: scholarshipItems },
+  { basePath: '/learning', items: learningItems },
+  { basePath: '/library', items: libraryItems },
+  { basePath: '/staff', items: staffItems },
+  { basePath: '/accommodation', items: accommodationItems },
+  { basePath: '/internship', items: internshipItems },
+  { basePath: '/welfare', items: welfareItems },
+  { basePath: '/graduation', items: graduationItems },
+  { basePath: '/communications', items: communicationsItems },
+  { basePath: '/quality', items: qualityItems },
+  { basePath: '/procurement', items: procurementItems },
+  { basePath: '/reports', items: reportsItems },
+  { basePath: '/administration', items: administrationItems },
+]
+
 export const adminNavigationItems: NavigationItem[] = [
   { label: 'Users & roles', href: '/users', icon: ShieldCheck, permission: 'users.manage' },
   { label: 'System administration', href: '/administration', icon: Settings2, permission: 'administration.manage' },
@@ -452,6 +580,10 @@ export const pageMeta: Record<string, { eyebrow: string; title: string; descript
   '/timetabling/lecturer-allocation': { eyebrow: 'Teaching operations', title: 'Lecturer allocation', description: 'Balance teaching assignments and lecturer availability.' },
   '/timetabling/conflicts': { eyebrow: 'Teaching operations', title: 'Conflict resolution', description: 'Resolve room, lecturer, and cohort scheduling clashes.' },
   '/attendance': { eyebrow: 'Teaching operations', title: 'Attendance', description: 'Monitor attendance sessions, corrections, and student participation signals.' },
+  '/attendance/sessions': { eyebrow: 'Teaching operations', title: 'Sessions & registers', description: 'Track class registers and lecturer submission status by scheduled session.' },
+  '/attendance/alerts': { eyebrow: 'Teaching operations', title: 'Attendance alerts', description: 'Follow students and cohorts below the institution attendance threshold.' },
+  '/attendance/corrections': { eyebrow: 'Teaching operations', title: 'Correction requests', description: 'Review authorized requests to correct submitted attendance records.' },
+  '/attendance/reports': { eyebrow: 'Teaching operations', title: 'Attendance reports & trends', description: 'Compare participation by course, programme, cohort, and teaching period.' },
   '/examinations': { eyebrow: 'Assessment & results', title: 'Examinations', description: 'Monitor marks entry, moderation, approvals, and publication readiness.' },
   '/examinations/assessment-setup': { eyebrow: 'Assessment & results', title: 'Assessment setup', description: 'Coordinate assessment components, schedules, and course coverage.' },
   '/examinations/marks-entry': { eyebrow: 'Assessment & results', title: 'Marks entry', description: 'Monitor marks submission and resolve missing result records.' },
@@ -704,10 +836,34 @@ Object.assign(moduleRows, {
     { reference: 'CON-2026-003', applicant: 'Hall B capacity check', programme: 'Enrollment exceeds room limit', intake: 'Health Sciences', status: 'Resolved' },
   ],
   '/attendance': [
-    { reference: 'ATT-2025-081', applicant: 'Attendance sessions', programme: '186 sessions this week', intake: 'Semester II · 2025', status: 'Active' },
-    { reference: 'ATT-LOW-22', applicant: 'Low attendance alerts', programme: '22 students below threshold', intake: 'Academic adviser queue', status: 'Needs attention' },
-    { reference: 'ATT-COR-08', applicant: 'Correction requests', programme: '8 authorised requests', intake: 'Registrar review', status: 'Under review' },
-    { reference: 'ATT-RPT-02', applicant: 'Attendance summary', programme: 'All faculties', intake: 'Updated today', status: 'Ready' },
+    { reference: 'ATT-2026-081', applicant: 'Scheduled class registers', programme: '186 sessions this week', intake: 'Semester II · 2026', status: 'Active' },
+    { reference: 'ATT-LOW-22', applicant: 'Low attendance alerts', programme: '22 students below 75%', intake: 'Academic adviser queue', status: 'Needs attention' },
+    { reference: 'ATT-COR-08', applicant: 'Correction requests', programme: '8 authorized requests', intake: 'Registrar review', status: 'Under review' },
+    { reference: 'ATT-RPT-02', applicant: 'Participation summary', programme: 'All faculties', intake: 'Updated today', status: 'Ready' },
+  ],
+  '/attendance/sessions': [
+    { reference: 'SES-2026-412', applicant: 'CSC 204 · Data Structures', programme: 'Year 2 · Dr. Sarah Nansubuga', intake: 'Mon · 09:00 · Lab 2', status: 'Submitted' },
+    { reference: 'SES-2026-398', applicant: 'BBA 310 · Strategic Management', programme: 'Year 3 · Mr. Brian Ouma', intake: 'Tue · 11:00 · Hall A', status: 'In progress' },
+    { reference: 'SES-2026-376', applicant: 'BED 402 · Education Policy', programme: 'Year 4 · Ms. Irene Akello', intake: 'Wed · 14:00 · Room E12', status: 'Not submitted' },
+    { reference: 'SES-2026-354', applicant: 'HSC 202 · Community Health', programme: 'Year 2 · Dr. Joseph Mugisha', intake: 'Thu · 08:00 · Hall B', status: 'Submitted' },
+  ],
+  '/attendance/alerts': [
+    { reference: 'ALR-2026-022', applicant: 'Mariam Atim · DCS Year 1', programme: 'Attendance 62% · CSC 101', intake: 'Advisor follow-up', status: 'Needs attention' },
+    { reference: 'ALR-2026-018', applicant: 'Peter Ssekabira · BED Year 4', programme: 'Attendance 68% · EDU 402', intake: '3 consecutive absences', status: 'Under review' },
+    { reference: 'ALR-2026-014', applicant: 'Computing Year 2 cohort', programme: 'Course attendance 71% · CSC 204', intake: 'Lecturer follow-up', status: 'Open' },
+    { reference: 'ALR-2026-009', applicant: 'Sarah Achieng · BIT Year 1', programme: 'Attendance 73% · BIT 105', intake: 'Advisor notified', status: 'Resolved' },
+  ],
+  '/attendance/corrections': [
+    { reference: 'COR-2026-008', applicant: 'Aisha Namukasa', programme: 'CSC 204 · 12 Nov · Marked absent', intake: 'Lecturer evidence attached', status: 'Under review' },
+    { reference: 'COR-2026-007', applicant: 'Daniel Okello', programme: 'BBA 310 · 10 Nov · Late arrival', intake: 'Faculty registrar', status: 'Pending' },
+    { reference: 'COR-2026-005', applicant: 'Mariam Atim', programme: 'DCS 102 · 08 Nov · Marked absent', intake: 'Class tutor confirmation', status: 'Needs attention' },
+    { reference: 'COR-2026-003', applicant: 'Peter Ssekabira', programme: 'EDU 402 · 06 Nov · Present', intake: 'Approved by registrar', status: 'Approved' },
+  ],
+  '/attendance/reports': [
+    { reference: 'RPT-ATT-01', applicant: 'Institutional participation', programme: 'All campuses · 82% average', intake: 'Semester II · 2026', status: 'Ready' },
+    { reference: 'RPT-ATT-02', applicant: 'Low-attendance students', programme: '22 students below 75%', intake: 'Advisor action list', status: 'Needs attention' },
+    { reference: 'RPT-ATT-03', applicant: 'Session submission rate', programme: '94% lecturer register completion', intake: 'This week', status: 'Ready' },
+    { reference: 'RPT-ATT-04', applicant: 'Attendance by faculty', programme: '5 faculties compared', intake: 'Updated today', status: 'Ready' },
   ],
   '/scholarships': [
     { reference: 'SCH-2025-0198', applicant: 'Education fund awards', programme: '82 sponsored students', intake: 'Semester II · 2025', status: 'Approved' },
@@ -843,6 +999,10 @@ export const moduleIcons: Record<string, LucideIcon> = {
   '/timetabling/lecturer-allocation': UsersRound,
   '/timetabling/conflicts': ShieldCheck,
   '/attendance': UsersRound,
+  '/attendance/sessions': ClipboardList,
+  '/attendance/alerts': CirclePause,
+  '/attendance/corrections': ArrowRightLeft,
+  '/attendance/reports': ChartNoAxesCombined,
   '/examinations': ClipboardList,
   '/examinations/assessment-setup': ClipboardList,
   '/examinations/marks-entry': FileText,
@@ -869,6 +1029,36 @@ export const moduleIcons: Record<string, LucideIcon> = {
 }
 
 export const moduleKpis: Record<string, KpiMetric[]> = {
+  '/attendance': [
+    { label: 'Sessions this week', value: '186', detail: 'Linked to published timetable', icon: CalendarDays, tone: 'blue' },
+    { label: 'Registers submitted', value: '94%', detail: 'Lecturer submission rate', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Below threshold', value: '22', detail: 'Students under 75% attendance', icon: CirclePause, tone: 'amber' },
+    { label: 'Open corrections', value: '8', detail: 'Awaiting authorized review', icon: ArrowRightLeft, tone: 'purple' },
+  ],
+  '/attendance/sessions': [
+    { label: 'Scheduled sessions', value: '186', detail: 'This teaching week', icon: CalendarDays, tone: 'blue' },
+    { label: 'Registers submitted', value: '175', detail: '94% completion', icon: ShieldCheck, tone: 'teal' },
+    { label: 'In progress', value: '7', detail: 'Lecturer taking attendance', icon: ClipboardList, tone: 'purple' },
+    { label: 'Not submitted', value: '4', detail: 'Follow-up required', icon: CirclePause, tone: 'amber' },
+  ],
+  '/attendance/alerts': [
+    { label: 'Students flagged', value: '22', detail: 'Below 75% threshold', icon: CirclePause, tone: 'amber' },
+    { label: 'Urgent follow-up', value: '8', detail: 'Multiple consecutive absences', icon: UsersRound, tone: 'purple' },
+    { label: 'Advisors notified', value: '16', detail: 'Cases assigned for follow-up', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Resolved this week', value: '11', detail: 'Returned above the threshold', icon: ClipboardList, tone: 'blue' },
+  ],
+  '/attendance/corrections': [
+    { label: 'Open requests', value: '8', detail: 'Awaiting decision', icon: ArrowRightLeft, tone: 'blue' },
+    { label: 'Evidence attached', value: '6', detail: 'Ready for review', icon: FileText, tone: 'teal' },
+    { label: 'Urgent', value: '2', detail: 'Near reporting deadline', icon: CirclePause, tone: 'amber' },
+    { label: 'Approved this week', value: '14', detail: 'Authorized record changes', icon: ShieldCheck, tone: 'purple' },
+  ],
+  '/attendance/reports': [
+    { label: 'Average attendance', value: '82%', detail: 'Across active sessions', icon: ChartNoAxesCombined, tone: 'blue' },
+    { label: 'Register completion', value: '94%', detail: 'Lecturer submissions', icon: ClipboardList, tone: 'teal' },
+    { label: 'Below threshold', value: '22', detail: 'Students requiring support', icon: CirclePause, tone: 'amber' },
+    { label: 'Faculties tracked', value: '5', detail: 'Current reporting period', icon: Building2, tone: 'purple' },
+  ],
   '/timetabling': [
     { label: 'Scheduled sessions', value: '412', detail: 'Teaching sessions this semester', icon: CalendarDays, tone: 'blue' },
     { label: 'Open conflicts', value: '12', detail: 'Room, lecturer, or cohort clashes', icon: CirclePause, tone: 'amber' },
@@ -1109,6 +1299,118 @@ export const moduleKpis: Record<string, KpiMetric[]> = {
     { label: 'Grade bands', value: '18', detail: 'Across shown grading systems', icon: ListTree, tone: 'purple' },
     { label: 'Draft systems', value: '1', detail: 'Postgraduate 4-point GPA', icon: ClipboardList, tone: 'amber' },
   ],
+}
+
+Object.assign(moduleKpis, {
+  '/scholarships': [
+    { label: 'Active awards', value: '82', detail: 'Students currently sponsored', icon: GraduationCap, tone: 'blue' },
+    { label: 'Applications', value: '42', detail: 'Awaiting committee review', icon: ClipboardList, tone: 'amber' },
+    { label: 'Sponsor commitment', value: 'UGX 420M', detail: 'Across active agreements', icon: Building2, tone: 'teal' },
+    { label: 'Award exceptions', value: '7', detail: 'Need finance approval', icon: CirclePause, tone: 'purple' },
+  ],
+  '/learning': [
+    { label: 'Course spaces', value: '86', detail: 'Active this semester', icon: BookOpen, tone: 'blue' },
+    { label: 'Published resources', value: '1,248', detail: 'Available to learners', icon: FileText, tone: 'teal' },
+    { label: 'Pending submissions', value: '124', detail: 'Awaiting marking', icon: ClipboardList, tone: 'amber' },
+    { label: 'Active learners', value: '2,184', detail: 'Across current courses', icon: UsersRound, tone: 'purple' },
+  ],
+  '/library': [
+    { label: 'Catalogue records', value: '12,840', detail: 'Across all campuses', icon: Library, tone: 'blue' },
+    { label: 'Loans today', value: '186', detail: '94 items returned', icon: ArrowRightLeft, tone: 'teal' },
+    { label: 'Overdue items', value: '114', detail: 'Need borrower follow-up', icon: CirclePause, tone: 'amber' },
+    { label: 'Clearance queue', value: '82', detail: 'Graduating students', icon: ShieldCheck, tone: 'purple' },
+  ],
+  '/staff': [
+    { label: 'Staff records', value: '246', detail: 'Across faculties and units', icon: UsersRound, tone: 'blue' },
+    { label: 'Leave requests', value: '12', detail: 'Awaiting approval', icon: CalendarDays, tone: 'amber' },
+    { label: 'Contracts due', value: '8', detail: 'Renewal this month', icon: FileText, tone: 'purple' },
+    { label: 'Workload exceptions', value: '14', detail: 'Require department review', icon: ListTree, tone: 'teal' },
+  ],
+  '/accommodation': [
+    { label: 'Available beds', value: '420', detail: 'Across active residences', icon: Building2, tone: 'blue' },
+    { label: 'Occupancy', value: '86%', detail: 'Current residence capacity', icon: UsersRound, tone: 'teal' },
+    { label: 'Allocation queue', value: '214', detail: 'Applications under review', icon: ClipboardList, tone: 'amber' },
+    { label: 'Open maintenance', value: '31', detail: 'Residence operations tasks', icon: Settings2, tone: 'purple' },
+  ],
+  '/internship': [
+    { label: 'Students placed', value: '156', detail: 'Current placement cycle', icon: MapPin, tone: 'blue' },
+    { label: 'Logbooks pending', value: '88', detail: 'Supervisor review required', icon: FileText, tone: 'amber' },
+    { label: 'Supervisor matches', value: '48', detail: 'Awaiting confirmation', icon: UsersRound, tone: 'teal' },
+    { label: 'Research projects', value: '12', detail: 'Active proposals', icon: GraduationCap, tone: 'purple' },
+  ],
+  '/welfare': [
+    { label: 'Active support cases', value: '32', detail: 'Restricted staff access', icon: ShieldCheck, tone: 'blue' },
+    { label: 'Appointments', value: '32', detail: 'Scheduled this week', icon: CalendarDays, tone: 'teal' },
+    { label: 'Open follow-ups', value: '41', detail: 'Assigned support tasks', icon: ClipboardList, tone: 'amber' },
+    { label: 'Authorized referrals', value: '8', detail: 'Access-audited referrals', icon: ArrowRightLeft, tone: 'purple' },
+  ],
+  '/graduation': [
+    { label: 'Candidates', value: '184', detail: 'Current graduation cohort', icon: GraduationCap, tone: 'blue' },
+    { label: 'Academic clearance', value: '172', detail: 'Requirements completed', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Finance clearance', value: '168', detail: 'Accounts confirmed', icon: CreditCard, tone: 'amber' },
+    { label: 'Alumni registered', value: '142', detail: 'Recent graduating cohort', icon: UsersRound, tone: 'purple' },
+  ],
+  '/communications': [
+    { label: 'Active campaigns', value: '4', detail: 'Audience-targeted messages', icon: UsersRound, tone: 'blue' },
+    { label: 'Announcements', value: '12', detail: 'Published this period', icon: ClipboardList, tone: 'teal' },
+    { label: 'Delivery rate', value: '98%', detail: 'Across recent sends', icon: ChartNoAxesCombined, tone: 'purple' },
+    { label: 'Draft messages', value: '6', detail: 'Awaiting approval', icon: FileText, tone: 'amber' },
+  ],
+  '/quality': [
+    { label: 'Evaluation responses', value: '1,842', detail: 'Current semester', icon: ClipboardList, tone: 'blue' },
+    { label: 'Open actions', value: '14', detail: 'Assigned for improvement', icon: ShieldCheck, tone: 'amber' },
+    { label: 'Programme reviews', value: '6', detail: 'Due this academic year', icon: GraduationCap, tone: 'purple' },
+    { label: 'Active surveys', value: '2', detail: 'Collecting responses', icon: ChartNoAxesCombined, tone: 'teal' },
+  ],
+  '/procurement': [
+    { label: 'Open requisitions', value: '18', detail: 'Across procurement stages', icon: ClipboardList, tone: 'blue' },
+    { label: 'Committed value', value: 'UGX 420M', detail: 'Current purchasing cycle', icon: CreditCard, tone: 'purple' },
+    { label: 'Low-stock alerts', value: '9', detail: 'Below reorder thresholds', icon: CirclePause, tone: 'amber' },
+    { label: 'Tracked assets', value: '1,428', detail: 'Institutional register', icon: Building2, tone: 'teal' },
+  ],
+  '/reports': [
+    { label: 'Saved reports', value: '24', detail: 'Available to your role', icon: ChartNoAxesCombined, tone: 'blue' },
+    { label: 'Updated today', value: '18', detail: 'Current reporting cycle', icon: CalendarDays, tone: 'teal' },
+    { label: 'Scheduled exports', value: '6', detail: 'Automated report delivery', icon: FileText, tone: 'purple' },
+    { label: 'Data exceptions', value: '3', detail: 'Need source review', icon: CirclePause, tone: 'amber' },
+  ],
+  '/administration': [
+    { label: 'Audit events today', value: '1,142', detail: 'Privileged actions recorded', icon: ClipboardList, tone: 'blue' },
+    { label: 'Running jobs', value: '12', detail: 'No failed jobs reported', icon: ArrowRightLeft, tone: 'teal' },
+    { label: 'Integrations', value: '4', detail: 'Configured connectors', icon: Settings2, tone: 'purple' },
+    { label: 'Import batches', value: '2', detail: 'Awaiting final review', icon: FileText, tone: 'amber' },
+  ],
+})
+
+for (const group of genericOperationalGroups) {
+  const parentMeta = pageMeta[group.basePath]
+  const parentRows = moduleRows[group.basePath] ?? []
+  const parentMetrics = moduleKpis[group.basePath] ?? []
+
+  for (const [index, area] of group.items.entries()) {
+    if (area.href === group.basePath) continue
+
+    pageMeta[area.href] = { eyebrow: parentMeta.eyebrow, title: area.label, description: area.description }
+    moduleIcons[area.href] = area.icon
+
+    const areaReference = area.href.split('/').filter(Boolean).pop()?.split('-').map((part) => part.slice(0, 3).toUpperCase()).join('') ?? 'AREA'
+    const rows: Array<Record<string, string>> = parentRows.map((row, rowIndex) => ({
+      ...row,
+      reference: `${areaReference}-${String(rowIndex + 1).padStart(3, '0')}`,
+      applicant: `${area.label} · ${row.applicant}`,
+    }))
+    moduleRows[area.href] = rows
+
+    const needsAttention = rows.filter((row) => /attention|pending|missing|hold/i.test(row.status)).length
+    const underReview = rows.filter((row) => /review|draft/i.test(row.status)).length
+    const focusMetric = parentMetrics[(index - 1) % Math.max(parentMetrics.length, 1)]
+    moduleKpis[area.href] = [
+      { label: area.label, value: focusMetric?.value ?? `${rows.length}`, detail: area.description, icon: area.icon, tone: 'blue' },
+      { label: 'Needs attention', value: `${needsAttention}`, detail: 'Items requiring follow-up', icon: CirclePause, tone: 'amber' },
+      { label: 'Under review', value: `${underReview}`, detail: 'Items in an approval queue', icon: ShieldCheck, tone: 'teal' },
+      { label: 'Records in view', value: `${rows.length * 126 + 238}`, detail: 'Current operating cycle', icon: CalendarDays, tone: 'purple' },
+    ]
+  }
 }
 
 export const institutionDefaults = {
