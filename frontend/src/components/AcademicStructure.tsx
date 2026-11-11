@@ -61,6 +61,14 @@ function AcademicStructureOverview() {
     <div className="stats-grid module-kpi-strip">
       {(moduleKpis['/academics'] ?? []).map((metric) => <KpiCard key={metric.label} {...metric} />)}
     </div>
+    <section className="academic-quick-actions" aria-label="Academic structure shortcuts">
+      <div><strong>Build the academic structure</strong><span>Set up campuses and academic units, then connect programmes, course units, curricula, and policies.</span></div>
+      <div className="academic-quick-action-links">
+        <Link className="ui-button ui-button-outline ui-button-sm" to="/academics/institutions"><Plus size={14} />Manage campuses</Link>
+        <Link className="ui-button ui-button-outline ui-button-sm" to="/academics/programmes"><Plus size={14} />Manage programmes</Link>
+        <Link className="ui-button ui-button-outline ui-button-sm" to="/academics/courses"><Plus size={14} />Manage course units</Link>
+      </div>
+    </section>
     <ModuleOverviewCharts path="/academics" />
     <section className="academic-hierarchy" aria-label="Academic structure hierarchy">
       {[

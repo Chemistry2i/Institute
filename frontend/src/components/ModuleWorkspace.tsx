@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
-import { CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, CircleHelp, Download, Filter, Layers, MoreHorizontal, Plus, RefreshCw, Search, X } from 'lucide-react'
+import { Archive, CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, CircleHelp, Download, Eye, Filter, Layers, MoreHorizontal, Pencil, Plus, RefreshCw, Search, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Badge, Button, Card, EmptyState, ErrorState, KpiCard, KpiSkeleton, Skeleton, TableSkeleton } from './ui'
 import { adminNavigationItems, moduleIcons, moduleKpis, moduleRows, navigationItems, pageMeta } from '../data'
@@ -8,10 +8,81 @@ import { addMatriculatedStudent, readModuleRows, writeModuleRows, type DemoRow }
 
 type ModuleRow = DemoRow
 type ModalMode = 'create' | 'filters' | 'detail' | null
+type AcademicField = 'reference' | 'applicant' | 'programme' | 'intake' | 'status'
+type AcademicWorkspaceConfig = {
+  entity: string
+  action: string
+  labels: Record<string, string>
+  placeholders: Record<string, string>
+  extraFields?: Array<{ key: string; label: string; placeholder: string; required?: boolean }>
+}
+
+const academicWorkspaceConfigs: Record<string, AcademicWorkspaceConfig> = {
+  '/academics/institutions': {
+    entity: 'institution or campus',
+    action: 'Add institution / campus',
+    labels: { reference: 'Code', applicant: 'Institution or campus name', programme: 'Location', intake: 'Type', status: 'Status' },
+    placeholders: { reference: 'e.g. CAMP-NORTH', applicant: 'Enter the institution or campus name', programme: 'City, district, country', intake: 'University, campus, college' },
+    extraFields: [{ key: 'contact', label: 'Official contact', placeholder: 'Email or phone number' }],
+  },
+  '/academics/faculties': {
+    entity: 'faculty or school',
+    action: 'Add faculty / school',
+    labels: { reference: 'Faculty code', applicant: 'Faculty or school name', programme: 'Parent institution', intake: 'Campus', status: 'Status' },
+    placeholders: { reference: 'e.g. FOS', applicant: 'Enter faculty or school name', programme: 'Institution name', intake: 'Campus location' },
+    extraFields: [{ key: 'dean', label: 'Dean or school head', placeholder: 'Name of the academic lead' }],
+  },
+  '/academics/departments': {
+    entity: 'department',
+    action: 'Add department',
+    labels: { reference: 'Department code', applicant: 'Department name', programme: 'Faculty or school', intake: 'Campus', status: 'Status' },
+    placeholders: { reference: 'e.g. BIO', applicant: 'Enter department name', programme: 'Parent faculty or school', intake: 'Campus location' },
+    extraFields: [{ key: 'head', label: 'Department head', placeholder: 'Name of the department head' }],
+  },
+  '/academics/programmes': {
+    entity: 'programme',
+    action: 'Create programme',
+    labels: { reference: 'Programme code', applicant: 'Programme name', programme: 'Faculty or school', intake: 'Award · duration · credits', status: 'Status' },
+    placeholders: { reference: 'e.g. BSC-BIO', applicant: 'Enter programme name', programme: 'Owning faculty or school', intake: 'Bachelor · 3 years · 120 credits' },
+    extraFields: [{ key: 'department', label: 'Owning department', placeholder: 'Department responsible for delivery', required: true }],
+  },
+  '/academics/courses': {
+    entity: 'course unit',
+    action: 'Add course unit',
+    labels: { reference: 'Course code', applicant: 'Course unit title', programme: 'Credit units', intake: 'Year · semester', status: 'Status' },
+    placeholders: { reference: 'e.g. BIO 101', applicant: 'Enter course unit title', programme: 'e.g. 4', intake: 'Year 1 · Semester I' },
+    extraFields: [{ key: 'owner', label: 'Programme or department', placeholder: 'Owning programme or department', required: true }],
+  },
+  '/academics/curricula': {
+    entity: 'curriculum',
+    action: 'Create curriculum',
+    labels: { reference: 'Curriculum code', applicant: 'Programme · version', programme: 'Academic year', intake: 'Course units · credit units', status: 'Status' },
+    placeholders: { reference: 'e.g. CUR-BSC-BIO-26', applicant: 'Programme name · version', programme: 'Academic year', intake: '32 course units · 120 credits' },
+    extraFields: [{ key: 'progression', label: 'Progression requirements', placeholder: 'Prerequisites or progression rules' }],
+  },
+  '/academics/calendar': {
+    entity: 'academic period',
+    action: 'Add academic period',
+    labels: { reference: 'Period code', applicant: 'Academic year or semester', programme: 'Start date – end date', intake: 'Registration or teaching dates', status: 'Status' },
+    placeholders: { reference: 'e.g. SEM-I-2027', applicant: 'e.g. Semester I · 2027', programme: 'YYYY-MM-DD – YYYY-MM-DD', intake: 'Registration and key dates' },
+    extraFields: [{ key: 'registrationDeadline', label: 'Registration deadline', placeholder: 'YYYY-MM-DD' }],
+  },
+  '/academics/grading': {
+    entity: 'grading system',
+    action: 'Create grading system',
+    labels: { reference: 'Scheme code', applicant: 'Grading system name', programme: 'Scale and grade bands', intake: 'Applicable awards', status: 'Status' },
+    placeholders: { reference: 'e.g. UG-100', applicant: 'Enter grading system name', programme: 'e.g. 0–100 · A–F · 7 bands', intake: 'Undergraduate, diploma, postgraduate' },
+    extraFields: [{ key: 'rules', label: 'Award rules', placeholder: 'GPA thresholds or classification rules' }],
+  },
+}
 
 export function ModuleWorkspace({ path, loading = false }: { path: string; loading?: boolean }) {
   const meta = pageMeta[path]
   const Icon = moduleIcons[path]
+  const academicConfig = academicWorkspaceConfigs[path]
+  const academicLabels = academicConfig
+    ? { ...academicConfig.labels, ...Object.fromEntries((academicConfig.extraFields ?? []).map((field) => [field.key, field.label])) }
+    : undefined
   const seededRows = moduleRows[path] ?? []
   const [recordState, setRecordState] = useState(() => ({ path, rows: readModuleRows(path, seededRows) }))
   const rows = recordState.path === path ? recordState.rows : readModuleRows(path, seededRows)
@@ -27,6 +98,7 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
     : [...navigationItems, ...adminNavigationItems].find((item) => path === item.href || path.startsWith(`${item.href}/`))?.permission
   const [modal, setModal] = useState<ModalMode>(null)
   const [selectedRow, setSelectedRow] = useState<ModuleRow | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<ModuleRow | null>(null)
   const [selectedReferences, setSelectedReferences] = useState<string[]>([])
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All statuses')
@@ -46,6 +118,7 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
   const currentPage = Math.min(page, pageCount - 1)
   const pageRows = filteredRows.slice(currentPage * pageSize, (currentPage + 1) * pageSize)
   const statusOptions = Array.from(new Set(rows.map((row) => row.status).filter(Boolean)))
+  const tableFields = [...new Set([...rows.flatMap((row) => Object.keys(row)), ...(academicConfig?.extraFields ?? []).map((field) => field.key)])]
   const selectedCount = rows.filter((row) => selectedReferences.includes(row.reference)).length
   const allRowsSelected = pageRows.length > 0 && pageRows.every((row) => selectedReferences.includes(row.reference))
 
@@ -106,6 +179,11 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
   }
 
   const deleteRecord = (reference: string) => {
+    if (academicConfig) {
+      setDeleteTarget(rows.find((row) => row.reference === reference) ?? null)
+      setModal(null)
+      return
+    }
     if (!window.confirm(`Delete record ${reference} from this preview?`)) return
     if (persistRows(rows.filter((row) => row.reference !== reference))) {
       setModal(null)
@@ -117,6 +195,19 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
     const content = JSON.stringify({ module: path, exportedAt: new Date().toISOString(), records }, null, 2)
     downloadJson(`${path.split('/').filter(Boolean).join('-') || 'module'}-records.json`, content)
     toast.success(`${records.length} records exported.`)
+  }
+  const confirmDeleteRecord = () => {
+    if (!deleteTarget) return
+    if (persistRows(rows.filter((row) => row.reference !== deleteTarget.reference))) {
+      toast.success(`${academicConfig?.entity ?? meta.title.toLowerCase()} removed from this preview.`)
+      setDeleteTarget(null)
+      setSelectedRow(null)
+      setModal(null)
+    }
+  }
+  const toggleAcademicStatus = (row: ModuleRow) => {
+    const status = row.status.toLowerCase() === 'active' ? 'Archived' : 'Active'
+    updateRecord({ ...row, status })
   }
 
   const importRows = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -185,18 +276,19 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
         <Button variant="outline" size="sm" onClick={() => importInputRef.current?.click()}><Plus size={15} /> Import</Button>
         <input ref={importInputRef} className="visually-hidden" type="file" accept="application/json,.json" onChange={(event) => void importRows(event)} aria-label={`Import ${meta.title} JSON file`} />
         <Button size="sm" onClick={() => exportRows(filteredRows)}><Download size={15} /> Export</Button>
-        <Button size="sm" onClick={() => setModal('create')}><Plus size={15} /> New record</Button>
+        <Button size="sm" onClick={() => setModal('create')}><Plus size={15} /> {academicConfig?.action ?? 'New record'}</Button>
       </div>
     </div>
     {selectedCount > 0 && <div className="bulk-selection-toolbar" aria-live="polite"><span>{selectedCount} selected</span><label className="bulk-status-action"><span>Set status</span><select value={bulkStatus} onChange={(event) => setBulkStatus(event.target.value)}><option value="">Choose status</option>{statusOptions.map((status) => <option key={status}>{status}</option>)}</select></label><Button variant="outline" size="sm" disabled={!bulkStatus} onClick={updateSelectedStatus}>Apply</Button><Button variant="outline" size="sm" onClick={() => exportRows(rows.filter((row) => selectedReferences.includes(row.reference)))}><Download size={14} /> Export selected</Button><Button variant="ghost" size="sm" onClick={() => setSelectedReferences([])}>Clear selection</Button></div>}
     <Card className="module-table-card">
       <div className="table-card-head"><div className="module-title"><div className="module-title-icon"><Icon size={19} /></div><div><h2>{meta.title}</h2><p>{rows.length} records · {filteredRows.length} matching filters</p></div></div><button className="card-menu" aria-label="More options" onClick={() => setModal('filters')}><MoreHorizontal size={18} /></button></div>
-      {filteredRows.length ? <><div className="table-responsive"><table className="data-table"><thead><tr><th className="bulk-select-cell"><input ref={selectAllRef} type="checkbox" checked={allRowsSelected} onChange={toggleAllRows} aria-label={`Select all records on page ${currentPage + 1}`} /></th>{Object.keys(rows[0] ?? {}).map((header) => <th key={header}>{header === 'reference' ? 'Reference' : header[0].toUpperCase() + header.slice(1)}</th>)}<th aria-label="Actions" /></tr></thead><tbody>{pageRows.map((row) => <tr key={row.reference}><td className="bulk-select-cell"><input type="checkbox" checked={selectedReferences.includes(row.reference)} onChange={() => toggleRowSelection(row.reference)} aria-label={`Select ${row.reference}`} /></td>{Object.entries(row).map(([key, value]) => <td key={key}>{key === 'status' ? <StatusBadge status={value} /> : key === 'applicant' ? <div className="table-person"><span className="table-avatar">{value.split(' ').map((word) => word[0]).join('').slice(0, 2)}</span><strong>{value}</strong></div> : <span className={key === 'reference' ? 'reference-code' : ''}>{value}</span>}</td>)}<td><button className="row-more" aria-label={`Open details for ${row.reference}`} onClick={() => openDetails(row)}><MoreHorizontal size={17} /></button></td></tr>)}</tbody></table></div>
+      {filteredRows.length ? <><div className="table-responsive"><table className="data-table"><thead><tr><th className="bulk-select-cell"><input ref={selectAllRef} type="checkbox" checked={allRowsSelected} onChange={toggleAllRows} aria-label={`Select all records on page ${currentPage + 1}`} /></th>{tableFields.map((header) => <th key={header}>{academicLabels?.[header] ?? (header === 'reference' ? 'Reference' : header[0].toUpperCase() + header.slice(1))}</th>)}<th>Actions</th></tr></thead><tbody>{pageRows.map((row) => <tr key={row.reference}><td className="bulk-select-cell"><input type="checkbox" checked={selectedReferences.includes(row.reference)} onChange={() => toggleRowSelection(row.reference)} aria-label={`Select ${row.reference}`} /></td>{tableFields.map((key) => { const value = row[key] ?? ''; return <td key={key}>{key === 'status' ? <StatusBadge status={value} /> : key === 'applicant' ? <div className="table-person"><span className="table-avatar">{value.split(' ').map((word) => word[0]).join('').slice(0, 2)}</span><strong>{value}</strong></div> : <span className={key === 'reference' ? 'reference-code' : ''}>{value || '—'}</span>}</td> })}<td><div className="student-row-actions"><button type="button" className="student-action-button" onClick={() => openDetails(row)}><Eye size={12} />View / edit</button>{academicConfig && <button type="button" className="student-action-button" onClick={() => toggleAcademicStatus(row)}>{row.status.toLowerCase() === 'active' ? <><Archive size={12} />Archive</> : <><Check size={12} />Activate</>}</button>}</div></td></tr>)}</tbody></table></div>
       <div className="table-footer"><span>Showing {filteredRows.length ? currentPage * pageSize + 1 : 0}–{Math.min((currentPage + 1) * pageSize, filteredRows.length)} of {filteredRows.length} matching records</span><div className="pagination"><button aria-label="Previous page" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}><ChevronLeft size={15} /></button>{Array.from({ length: pageCount }, (_, index) => <button key={index} className={index === currentPage ? 'page-active' : ''} aria-current={index === currentPage ? 'page' : undefined} onClick={() => setPage(index)}>{index + 1}</button>)}<button aria-label="Next page" disabled={currentPage >= pageCount - 1} onClick={() => setPage(currentPage + 1)}><ChevronRight size={15} /></button></div></div></> : <EmptyState title="No matching records" description="Try another search or clear the selected status filter." actionLabel="Clear filters" onAction={() => { setSearch(''); setStatusFilter('All statuses') }} />}
     </Card>
-    {modal === 'create' && <FormModal meta={meta} onClose={() => setModal(null)} onCreate={createRecord} />}
+    {modal === 'create' && <FormModal meta={meta} academicConfig={academicConfig} onClose={() => setModal(null)} onCreate={createRecord} />}
     {modal === 'filters' && <FilterModal statuses={statusOptions} status={statusFilter} onApply={setStatusFilter} onClose={() => setModal(null)} />}
-    {modal === 'detail' && selectedRow && <DetailModal row={selectedRow} onClose={() => setModal(null)} onSave={updateRecord} onDelete={deleteRecord} />}
+    {modal === 'detail' && selectedRow && <DetailModal row={selectedRow} labels={academicLabels} requiredFields={academicConfig ? ['applicant', 'programme', 'intake', ...(academicConfig.extraFields ?? []).filter((field) => field.required).map((field) => field.key)] : undefined} entity={academicConfig?.entity} onClose={() => setModal(null)} onSave={updateRecord} onDelete={deleteRecord} />}
+    {deleteTarget && <ModalShell title={`Delete ${academicConfig?.entity ?? 'record'}?`} description={`This will remove ${deleteTarget.applicant} (${deleteTarget.reference}) from this browser’s preview.`} onClose={() => { setDeleteTarget(null); if (selectedRow) setModal('detail') }} footer={<><Button variant="ghost" onClick={() => { setDeleteTarget(null); if (selectedRow) setModal('detail') }}>Cancel</Button><Button variant="danger" onClick={confirmDeleteRecord}><Archive size={14} />Delete permanently</Button></>}><div className="modal-info"><CircleAlert size={15} /><span>This action only affects the local demo record and cannot be undone.</span></div></ModalShell>}
   </>
 }
 
@@ -209,26 +301,41 @@ export function ModalShell({ title, description, children, onClose, footer, clas
   return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}><div className={`workflow-modal ${className}`.trim()} role="dialog" aria-modal="true" aria-labelledby="workflow-modal-title"><div className="workflow-modal-head"><div><div className="eyebrow">Frontend workflow</div><h2 id="workflow-modal-title">{title}</h2><p>{description}</p></div><button className="modal-close" onClick={onClose} aria-label="Close dialog"><X size={18} /></button></div><div className="workflow-modal-body">{children}</div><div className="workflow-modal-foot">{footer}</div></div></div>
 }
 
-export function FormModal({ meta, onClose, onCreate }: { meta: { title: string }; onClose: () => void; onCreate: (record: ModuleRow) => void }) {
+export function FormModal({ meta, academicConfig, onClose, onCreate }: { meta: { title: string }; academicConfig?: AcademicWorkspaceConfig; onClose: () => void; onCreate: (record: ModuleRow) => void }) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const [record, setRecord] = useState({ reference: '', applicant: '', programme: '', intake: '', status: 'Draft' })
-  const update = (key: keyof typeof record, value: string) => setRecord((current) => ({ ...current, [key]: value }))
+  const defaultLabels: Record<AcademicField, string> = { reference: 'Reference ID', applicant: 'Record name', programme: 'Programme or category', intake: 'Period or context', status: 'Status' }
+  const defaultPlaceholders: Partial<Record<AcademicField, string>> = { reference: 'Generated if left blank', applicant: 'Enter a name or title', programme: 'Programme, department, or category', intake: 'Intake, term, or effective date' }
+  const fields = ['reference', 'applicant', 'programme', 'intake', ...(academicConfig?.extraFields ?? []).map((field) => field.key), 'status']
+  const [record, setRecord] = useState<Record<string, string>>(() => Object.fromEntries(fields.map((field) => [field, field === 'status' ? 'Draft' : ''])))
+  const update = (key: string, value: string) => setRecord((current) => ({ ...current, [key]: value }))
+  const requiredFields = academicConfig
+    ? ['applicant', 'programme', 'intake', ...(academicConfig.extraFields ?? []).filter((field) => field.required).map((field) => field.key)]
+    : ['applicant']
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!record.applicant.trim()) { setError('Enter a record name before saving.'); return }
+    if (requiredFields.some((field) => !record[field]?.trim())) {
+      setError(academicConfig ? 'Complete the name and required academic details before saving.' : 'Enter a record name before saving.')
+      return
+    }
     setError('')
     setSaving(true)
     window.setTimeout(() => {
-      const reference = record.reference.trim() || `DEMO-${Date.now()}`
-      onCreate({ ...record, reference })
+      const cleanRecord: Record<string, string> = Object.fromEntries(Object.entries(record).map(([key, value]) => [key, value.trim()]))
+      const reference = cleanRecord.reference || `DEMO-${Date.now()}`
+      onCreate({ ...cleanRecord, reference })
       setSaving(false)
     }, 320)
   }
-  return <ModalShell title={`Create ${meta.title.toLowerCase()} record`} description="Create a preview record. It is stored locally in this browser until API persistence is wired." onClose={onClose} footer={<><Button variant="ghost" onClick={onClose} disabled={saving}>Cancel</Button><Button type="submit" form="module-create-form" loading={saving}>Create record</Button></>}>
-    <form id="module-create-form" onSubmit={submit} className="modal-form-grid"><label>Record name<input value={record.applicant} onChange={(event) => update('applicant', event.target.value)} placeholder="Enter a name or title" autoFocus required /></label><label>Reference ID<input value={record.reference} onChange={(event) => update('reference', event.target.value)} placeholder="Generated if left blank" /></label><label>Programme or category<input value={record.programme} onChange={(event) => update('programme', event.target.value)} placeholder="Programme, department, or category" /></label><label>Period or context<input value={record.intake} onChange={(event) => update('intake', event.target.value)} placeholder="Intake, term, or effective date" /></label><label>Status<select value={record.status} onChange={(event) => update('status', event.target.value)}><option>Draft</option><option>Under review</option><option>Active</option><option>Pending</option><option>Approved</option></select></label></form>
+  return <ModalShell title={academicConfig ? `Create ${academicConfig.entity}` : `Create ${meta.title.toLowerCase()} record`} description={academicConfig ? `Add a ${academicConfig.entity} to the academic structure. This preview record is saved in this browser.` : 'Create a preview record. It is stored locally in this browser until API persistence is wired.'} onClose={onClose} footer={<><Button variant="ghost" onClick={onClose} disabled={saving}>Cancel</Button><Button type="submit" form="module-create-form" loading={saving}><Plus size={14} />{academicConfig ? `Create ${academicConfig.entity}` : 'Create record'}</Button></>}>
+    <form id="module-create-form" onSubmit={submit} className="modal-form-grid">{fields.map((field) => {
+      const extraField = academicConfig?.extraFields?.find((item) => item.key === field)
+      const label = extraField?.label ?? academicConfig?.labels[field] ?? defaultLabels[field as AcademicField]
+      const placeholder = extraField?.placeholder ?? academicConfig?.placeholders[field] ?? defaultPlaceholders[field as AcademicField]
+      return <label key={field} className={field === 'status' ? '' : field === 'applicant' ? 'modal-form-wide' : ''}>{label}{field === 'status' ? <select value={record[field]} onChange={(event) => update(field, event.target.value)}><option>Draft</option><option>Active</option><option>Archived</option></select> : <input value={record[field]} onChange={(event) => update(field, event.target.value)} placeholder={placeholder} autoFocus={field === 'applicant'} required={requiredFields.includes(field)} />}</label>
+    })}</form>
     {error && <div className="settings-form-message settings-form-error" role="alert">{error}</div>}
-    <div className="modal-info"><CircleHelp size={15} /><span>New records are saved to this browser’s demo workspace and can be exported as JSON.</span></div>
+    <div className="modal-info"><CircleHelp size={15} /><span>New records are saved to this browser’s demo workspace and can be exported as JSON. Production use requires permission checks and server persistence.</span></div>
   </ModalShell>
 }
 
@@ -237,12 +344,19 @@ export function FilterModal({ onClose, statuses, status, onApply }: { onClose: (
   return <ModalShell title="Filter workspace" description="Filter the current local record set by status. Use search for other fields." onClose={onClose} footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={() => { onApply(selectedStatus); onClose() }}>Apply filters</Button></>}><div className="modal-form-grid"><label>Status<select value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}><option>All statuses</option>{statuses.map((item) => <option key={item}>{item}</option>)}</select></label></div></ModalShell>
 }
 
-function DetailModal({ row, onClose, onSave, onDelete }: { row: ModuleRow; onClose: () => void; onSave: (row: ModuleRow) => void; onDelete: (reference: string) => void }) {
-  const [draft, setDraft] = useState(row)
+function DetailModal({ row, labels, requiredFields, entity, onClose, onSave, onDelete }: { row: ModuleRow; labels?: Record<string, string>; requiredFields?: string[]; entity?: string; onClose: () => void; onSave: (row: ModuleRow) => void; onDelete: (reference: string) => void }) {
+  const [draft, setDraft] = useState(() => labels ? Object.fromEntries(Object.keys(labels).map((key) => [key, row[key] ?? ''])) : row)
   const [editing, setEditing] = useState(false)
   const update = (key: string, value: string) => setDraft((current) => ({ ...current, [key]: value }))
-  return <ModalShell title={draft.applicant ?? draft.reference} description={`Review and edit the local preview record ${draft.reference}.`} onClose={onClose} footer={<><Button variant="danger" onClick={() => onDelete(row.reference)}>Delete</Button><Button variant="ghost" onClick={onClose}>Close</Button>{editing ? <Button onClick={() => onSave(draft)}>Save changes</Button> : <Button variant="outline" onClick={() => setEditing(true)}>Edit record</Button>}</>}>
-    <div className="detail-list">{Object.entries(draft).map(([key, value]) => <div className="detail-row" key={key}><span>{key[0].toUpperCase() + key.slice(1)}</span><strong>{editing ? key === 'status' ? <input value={value} onChange={(event) => update(key, event.target.value)} /> : <input value={value} onChange={(event) => update(key, event.target.value)} disabled={key === 'reference'} /> : key === 'status' ? <StatusBadge status={value} /> : value}</strong></div>)}</div>
+  const save = () => {
+    if (labels && (requiredFields ?? ['applicant', 'programme', 'intake']).some((field) => !draft[field]?.trim())) {
+      toast.error('Complete the name and required academic details before saving.')
+      return
+    }
+    onSave(draft)
+  }
+  return <ModalShell title={draft.applicant ?? draft.reference} description={entity ? `Review the ${entity} record. Changes are saved to this browser’s preview.` : `Review and edit the local preview record ${draft.reference}.`} onClose={onClose} footer={<><Button variant="danger" onClick={() => onDelete(row.reference)}><Archive size={14} />Delete</Button><Button variant="ghost" onClick={onClose}>Close</Button>{editing ? <Button onClick={save}><Check size={14} />Save changes</Button> : <Button variant="outline" onClick={() => setEditing(true)}><Pencil size={14} />Edit record</Button>}</>}>
+    <div className="detail-list">{Object.entries(draft).map(([key, value]) => <div className="detail-row" key={key}><span>{labels?.[key as AcademicField] ?? key[0].toUpperCase() + key.slice(1)}</span><strong>{editing ? key === 'status' && labels ? <select value={value} onChange={(event) => update(key, event.target.value)}><option>Draft</option><option>Active</option><option>Archived</option></select> : key === 'status' ? <input value={value} onChange={(event) => update(key, event.target.value)} /> : <input value={value} onChange={(event) => update(key, event.target.value)} disabled={key === 'reference'} required={key === 'applicant'} /> : key === 'status' ? <StatusBadge status={value} /> : value}</strong></div>)}</div>
   </ModalShell>
 }
 
