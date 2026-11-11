@@ -342,7 +342,7 @@ export function StudentPlacementPage() {
 
   if (!can('students.view')) return <Card className="permission-empty"><div className="permission-empty-icon"><ShieldCheck size={28} /></div><h2>Permission required</h2><p>Your current role does not have access to student placement and status workflows.</p></Card>
 
-  const assignPlacement = (student: (typeof rows)[number], campus: string, faculty: string) => {
+  const assignPlacement = (student: Pick<(typeof rows)[number], 'id' | 'name'>, campus: string, faculty: string) => {
     setRows((current) => current.map((row) => row.id === student.id ? { ...row, campus, faculty } : row))
     toast.success(`${student.name} assigned to ${faculty} at ${campus}.`)
     setSelected(null)

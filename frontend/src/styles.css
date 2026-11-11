@@ -310,6 +310,71 @@ button.settings-role-row { cursor: pointer; }
 .student-row-actions { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .student-action-button { display: inline-flex; align-items: center; justify-content: center; gap: 5px; min-height: 23px; padding: 4px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--ink); font-size: 8px; font-weight: 600; white-space: nowrap; }
 .student-action-button:hover { border-color: rgba(23,74,132,.3); color: var(--primary); background: rgba(23,74,132,.04); }
+.admissions-flow-card { margin-bottom: 18px; overflow: hidden; }
+.admissions-flow-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; padding: 4px 20px 20px; }
+.admissions-flow-step { display: flex; align-items: flex-start; gap: 10px; min-height: 100px; padding: 14px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--ink); text-align: left; }
+.admissions-flow-step:hover { border-color: color-mix(in srgb, var(--primary) 36%, var(--border)); background: color-mix(in srgb, var(--primary) 4%, var(--surface)); }
+.admissions-flow-icon { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 auto; border-radius: 8px; background: color-mix(in srgb, var(--primary) 10%, var(--surface)); color: var(--primary); }
+.admissions-flow-copy { display: grid; gap: 5px; }
+.admissions-flow-copy small { color: var(--secondary); font-size: 7px; font-weight: 700; letter-spacing: .1em; }
+.admissions-flow-copy strong { color: var(--ink); font-size: 10px; }
+.admissions-flow-copy > span { color: var(--muted); font-size: 8px; line-height: 1.5; }
+.admissions-flow-note { display: flex; align-items: flex-start; gap: 8px; margin: 0 20px 18px; padding: 10px 12px; border-radius: 7px; background: color-mix(in srgb, var(--info) 7%, var(--surface)); color: var(--muted); font-size: 8px; line-height: 1.5; }
+.admissions-flow-note svg { flex: 0 0 auto; color: var(--info); }
+.admissions-shortcuts { margin-top: 20px; }
+.admissions-shortcut { width: 100%; border: 1px solid var(--border); cursor: pointer; text-align: left; }
+.admissions-page-heading { margin: 4px 0 16px; }
+.admissions-page-heading h2 { margin: 0; color: var(--ink); font-size: 16px; font-weight: 600; }
+.admissions-page-heading p { margin: 5px 0 0; color: var(--muted); font-size: 9px; }
+.admissions-history { display: grid; gap: 8px; margin: 0; padding-left: 18px; color: var(--muted); font-size: 9px; }
+.admissions-clearance-list { display: grid; gap: 10px; }
+.admissions-clearance-list label { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 9px; }
+.admissions-clearance-list input { accent-color: var(--primary); }
+.admissions-clearance-list > span { color: var(--muted); font-size: 8px; }
+.admissions-document-list { display: grid; gap: 10px; }
+.admissions-document-row { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; }
+.admissions-document-copy { display: flex; flex: 1; min-width: 0; align-items: center; gap: 9px; color: var(--primary); }
+.admissions-document-copy span { display: grid; gap: 3px; min-width: 0; }
+.admissions-document-copy strong { color: var(--ink); font-size: 9px; }
+.admissions-document-copy small { color: var(--muted); font-size: 8px; overflow-wrap: anywhere; }
+.admissions-document-row select { max-width: 110px; padding: 6px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--ink); font-size: 8px; }
+.admissions-upload-button { position: relative; overflow: hidden; }
+.admissions-upload-button input, .online-applicant-document input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); }
+.online-application-wrap { display: grid; place-items: start center; }
+.online-application-card { width: min(100%, 760px); padding: 22px; }
+.online-application-brand { display: flex; align-items: flex-start; gap: 13px; padding-bottom: 18px; }
+.online-application-mark { display: grid; place-items: center; width: 40px; height: 40px; flex: 0 0 auto; border-radius: 11px; background: color-mix(in srgb, var(--primary) 10%, var(--surface)); color: var(--primary); }
+.online-application-brand h2 { margin: 0; color: var(--ink); font-size: 16px; }
+.online-application-brand p { margin: 5px 0 0; color: var(--muted); font-size: 9px; }
+.online-application-form { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; padding-top: 18px; }
+.online-application-form > label, .online-track-form > label { display: grid; gap: 6px; color: var(--muted); font-size: 9px; }
+.online-application-form input, .online-application-form select, .online-track-form input { width: 100%; min-height: 36px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; outline: 0; background: var(--surface); color: var(--ink); font-size: 10px; }
+.online-application-form input:focus, .online-application-form select:focus, .online-track-form input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent); }
+.online-application-info { display: flex; grid-column: 1 / -1; align-items: flex-start; gap: 8px; padding: 10px; border-radius: 7px; background: var(--surface-muted); color: var(--muted); font-size: 8px; line-height: 1.5; }
+.online-application-info svg { flex: 0 0 auto; color: var(--primary); }
+.online-track-form { display: flex; align-items: flex-end; gap: 10px; padding-top: 18px; }
+.online-track-form > label { flex: 1; }
+.online-track-result { display: grid; gap: 9px; margin-top: 18px; padding: 14px; border: 1px solid var(--border); border-radius: 9px; background: var(--surface-muted); }
+.online-track-result-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.online-track-result-head > div { display: grid; gap: 4px; }
+.online-track-result-head small { color: var(--muted); font-size: 7px; font-weight: 700; letter-spacing: .1em; }
+.online-track-result-head strong { color: var(--primary); font-size: 11px; }
+.online-track-result > p { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--muted); font-size: 9px; }
+.online-track-result ol { display: grid; gap: 5px; margin: 0; padding-left: 17px; color: var(--ink); font-size: 8px; }
+.online-track-contact { font-size: 8px !important; }
+.online-applicant-documents { display: grid; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.online-applicant-documents > strong { color: var(--ink); font-size: 9px; }
+.online-applicant-documents > small { color: var(--muted); font-size: 8px; }
+.online-applicant-document { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.online-applicant-document > span { display: grid; grid-template-columns: 16px 1fr; align-items: center; gap: 5px; color: var(--ink); font-size: 8px; }
+.online-applicant-document > span svg { grid-row: span 2; color: var(--primary); }
+.online-applicant-document > span small { grid-column: 2; color: var(--muted); font-size: 7px; }
+.online-demo-disclaimer { margin: 14px 0 0; color: var(--muted); font-size: 8px; }
+.online-offer-response { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px; border: 1px solid color-mix(in srgb, var(--success) 20%, var(--border)); border-radius: 7px; background: color-mix(in srgb, var(--success) 6%, var(--surface)); }
+.online-offer-response > strong { color: var(--ink); font-size: 9px; }
+.online-offer-response > div { display: flex; gap: 7px; }
+@media (max-width: 900px) { .admissions-flow-grid { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .admissions-flow-grid { grid-template-columns: 1fr; padding-inline: 12px; }.admissions-flow-note { margin-inline: 12px; }.online-application-card { padding: 16px; }.online-application-form { grid-template-columns: 1fr; }.online-application-info { grid-column: auto; }.online-track-form { align-items: stretch; flex-direction: column; }.online-offer-response { align-items: flex-start; flex-direction: column; }.admissions-document-row { align-items: flex-start; flex-wrap: wrap; }.admissions-document-row select { margin-left: auto; } }
 .student-empty-cell { height: 90px; color: var(--muted) !important; text-align: center; }
 .bulk-status-action { display: inline-flex; align-items: center; gap: 7px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--muted); font-size: 8px; }
 .bulk-status-action span { color: var(--muted); font-weight: 600; }

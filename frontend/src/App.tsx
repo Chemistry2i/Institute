@@ -46,6 +46,7 @@ import { ModuleLanding, OperationalModuleRoute } from './components/OperationalM
 import { Sidebar } from './components/Sidebar'
 import { SettingsPage as SettingsWorkspace } from './components/SettingsPage'
 import { StudentDocumentsPage, StudentInformation, StudentLifecyclePage, StudentPlacementPage } from './components/StudentInformation'
+import { AdmissionsOverview, AdmissionsWorkflowPage, OnlineApplicationPage } from './components/AdmissionsWorkflow'
 import { UsersRolesPage } from './components/UsersRolesPage'
 import {
   admissionsItems,
@@ -114,12 +115,9 @@ function Shell() {
 function AdmissionsRoute() {
   const { pathname } = useLocation()
 
-  if (pathname === '/admissions') return <ModuleLanding basePath="/admissions" items={admissionsItems} steps={[
-    { label: 'Application pipeline', href: '/admissions/application-pipeline' },
-    { label: 'Applicant review', href: '/admissions/applicant-review' },
-    { label: 'Document verification', href: '/admissions/document-verification' },
-    { label: 'Offers & decisions', href: '/admissions/offers-decisions' },
-  ]} />
+  if (pathname === '/admissions') return <AdmissionsOverview />
+  if (pathname === '/admissions/online-application') return <OnlineApplicationPage />
+  if (['/admissions/application-pipeline', '/admissions/applicant-review', '/admissions/document-verification', '/admissions/offers-decisions', '/admissions/matriculation'].includes(pathname)) return <AdmissionsWorkflowPage path={pathname} />
   return <ModuleWorkspace path={pathname} />
 }
 

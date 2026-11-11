@@ -17,6 +17,7 @@ import {
   CirclePause,
   FileText,
   MapPin,
+  Plus,
   Settings2,
   ShieldCheck,
   UserRound,
@@ -182,6 +183,7 @@ export const academicStructureItems = [
 
 export const admissionsItems = [
   { label: 'Overview', href: '/admissions', icon: LayoutDashboard, description: 'See the intake funnel, decision queue, and current admissions pressure points.' },
+  { label: 'Online application portal', href: '/admissions/online-application', icon: Plus, description: 'Submit an applicant form or check progress using an application reference.' },
   { label: 'Application pipeline', href: '/admissions/application-pipeline', icon: ClipboardList, description: 'Track new applications, review stages, and applicant demand by intake.' },
   { label: 'Applicant review', href: '/admissions/applicant-review', icon: UserRound, description: 'Review applicant quality, faculty preferences, and shortlist decisions.' },
   { label: 'Document verification', href: '/admissions/document-verification', icon: FileText, description: 'Confirm missing, received, and verified applicant documents.' },
@@ -550,6 +552,7 @@ export const facultyData = [
 
 export const pageMeta: Record<string, { eyebrow: string; title: string; description: string }> = {
   '/admissions': { eyebrow: 'Admissions office', title: 'Keep every application moving', description: 'Review intake activity, missing documents, and decision queues from one place.' },
+  '/admissions/online-application': { eyebrow: 'Applicant portal', title: 'Apply to Peculiar Metropolitan Institute', description: 'Submit an application or track progress using your application reference.' },
   '/admissions/application-pipeline': { eyebrow: 'Admissions office', title: 'Application pipeline', description: 'Follow applicants from submission through review and decision stages.' },
   '/admissions/applicant-review': { eyebrow: 'Admissions office', title: 'Applicant review', description: 'Review shortlist quality, programme fit, and faculty-level decision readiness.' },
   '/admissions/document-verification': { eyebrow: 'Admissions office', title: 'Document verification', description: 'Monitor required documents, missing files, and verification completion.' },
