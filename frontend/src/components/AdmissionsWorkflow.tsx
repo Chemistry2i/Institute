@@ -147,6 +147,18 @@ function stageTone(stage: ApplicationStage): 'neutral' | 'success' | 'warning' |
   return 'neutral'
 }
 
+function allowedStageChanges(stage: ApplicationStage): ApplicationStage[] {
+  const transitions: Partial<Record<ApplicationStage, ApplicationStage[]>> = {
+    Submitted: ['Screening', 'Documents pending', 'Rejected'],
+    Screening: ['Faculty review', 'Documents pending', 'Rejected'],
+    'Faculty review': ['Offer issued', 'Waitlisted', 'Documents pending', 'Rejected'],
+    'Documents pending': ['Screening', 'Faculty review', 'Rejected'],
+    'Offer issued': ['Accepted', 'Declined', 'Waitlisted'],
+    Waitlisted: ['Offer issued', 'Rejected'],
+  }
+  return [stage, ...(transitions[stage] ?? [])]
+}
+
 export function AdmissionsOverview() {
   const { can } = useAppContext()
   const navigate = useNavigate()
@@ -259,8 +271,8 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
   }
   const changePipelineStage = (application: Application, stage: ApplicationStage) => {
     if (application.stage === stage) return
-    if (stage === 'Enrolled') {
-      toast.error('Use the matriculation workflow to complete enrollment and create the student record.')
+    if (!allowedStageChanges(application.stage).includes(stage)) {
+      toast.error('That stage change is not available from the current application stage.')
       return
     }
     updateApplication(application.id, { stage }, `Stage changed from ${application.stage} to ${stage}`)
@@ -379,13 +391,13 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     <div className="module-toolbar student-toolbar admissions-workflow-toolbar">
       <label className="toolbar-search"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search applicants, references, programmes" aria-label="Search applications" /></label>
       {isPipeline && <div className="application-pipeline-filters">
-        <label><span><Filter size={13} />Intake</span><select value={intakeFilter} onChange={(event) => setIntakeFilter(event.target.value)} aria-label="Filter applications by intake"><option>All</option>{intakes.map((intake) => <option key={intake}>{intake}</option>)}</select></label>
-        <label><span><GraduationCap size={13} />Programme</span><select value={programmeFilter} onChange={(event) => setProgrammeFilter(event.target.value)} aria-label="Filter applications by programme"><option>All</option>{programmes.map((programme) => <option key={programme}>{programme}</option>)}</select></label>
+        <label className="application-pipeline-filter"><span className="application-pipeline-filter-icon"><CalendarDays size={14} /></span><select value={intakeFilter} onChange={(event) => setIntakeFilter(event.target.value)} aria-label="Filter applications by intake"><option value="All">All intakes</option>{intakes.map((intake) => <option key={intake}>{intake}</option>)}</select></label>
+        <label className="application-pipeline-filter"><span className="application-pipeline-filter-icon"><GraduationCap size={14} /></span><select value={programmeFilter} onChange={(event) => setProgrammeFilter(event.target.value)} aria-label="Filter applications by programme"><option value="All">All programmes</option>{programmes.map((programme) => <option key={programme}>{programme}</option>)}</select></label>
         {(stageFilter !== 'All' || intakeFilter !== 'All' || programmeFilter !== 'All' || search) && <Button type="button" variant="ghost" size="sm" onClick={() => { setStageFilter('All'); setIntakeFilter('All'); setProgrammeFilter('All'); setSearch('') }}><X size={13} />Clear</Button>}
       </div>}
       <div className="toolbar-actions">
         {isPipeline && <Button type="button" variant="outline" size="sm" onClick={exportPipelineCsv}><Download size={14} /> Export CSV</Button>}
-        <Button type="button" variant="outline" size="sm" onClick={exportApplications}><Download size={14} /> Export queue</Button>
+        <Button type="button" variant="outline" size="sm" onClick={exportApplications}><Download size={14} /> Export JSON</Button>
         {path === '/admissions/application-pipeline' && <Button type="button" size="sm" onClick={() => setCreateOpen(true)}><Plus size={14} /> Add application</Button>}
       </div>
     </div>
@@ -394,7 +406,7 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       <div className="table-responsive"><table className="data-table student-table">
         <thead><tr><th>Application</th><th>Applicant</th><th>Programme</th><th>Intake</th><th>Documents</th><th>Stage</th><th>Actions</th></tr></thead>
         <tbody>{filtered.map((app) => <tr key={app.id}>
-          <td className="reference-code">{app.id}</td><td><div className="table-person"><div><strong>{app.name}</strong><small>{app.email}</small></div></div></td><td>{app.programme}</td><td>{app.intake}</td><td>{app.documents.filter((doc) => doc.required && doc.status === 'Verified').length}/{app.documents.filter((doc) => doc.required).length} verified</td><td>{isPipeline ? <select className="application-pipeline-row-stage" aria-label={`Change stage for ${app.name}`} title={app.stage === 'Enrolled' ? 'Enrollment is managed through matriculation.' : 'Changing this stage adds an entry to application history.'} value={app.stage} disabled={app.stage === 'Enrolled'} onChange={(event) => changePipelineStage(app, event.target.value as ApplicationStage)}>{pipelineStages.map((stage) => <option key={stage} disabled={stage === 'Enrolled'}>{stage}</option>)}</select> : <Badge tone={stageTone(app.stage)}>{app.stage}</Badge>}</td>
+          <td className="reference-code">{app.id}</td><td><div className="table-person"><div><strong>{app.name}</strong><small>{app.email}</small></div></div></td><td>{app.programme}</td><td>{app.intake}</td><td>{app.documents.filter((doc) => doc.required && doc.status === 'Verified').length}/{app.documents.filter((doc) => doc.required).length} verified</td><td>{isPipeline ? <select className="application-pipeline-row-stage" aria-label={`Change stage for ${app.name}`} title="Available stages follow the admissions workflow. Every change is added to application history." value={app.stage} disabled={allowedStageChanges(app.stage).length === 1} onChange={(event) => changePipelineStage(app, event.target.value as ApplicationStage)}>{allowedStageChanges(app.stage).map((stage) => <option key={stage}>{stage}</option>)}</select> : <Badge tone={stageTone(app.stage)}>{app.stage}</Badge>}</td>
           <td><div className="student-row-actions">
             <button type="button" className="student-action-button" onClick={() => setSelected(app)}><Eye size={12} />Details</button>
             {path === '/admissions/applicant-review' && <button type="button" className="student-action-button" onClick={() => setSelected(app)}><ClipboardCheck size={12} />Review</button>}
@@ -662,13 +674,42 @@ function ApplicationActionDialog({ application, path, onClose, onStageChange, on
     : isOffer
       ? ['Accepted', 'Declined'].includes(application.stage) ? null : <><Button type="button" variant="outline" onClick={() => nextStage('Waitlisted', 'Applicant added to waitlist')}><CalendarDays size={14} />Waitlist</Button>{application.stage === 'Offer issued' ? <><Button type="button" variant="outline" onClick={() => nextStage('Declined', 'Offer declined by applicant')}><X size={14} />Decline</Button><Button type="button" onClick={acceptOffer}><Check size={14} />Record acceptance</Button></> : <Button type="button" onClick={issueOffer}><BadgeCheck size={14} />Issue offer</Button>}</>
       : null
-  return <ModalShell title={isMatriculation ? 'Matriculation clearance' : isReview ? 'Applicant review' : isOffer ? 'Offer decision' : 'Application details'} description={`${application.id} · ${application.name}`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Close</Button>{decisionActions}{isMatriculation && application.stage !== 'Enrolled' && <Button type="button" onClick={onMatriculate}><GraduationCap size={14} />Enroll student</Button>}</>}>
-    <div className="student-profile-content">
-      <section className="student-profile-section"><div className="student-section-heading"><UserRound size={15} /><h3>Applicant record</h3></div><dl className="student-detail-grid"><div className="student-detail-field"><dt>Email</dt><dd>{application.email}</dd></div><div className="student-detail-field"><dt>Phone</dt><dd>{application.phone || 'Not provided'}</dd></div><div className="student-detail-field"><dt>Programme</dt><dd>{application.programme}</dd></div><div className="student-detail-field"><dt>Intake</dt><dd>{application.intake}</dd></div><div className="student-detail-field"><dt>Current stage</dt><dd><Badge tone={stageTone(application.stage)}>{application.stage}</Badge></dd></div>{application.studentId && <div className="student-detail-field"><dt>Student ID</dt><dd>{application.studentId}</dd></div>}</dl></section>
+  const previousEducation = application.previousEducation ?? []
+  const academicResults = application.academicResults ?? []
+  const documentsVerified = application.documents.filter((document) => document.required && document.status === 'Verified').length
+  const documentsRequired = application.documents.filter((document) => document.required).length
+  const initials = application.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase()
+  return <ModalShell title={isMatriculation ? 'Matriculation clearance' : isReview ? 'Applicant review' : isOffer ? 'Offer decision' : 'Application details'} description={`${application.id} · Submitted application record`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Close</Button>{decisionActions}{isMatriculation && application.stage !== 'Enrolled' && <Button type="button" onClick={onMatriculate}><GraduationCap size={14} />Enroll student</Button>}</>}>
+    <div className="application-details">
+      <section className="application-details-hero">
+        <span className="application-details-avatar">{initials || <UserRound size={20} />}</span>
+        <div className="application-details-hero-copy"><h3>{application.name}</h3><span>{application.email}{application.phone ? ` · ${application.phone}` : ''}</span><div><Badge tone={stageTone(application.stage)}>{application.stage}</Badge><span className="application-details-reference">{application.id}</span></div></div>
+        <div className="application-details-doc-summary"><strong>{documentsVerified}/{documentsRequired}</strong><span>required documents verified</span></div>
+      </section>
+      <section className="application-details-section"><div className="student-section-heading"><UserRound size={15} /><h3>Personal details</h3></div><dl className="application-details-grid">
+        <ApplicationDetailField label="First name">{application.firstName || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Middle name">{application.middleName || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Last name">{application.lastName || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Email">{application.email || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Phone">{application.phone || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Date of birth">{application.dateOfBirth || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Gender">{application.gender || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Nationality">{application.nationality || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="District">{application.district || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Location">{application.location || application.address || 'Not provided'}</ApplicationDetailField>
+      </dl></section>
+      <section className="application-details-section"><div className="student-section-heading"><GraduationCap size={15} /><h3>Programme choice</h3></div><dl className="application-details-grid">
+        <ApplicationDetailField label="First choice">{application.programme}</ApplicationDetailField><ApplicationDetailField label="Second choice">{application.secondChoice || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Intake">{application.intake}</ApplicationDetailField><ApplicationDetailField label="Study mode">{application.studyMode || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Current stage"><Badge tone={stageTone(application.stage)}>{application.stage}</Badge></ApplicationDetailField>{application.studentId && <ApplicationDetailField label="Student ID">{application.studentId}</ApplicationDetailField>}
+      </dl></section>
+      <section className="application-details-section"><div className="student-section-heading"><UsersRound size={15} /><h3>Next of kin / emergency contact</h3></div><dl className="application-details-grid">
+        <ApplicationDetailField label="Name">{[application.nextOfKin?.firstName, application.nextOfKin?.middleName, application.nextOfKin?.lastName].filter(Boolean).join(' ') || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Relationship">{application.nextOfKin?.relationship || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Phone">{application.nextOfKin?.phone || 'Not provided'}</ApplicationDetailField><ApplicationDetailField label="Email">{application.nextOfKin?.email || 'Not provided'}</ApplicationDetailField>
+      </dl></section>
+      <section className="application-details-section"><div className="student-section-heading"><BookOpen size={15} /><h3>Previous education & results</h3></div>
+        {previousEducation.length > 0 ? <div className="application-education-list">{previousEducation.map((education, index) => <div className="application-education-item" key={`${education.institution}-${index}`}><strong>{education.qualification || 'Qualification not specified'}</strong><span>{education.institution || 'Institution not specified'}</span><small>Completed {education.completionYear || 'year not provided'}</small></div>)}</div> : <p className="application-details-empty">No previous education details were included.</p>}
+        {academicResults.length > 0 && <div className="application-results-table-wrap"><table className="application-results-table"><thead><tr><th>Subject</th><th>Grade</th><th>Examination body</th></tr></thead><tbody>{academicResults.map((result, index) => <tr key={`${result.subject}-${index}`}><td>{result.subject}</td><td>{result.grade}</td><td>{result.examinationBody || 'Not provided'}</td></tr>)}</tbody></table></div>}
+      </section>
+      <section className="application-details-section"><div className="student-section-heading"><FileText size={15} /><h3>Supporting documents</h3><span className="application-details-section-count">{application.documents.length}</span></div><div className="application-details-document-list">
+        {application.documents.length > 0 ? application.documents.map((document) => <div className="application-details-document" key={document.name}><span className="application-details-document-icon"><FileText size={15} /></span><span className="application-details-document-copy"><strong>{document.name}{document.required && <small>Required</small>}</strong><span>{document.fileName || 'No file attached'}</span></span><Badge tone={document.status === 'Verified' ? 'success' : document.status === 'Received' ? 'info' : 'warning'}>{document.status}</Badge></div>) : <p className="application-details-empty">No documents are recorded for this application.</p>}
+      </div></section>
       {isMatriculation && <section className="student-profile-section"><div className="student-section-heading"><ShieldCheck size={15} /><h3>Pre-enrollment clearance</h3></div><div className="admissions-clearance-list"><label><input type="checkbox" checked={application.identityVerified} onChange={(event) => onClearanceChange({ identityVerified: event.target.checked })} /> Identity verified</label><label><input type="checkbox" checked={application.feesCleared} onChange={(event) => onClearanceChange({ feesCleared: event.target.checked })} /> Initial fees confirmed</label><span>{application.documents.filter((doc) => doc.status === 'Verified').length}/{application.documents.length} required documents verified</span></div><p className="modal-info"><GraduationCap size={14} />Enrollment is enabled only after identity, fees, and all required documents are cleared.</p></section>}
-      <section className="student-profile-section"><div className="student-section-heading"><CalendarDays size={15} /><h3>Application history</h3></div><ol className="admissions-history">{application.history.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol></section>
+      <section className="application-details-section"><div className="student-section-heading"><CalendarDays size={15} /><h3>Application history</h3></div>{application.history.length > 0 ? <ol className="admissions-history">{application.history.map((item, index) => <li key={`${item}-${index}`}>{item}</li>)}</ol> : <p className="application-details-empty">No history entries are recorded.</p>}</section>
     </div>
   </ModalShell>
+}
+
+function ApplicationDetailField({ label, children }: { label: string; children: ReactNode }) {
+  return <div className="application-detail-field"><dt>{label}</dt><dd>{children}</dd></div>
 }
 
 function ApplicationDocumentsDialog({ application, onClose, onSave }: { application: Application; onClose: () => void; onSave: (documents: ApplicationDocument[]) => void }) {
