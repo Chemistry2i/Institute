@@ -2,6 +2,7 @@ import type { LucideIcon } from 'lucide-react'
 import {
   BookOpen,
   Building2,
+  CalendarDays,
   ChartNoAxesCombined,
   ClipboardList,
   CreditCard,
@@ -107,7 +108,7 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Dashboard', href: '/', icon: LayoutDashboard, permission: 'dashboard.view' },
   { label: 'Admissions', href: '/admissions', icon: ClipboardList, permission: 'admissions.view', badge: '24' },
   { label: 'Students', href: '/students', icon: UsersRound, permission: 'students.view' },
-  { label: 'Academics', href: '/academics', icon: BookOpen, permission: 'academics.view' },
+  { label: 'Academic structure', href: '/academics', icon: BookOpen, permission: 'academics.view' },
   { label: 'Registration', href: '/registration', icon: GraduationCap, permission: 'registration.view', badge: '8' },
   { label: 'Timetabling', href: '/timetabling', icon: ClipboardList, permission: 'timetabling.view' },
   { label: 'Attendance', href: '/attendance', icon: UsersRound, permission: 'attendance.view' },
@@ -126,6 +127,18 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Procurement & inventory', href: '/procurement', icon: Building2, permission: 'procurement.view' },
   { label: 'Reports', href: '/reports', icon: ChartNoAxesCombined, permission: 'reports.view' },
 ]
+
+export const academicStructureItems = [
+  { label: 'Overview', href: '/academics', icon: BookOpen, description: 'See the complete academic setup and how its parts connect.' },
+  { label: 'Institutions & campuses', href: '/academics/institutions', icon: Building2, description: 'Institution profile, locations, and campuses.' },
+  { label: 'Faculties & schools', href: '/academics/faculties', icon: UsersRound, description: 'Academic divisions and the departments they oversee.' },
+  { label: 'Departments', href: '/academics/departments', icon: ClipboardList, description: 'Department ownership and academic organisation.' },
+  { label: 'Programmes', href: '/academics/programmes', icon: GraduationCap, description: 'Awards, duration, and programme ownership.' },
+  { label: 'Course units', href: '/academics/courses', icon: BookOpen, description: 'Course codes, levels, and credit units.' },
+  { label: 'Curriculum & credit units', href: '/academics/curricula', icon: ClipboardList, description: 'Programme course plans and progression requirements.' },
+  { label: 'Academic years & semesters', href: '/academics/calendar', icon: CalendarDays, description: 'Academic periods and their key dates.' },
+  { label: 'Grading systems', href: '/academics/grading', icon: ShieldCheck, description: 'Grading scales and result interpretation rules.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
 
 export const adminNavigationItems: NavigationItem[] = [
   { label: 'Users & roles', href: '/users', icon: ShieldCheck, permission: 'users.manage' },
@@ -249,7 +262,15 @@ export const facultyData = [
 export const pageMeta: Record<string, { eyebrow: string; title: string; description: string }> = {
   '/admissions': { eyebrow: 'Admissions office', title: 'Keep every application moving', description: 'Review intake activity, missing documents, and decision queues from one place.' },
   '/students': { eyebrow: 'Student information', title: 'Student records', description: 'A governed view of active, graduating, and at-risk student records.' },
-  '/academics': { eyebrow: 'Academic structure', title: 'Programmes & curriculum', description: 'Manage programme structures, course units, and teaching periods.' },
+  '/academics': { eyebrow: 'Academic structure', title: 'Academic structure overview', description: 'Explore how your institution, academic organisation, programmes, and policies fit together.' },
+  '/academics/institutions': { eyebrow: 'Academic structure', title: 'Institutions & campuses', description: 'Manage institutional identity and the campuses where academic activity takes place.' },
+  '/academics/faculties': { eyebrow: 'Academic structure', title: 'Faculties & schools', description: 'Organise academic departments under faculties, schools, and colleges.' },
+  '/academics/departments': { eyebrow: 'Academic structure', title: 'Departments', description: 'Maintain departments and their parent academic units.' },
+  '/academics/programmes': { eyebrow: 'Academic structure', title: 'Programmes', description: 'Define awards, study duration, and the academic units responsible for delivery.' },
+  '/academics/courses': { eyebrow: 'Academic structure', title: 'Course units', description: 'Maintain course units, codes, credit units, and academic levels.' },
+  '/academics/curricula': { eyebrow: 'Academic structure', title: 'Curriculum & credit units', description: 'Arrange course units into programme structures and progression requirements.' },
+  '/academics/calendar': { eyebrow: 'Academic structure', title: 'Academic years & semesters', description: 'Configure academic years, semesters, and their key dates.' },
+  '/academics/grading': { eyebrow: 'Academic structure', title: 'Grading systems', description: 'Configure grading scales and the rules used to interpret academic results.' },
   '/registration': { eyebrow: 'Semester operations', title: 'Registration control room', description: 'Track registration progress, exceptions, and credit-load compliance.' },
   '/timetabling': { eyebrow: 'Teaching operations', title: 'Timetabling', description: 'Coordinate rooms, lecturers, exam slots, and conflict-free academic schedules.' },
   '/attendance': { eyebrow: 'Teaching operations', title: 'Attendance', description: 'Monitor attendance sessions, corrections, and student participation signals.' },
@@ -284,6 +305,46 @@ export const moduleRows: Record<string, Array<Record<string, string>>> = {
     { reference: 'BBA', applicant: 'Bachelor of Business Admin', programme: 'Faculty of Business', intake: '3 years · 108 credits', status: 'Active' },
     { reference: 'DCS', applicant: 'Diploma in Computing', programme: 'Faculty of Computing', intake: '2 years · 80 credits', status: 'Draft' },
     { reference: 'BED', applicant: 'Bachelor of Education', programme: 'Faculty of Education', intake: '4 years · 132 credits', status: 'Active' },
+  ],
+  '/academics/institutions': [
+    { reference: 'MMI', applicant: 'Makerere Metropolitan Institute', programme: 'Kampala, Uganda', intake: 'University', status: 'Active' },
+    { reference: 'CAMP-MAIN', applicant: 'Main campus', programme: 'Kampala', intake: 'Institution campus', status: 'Active' },
+    { reference: 'CAMP-EAST', applicant: 'East campus', programme: 'Jinja', intake: 'Institution campus', status: 'Active' },
+  ],
+  '/academics/faculties': [
+    { reference: 'FOC', applicant: 'Faculty of Computing', programme: '3 departments', intake: 'Main campus', status: 'Active' },
+    { reference: 'FOB', applicant: 'Faculty of Business', programme: '4 departments', intake: 'Main campus', status: 'Active' },
+    { reference: 'FOE', applicant: 'Faculty of Education', programme: '3 departments', intake: 'East campus', status: 'Active' },
+  ],
+  '/academics/departments': [
+    { reference: 'CS', applicant: 'Computer Science', programme: 'Faculty of Computing', intake: '8 course units', status: 'Active' },
+    { reference: 'IS', applicant: 'Information Systems', programme: 'Faculty of Computing', intake: '6 course units', status: 'Active' },
+    { reference: 'BM', applicant: 'Business Management', programme: 'Faculty of Business', intake: '7 course units', status: 'Active' },
+  ],
+  '/academics/programmes': [
+    { reference: 'BSC-CS', applicant: 'BSc Computer Science', programme: 'Faculty of Computing', intake: '4 years · 128 credits', status: 'Active' },
+    { reference: 'BBA', applicant: 'Bachelor of Business Admin', programme: 'Faculty of Business', intake: '3 years · 108 credits', status: 'Active' },
+    { reference: 'DCS', applicant: 'Diploma in Computing', programme: 'Faculty of Computing', intake: '2 years · 80 credits', status: 'Draft' },
+  ],
+  '/academics/courses': [
+    { reference: 'CSC 101', applicant: 'Introduction to Computing', programme: '4 credit units', intake: 'Year 1 · Semester I', status: 'Active' },
+    { reference: 'CSC 204', applicant: 'Data Structures', programme: '4 credit units', intake: 'Year 2 · Semester II', status: 'Active' },
+    { reference: 'BBA 310', applicant: 'Strategic Management', programme: '3 credit units', intake: 'Year 3 · Semester I', status: 'Active' },
+  ],
+  '/academics/curricula': [
+    { reference: 'CUR-BSC-CS-25', applicant: 'BSc Computer Science · 2025', programme: '32 course units', intake: '128 credit units', status: 'Active' },
+    { reference: 'CUR-BBA-25', applicant: 'Bachelor of Business Admin · 2025', programme: '30 course units', intake: '108 credit units', status: 'Active' },
+    { reference: 'CUR-DCS-DRAFT', applicant: 'Diploma in Computing · 2025', programme: '20 course units', intake: '80 credit units', status: 'Draft' },
+  ],
+  '/academics/calendar': [
+    { reference: 'AY-2025', applicant: 'Academic year 2025', programme: '1 Aug 2025 – 31 Jul 2026', intake: '2 semesters', status: 'Active' },
+    { reference: 'SEM-II-2025', applicant: 'Semester II · 2025', programme: '1 Feb – 30 Jun 2026', intake: 'Registration open', status: 'Active' },
+    { reference: 'SEM-I-2026', applicant: 'Semester I · 2026', programme: '1 Aug – 31 Dec 2026', intake: 'Planning', status: 'Draft' },
+  ],
+  '/academics/grading': [
+    { reference: 'UG-CLASSIC', applicant: 'Undergraduate 0–100', programme: 'A – F · 7 bands', intake: 'Undergraduate awards', status: 'Active' },
+    { reference: 'DIP-CLASSIC', applicant: 'Diploma 0–100', programme: 'A – F · 6 bands', intake: 'Diploma awards', status: 'Active' },
+    { reference: 'PG-4PT', applicant: 'Postgraduate 4-point GPA', programme: 'A – F · 5 bands', intake: 'Postgraduate awards', status: 'Draft' },
   ],
   '/registration': [
     { reference: 'REG-0821', applicant: 'Semester registration', programme: '2,184 students started', intake: 'Deadline · 22 Aug', status: 'On track' },
@@ -402,6 +463,14 @@ export const moduleIcons: Record<string, LucideIcon> = {
   '/admissions': ClipboardList,
   '/students': UserRound,
   '/academics': BookOpen,
+  '/academics/institutions': Building2,
+  '/academics/faculties': UsersRound,
+  '/academics/departments': ClipboardList,
+  '/academics/programmes': GraduationCap,
+  '/academics/courses': BookOpen,
+  '/academics/curricula': ClipboardList,
+  '/academics/calendar': CalendarDays,
+  '/academics/grading': ShieldCheck,
   '/registration': GraduationCap,
   '/timetabling': ClipboardList,
   '/attendance': UsersRound,

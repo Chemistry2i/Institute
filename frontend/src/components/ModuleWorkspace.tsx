@@ -13,7 +13,7 @@ export function ModuleWorkspace({ path }: { path: string }) {
   const Icon = moduleIcons[path]
   const rows = moduleRows[path] ?? []
   const { can } = useAppContext()
-  const permission = navigationItems.find((item) => item.href === path)?.permission
+  const permission = path.startsWith('/academics/') ? 'academics.view' : navigationItems.find((item) => item.href === path)?.permission
   const [modal, setModal] = useState<ModalMode>(null)
   const [selectedRow, setSelectedRow] = useState<ModuleRow | null>(null)
 

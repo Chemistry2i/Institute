@@ -41,8 +41,10 @@ import {
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Badge, Button, Card } from './components/ui'
 import { AppProvider, defaultColors, useAppContext, type ThemeColors } from './app-context'
+import { AcademicStructureNav, AcademicStructureRoute } from './components/AcademicStructure'
 import { FilterModal, FormModal, ModuleWorkspace } from './components/ModuleWorkspace'
 import {
+  academicStructureItems,
   activities,
   adminNavigationItems,
   enrolmentData,
@@ -66,7 +68,7 @@ function App() {
       <Route path="/" element={<Dashboard />} />
       <Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} />
       <Route path="/students" element={<StudentsPage />} />
-      <Route path="/academics" element={<ModuleWorkspace path="/academics" />} />
+      <Route path="/academics/*" element={<AcademicStructureRoute />} />
       <Route path="/registration" element={<ModuleWorkspace path="/registration" />} />
       <Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} />
       <Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} />
@@ -136,7 +138,9 @@ function Shell() {
           </button>
         </div>
         {modulesOpen && <nav className="sidebar-nav" aria-label="Module navigation">
-          {visibleMain.map((item) => <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}
+          {visibleMain.map((item) => item.href === '/academics'
+            ? <AcademicStructureNav key={item.href} item={item} items={academicStructureItems} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
+            : <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}
         </nav>}
         {visibleAdmin.length > 0 && <>
           <div className="sidebar-section-label sidebar-section-admin">Administration</div>
@@ -176,7 +180,7 @@ function NavItem({ item, collapsed, onNavigate }: { item: typeof navigationItems
 }
 
 function RoutesOutlet() {
-  return <div className="route-content"><Routes><Route path="/" element={<Dashboard />} /><Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} /><Route path="/students" element={<StudentsPage />} /><Route path="/academics" element={<ModuleWorkspace path="/academics" />} /><Route path="/registration" element={<ModuleWorkspace path="/registration" />} /><Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} /><Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} /><Route path="/examinations" element={<ModuleWorkspace path="/examinations" />} /><Route path="/finance" element={<ModuleWorkspace path="/finance" />} /><Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} /><Route path="/learning" element={<ModuleWorkspace path="/learning" />} /><Route path="/library" element={<ModuleWorkspace path="/library" />} /><Route path="/staff" element={<ModuleWorkspace path="/staff" />} /><Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} /><Route path="/internship" element={<ModuleWorkspace path="/internship" />} /><Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} /><Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} /><Route path="/communications" element={<ModuleWorkspace path="/communications" />} /><Route path="/quality" element={<ModuleWorkspace path="/quality" />} /><Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} /><Route path="/reports" element={<ModuleWorkspace path="/reports" />} /><Route path="/users" element={<UsersPage />} /><Route path="/administration" element={<ModuleWorkspace path="/administration" />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Dashboard />} /></Routes></div>
+  return <div className="route-content"><Routes><Route path="/" element={<Dashboard />} /><Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} /><Route path="/students" element={<StudentsPage />} /><Route path="/academics/*" element={<AcademicStructureRoute />} /><Route path="/registration" element={<ModuleWorkspace path="/registration" />} /><Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} /><Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} /><Route path="/examinations" element={<ModuleWorkspace path="/examinations" />} /><Route path="/finance" element={<ModuleWorkspace path="/finance" />} /><Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} /><Route path="/learning" element={<ModuleWorkspace path="/learning" />} /><Route path="/library" element={<ModuleWorkspace path="/library" />} /><Route path="/staff" element={<ModuleWorkspace path="/staff" />} /><Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} /><Route path="/internship" element={<ModuleWorkspace path="/internship" />} /><Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} /><Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} /><Route path="/communications" element={<ModuleWorkspace path="/communications" />} /><Route path="/quality" element={<ModuleWorkspace path="/quality" />} /><Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} /><Route path="/reports" element={<ModuleWorkspace path="/reports" />} /><Route path="/users" element={<UsersPage />} /><Route path="/administration" element={<ModuleWorkspace path="/administration" />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Dashboard />} /></Routes></div>
 }
 
 function Dashboard() {
