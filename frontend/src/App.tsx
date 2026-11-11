@@ -176,7 +176,7 @@ function RouteTransitionLoader() {
 
   return <div className="route-transition-loader" role="status" aria-live="polite">
     <div className="route-transition-card">
-      <LoadingSpinner size="sm" label="Loading module" />
+      <LoadingSpinner size="md" label="Loading module" />
       <span>Loading module…</span>
     </div>
   </div>
