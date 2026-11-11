@@ -708,7 +708,7 @@ export const moduleRows: Record<string, Array<Record<string, string>>> = {
     { reference: 'BED', applicant: 'Bachelor of Education', programme: 'Faculty of Education', intake: '4 years · 132 credits', status: 'Active' },
   ],
   '/academics/institutions': [
-    { reference: 'MMI', applicant: 'Makerere Metropolitan Institute', programme: 'Kampala, Uganda', intake: 'University', status: 'Active' },
+    { reference: 'MMI', applicant: 'Peculiar Metropolitan Institute', programme: 'Kampala, Uganda', intake: 'University', status: 'Active' },
     { reference: 'CAMP-MAIN', applicant: 'Main campus', programme: 'Kampala', intake: 'Institution campus', status: 'Active' },
     { reference: 'CAMP-EAST', applicant: 'East campus', programme: 'Jinja', intake: 'Institution campus', status: 'Active' },
   ],
@@ -1444,7 +1444,7 @@ for (const group of genericOperationalGroups) {
 }
 
 export const institutionDefaults = {
-  name: 'Makerere Metropolitan Institute',
+  name: 'Peculiar Metropolitan Institute',
   shortName: 'MMI',
   location: 'Kampala, Uganda',
   type: 'University',
