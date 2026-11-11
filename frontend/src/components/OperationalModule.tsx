@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { useAppContext } from '../app-context'
 import { adminNavigationItems, moduleKpis, navigationItems, pageMeta } from '../data'
 import { ModuleWorkspace } from './ModuleWorkspace'
+import { ModuleOverviewCharts } from './ModuleOverviewCharts'
 import { Card, KpiCard } from './ui'
 
 type OperationalArea = {
@@ -36,6 +37,7 @@ export function ModuleLanding({ basePath, items, steps }: ModuleLandingProps) {
     <div className="stats-grid module-kpi-strip">
       {(moduleKpis[basePath] ?? []).map((metric) => <KpiCard key={metric.label} {...metric} />)}
     </div>
+    <ModuleOverviewCharts path={basePath} />
     {steps && <section className="academic-hierarchy" aria-label={`${meta.title} workflow`}>
       {steps.map((step, index) => <div className="academic-hierarchy-step" key={step.href}>
         <Link to={step.href}>{step.label}</Link>

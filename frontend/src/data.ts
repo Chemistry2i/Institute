@@ -186,6 +186,7 @@ export const admissionsItems = [
   { label: 'Applicant review', href: '/admissions/applicant-review', icon: UserRound, description: 'Review applicant quality, faculty preferences, and shortlist decisions.' },
   { label: 'Document verification', href: '/admissions/document-verification', icon: FileText, description: 'Confirm missing, received, and verified applicant documents.' },
   { label: 'Offers & decisions', href: '/admissions/offers-decisions', icon: ShieldCheck, description: 'Issue offers, manage waitlists, acceptances, and release windows.' },
+  { label: 'Enrollment & matriculation', href: '/admissions/matriculation', icon: GraduationCap, description: 'Convert accepted offers into verified, enrolled student records.' },
   { label: 'Intake planning', href: '/admissions/intake-planning', icon: CalendarDays, description: 'Align applicant volume, capacity, and enrolment planning by intake.' },
   { label: 'Reports & trends', href: '/admissions/reports', icon: ChartNoAxesCombined, description: 'Measure conversion and performance across the admissions intake cycle.' },
 ] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
@@ -553,6 +554,7 @@ export const pageMeta: Record<string, { eyebrow: string; title: string; descript
   '/admissions/applicant-review': { eyebrow: 'Admissions office', title: 'Applicant review', description: 'Review shortlist quality, programme fit, and faculty-level decision readiness.' },
   '/admissions/document-verification': { eyebrow: 'Admissions office', title: 'Document verification', description: 'Monitor required documents, missing files, and verification completion.' },
   '/admissions/offers-decisions': { eyebrow: 'Admissions office', title: 'Offers & decisions', description: 'Manage offers, acceptances, waitlists, and programme allocation decisions.' },
+  '/admissions/matriculation': { eyebrow: 'Enrollment services', title: 'Enrollment & matriculation', description: 'Move accepted applicants through confirmation, document clearance, student ID creation, and first registration.' },
   '/admissions/intake-planning': { eyebrow: 'Admissions office', title: 'Intake planning', description: 'Plan capacity, intakes, and applicant volume for each programme and campus.' },
   '/admissions/reports': { eyebrow: 'Admissions office', title: 'Reports & trends', description: 'Measure conversion rates and track admissions performance over time.' },
   '/students': { eyebrow: 'Student management', title: 'Student overview', description: 'Monitor student records, status distribution, and pending lifecycle work.' },
@@ -626,6 +628,12 @@ export const moduleRows: Record<string, Array<Record<string, string>>> = {
     { reference: 'APP-2025-0938', applicant: 'Isaac Kato', programme: 'Diploma in Business', intake: 'August 2025', status: 'Missing documents' },
     { reference: 'APP-2025-0926', applicant: 'Lydia Auma', programme: 'Bachelor of Education', intake: 'August 2025', status: 'Offer ready' },
     { reference: 'APP-2025-0890', applicant: 'Moses Tumusiime', programme: 'BSc Information Technology', intake: 'August 2025', status: 'Accepted' },
+  ],
+  '/admissions/matriculation': [
+    { reference: 'ENR-2026-0142', applicant: 'Grace Nabbosa', programme: 'BSc Computer Science · August 2026', intake: 'Identity verified · student ID pending', status: 'Needs attention' },
+    { reference: 'ENR-2026-0138', applicant: 'Isaac Kato', programme: 'Diploma in Business · August 2026', intake: 'Documents cleared · fees confirmed', status: 'Ready to enroll' },
+    { reference: 'ENR-2026-0126', applicant: 'Lydia Auma', programme: 'Bachelor of Education · August 2026', intake: 'Offer accepted · clearance in review', status: 'Under review' },
+    { reference: 'ENR-2026-0090', applicant: 'Moses Tumusiime', programme: 'BSc Information Technology · August 2026', intake: 'Student ID issued · registration started', status: 'Enrolled' },
   ],
   '/admissions/application-pipeline': [
     { reference: 'APP-2025-1102', applicant: 'Annette Muwonge', programme: 'BSc Computer Science', intake: 'August 2025', status: 'Fresh application' },
@@ -981,6 +989,7 @@ export const moduleIcons: Record<string, LucideIcon> = {
   '/admissions/applicant-review': UserRound,
   '/admissions/document-verification': FileText,
   '/admissions/offers-decisions': ShieldCheck,
+  '/admissions/matriculation': GraduationCap,
   '/admissions/intake-planning': CalendarDays,
   '/admissions/reports': ChartNoAxesCombined,
   '/students': UserRound,
@@ -1199,6 +1208,12 @@ export const moduleKpis: Record<string, KpiMetric[]> = {
     { label: 'Under review', value: '342', detail: 'Awaiting faculty decision', icon: UserRound, tone: 'amber' },
     { label: 'Offer ready', value: '186', detail: 'Ready to issue or release', icon: ShieldCheck, tone: 'teal' },
     { label: 'Yield forecast', value: '61%', detail: 'Expected conversion rate', icon: ChartNoAxesCombined, tone: 'purple' },
+  ],
+  '/admissions/matriculation': [
+    { label: 'Offers accepted', value: '122', detail: 'Ready for enrollment processing', icon: GraduationCap, tone: 'blue' },
+    { label: 'Clearance in progress', value: '34', detail: 'Documents or finance checks', icon: FileText, tone: 'amber' },
+    { label: 'Ready to enroll', value: '68', detail: 'Pre-enrollment requirements met', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Student records created', value: '20', detail: 'Matriculated this intake', icon: UsersRound, tone: 'purple' },
   ],
   '/admissions/application-pipeline': [
     { label: 'Fresh applications', value: '412', detail: 'Submitted in current cycle', icon: ClipboardList, tone: 'blue' },

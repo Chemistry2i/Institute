@@ -4,6 +4,7 @@ import { ChevronRight, CircleHelp, Minus, Plus } from 'lucide-react'
 import { academicStructureItems, moduleKpis, type NavigationItem } from '../data'
 import { useAppContext } from '../app-context'
 import { Card, KpiCard } from './ui'
+import { ModuleOverviewCharts } from './ModuleOverviewCharts'
 import { ModuleWorkspace } from './ModuleWorkspace'
 
 const areaGroups = [
@@ -60,6 +61,7 @@ function AcademicStructureOverview() {
     <div className="stats-grid module-kpi-strip">
       {(moduleKpis['/academics'] ?? []).map((metric) => <KpiCard key={metric.label} {...metric} />)}
     </div>
+    <ModuleOverviewCharts path="/academics" />
     <section className="academic-hierarchy" aria-label="Academic structure hierarchy">
       {[
         { label: 'Institution', href: '/academics/institutions' },

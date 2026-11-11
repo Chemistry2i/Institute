@@ -3,6 +3,7 @@
     { "path": "/login", "title": "Sign in" },
     { "path": "/", "title": "Dashboard" },
     { "path": "/admissions", "title": "Admissions" },
+    { "path": "/admissions/matriculation", "title": "Enrollment & matriculation" },
     { "path": "/students", "title": "Students" },
     { "path": "/academics", "title": "Academic structure" },
     { "path": "/registration", "title": "Registration" },
