@@ -73,6 +73,23 @@ const countryNames = new Intl.DisplayNames(['en'], { type: 'region' })
 const phoneCountries = getCountries()
   .map((code) => ({ code, name: countryNames.of(code) ?? code, callingCode: getCountryCallingCode(code) }))
   .sort((left, right) => left.name.localeCompare(right.name))
+const ugandanDistricts = [
+  'Abim', 'Adjumani', 'Agago', 'Alebtong', 'Amolatar', 'Amudat', 'Amuria', 'Amuru', 'Apac', 'Arua',
+  'Budaka', 'Bududa', 'Bugiri', 'Bugweri', 'Buhweju', 'Buikwe', 'Bukedea', 'Bukomansimbi', 'Bukwo',
+  'Bulambuli', 'Buliisa', 'Bundibugyo', 'Bunyangabu', 'Bushenyi', 'Busia', 'Butaleja', 'Butambala',
+  'Butebo', 'Buvuma', 'Buyende', 'Dokolo', 'Gomba', 'Gulu', 'Hoima', 'Ibanda', 'Iganga', 'Isingiro',
+  'Jinja', 'Kaabong', 'Kabale', 'Kabarole', 'Kaberamaido', 'Kagadi', 'Kakumiro', 'Kalaki', 'Kalangala',
+  'Kaliro', 'Kalungu', 'Kampala', 'Kamuli', 'Kamwenge', 'Kanungu', 'Kapchorwa', 'Kapelebyong', 'Karenga',
+  'Kasanda', 'Kasese', 'Katakwi', 'Kayunga', 'Kazo', 'Kibaale', 'Kiboga', 'Kibuku', 'Kikuube', 'Kiruhura',
+  'Kiryandongo', 'Kisoro', 'Kitagwenda', 'Kitgum', 'Koboko', 'Kole', 'Kotido', 'Kumi', 'Kwania', 'Kween',
+  'Kyankwanzi', 'Kyegegwa', 'Kyenjojo', 'Kyotera', 'Lamwo', 'Lira', 'Luuka', 'Luwero', 'Lwengo', 'Lyantonde',
+  'Madi-Okollo', 'Manafwa', 'Maracha', 'Masaka', 'Masindi', 'Mayuge', 'Mbale', 'Mbarara', 'Mitooma',
+  'Mityana', 'Moroto', 'Moyo', 'Mpigi', 'Mubende', 'Mukono', 'Nabilatuk', 'Nakapiripirit', 'Nakaseke',
+  'Nakasongola', 'Namayingo', 'Namisindwa', 'Namutumba', 'Napak', 'Nebbi', 'Ngora', 'Ntoroko', 'Ntungamo',
+  'Nwoya', 'Obongi', 'Omoro', 'Otuke', 'Oyam', 'Pader', 'Pakwach', 'Pallisa', 'Rakai', 'Rubanda', 'Rubirizi',
+  'Rukiga', 'Rukungiri', 'Rwampara', 'Sembabule', 'Serere', 'Sheema', 'Sironko', 'Soroti', 'Terego', 'Tororo',
+  'Wakiso', 'Yumbe', 'Zombo',
+]
 const formatPhone = (country: CountryCode, number: string) => `+${getCountryCallingCode(country)} ${number.trim()}`
 const requiredDocuments = ['Identity document', 'Academic certificate', 'Academic transcript']
 const initialDocuments = requiredDocuments.map((name) => ({ name, status: 'Received' as const, fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf`, required: true }))
@@ -489,18 +506,18 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
         <ApplicationField label="Middle name" icon={UserRound} optional><input autoComplete="additional-name" value={draft.middleName} onChange={(event) => updateName('middleName', event.target.value)} /></ApplicationField>
         <ApplicationField label="Last name" icon={UserRound}><input autoComplete="family-name" value={draft.lastName} onChange={(event) => updateName('lastName', event.target.value)} required /></ApplicationField>
         <ApplicationField label="Email address" icon={Mail}><input type="email" autoComplete="email" value={draft.email} onChange={(event) => update('email', event.target.value)} required /></ApplicationField>
-        <ApplicationField label="Phone number" icon={Phone}><div className="application-phone-fields"><select aria-label="Phone country calling code" value={draft.phoneCountry} onChange={(event) => update('phoneCountry', event.target.value as CountryCode)} required>{phoneCountries.map((country) => <option key={country.code} value={country.code}>{country.code} +{country.callingCode} · {country.name}</option>)}</select><input type="tel" autoComplete="tel-national" inputMode="tel" placeholder="e.g. 700 123 456" aria-label="Phone number" value={draft.phoneNumber} onChange={(event) => update('phoneNumber', event.target.value)} required /></div></ApplicationField>
+        <ApplicationField label="Phone number"><div className="application-phone-fields"><select aria-label="Phone country calling code" value={draft.phoneCountry} onChange={(event) => update('phoneCountry', event.target.value as CountryCode)} required>{phoneCountries.map((country) => <option key={country.code} value={country.code}>{country.code} +{country.callingCode} · {country.name}</option>)}</select><input type="tel" autoComplete="tel-national" inputMode="tel" placeholder="e.g. 700 123 456" aria-label="Phone number" value={draft.phoneNumber} onChange={(event) => update('phoneNumber', event.target.value)} required /></div></ApplicationField>
         <ApplicationField label="Date of birth" icon={CalendarDays}><input type="date" value={draft.dateOfBirth} onChange={(event) => update('dateOfBirth', event.target.value)} required /></ApplicationField>
-        <ApplicationField label="Gender" icon={UserRound}><select value={draft.gender} onChange={(event) => update('gender', event.target.value)} required><option value="">Select gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></ApplicationField>
+        <ApplicationField label="Gender" icon={UserRound}><select value={draft.gender} onChange={(event) => update('gender', event.target.value)} required><option value="">Select gender</option><option>Female</option><option>Male</option></select></ApplicationField>
         <ApplicationField label="Nationality" icon={Globe2}><select autoComplete="country-name" value={draft.nationality} onChange={(event) => update('nationality', event.target.value)} required><option value="">Select country</option>{phoneCountries.map((country) => <option key={country.code}>{country.name}</option>)}</select></ApplicationField>
-        <ApplicationField label="District" icon={Building2}><input autoComplete="address-level1" value={draft.district} onChange={(event) => update('district', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="District" icon={Building2}><select autoComplete="address-level1" value={draft.district} onChange={(event) => update('district', event.target.value)} required><option value="">Select district</option>{ugandanDistricts.map((district) => <option key={district}>{district}</option>)}</select></ApplicationField>
         <ApplicationField label="Location (village, town or area)" icon={MapPin}><input autoComplete="address-level2" value={draft.location} onChange={(event) => update('location', event.target.value)} required /></ApplicationField>
         <div className="application-subsection-heading"><h4>Next of kin / emergency contact</h4></div>
         <ApplicationField label="First name" icon={UsersRound}><input value={draft.nextOfKin.firstName} onChange={(event) => updateNextOfKin('firstName', event.target.value)} required /></ApplicationField>
         <ApplicationField label="Middle name" icon={UsersRound} optional><input value={draft.nextOfKin.middleName} onChange={(event) => updateNextOfKin('middleName', event.target.value)} /></ApplicationField>
         <ApplicationField label="Last name" icon={UsersRound}><input value={draft.nextOfKin.lastName} onChange={(event) => updateNextOfKin('lastName', event.target.value)} required /></ApplicationField>
         <ApplicationField label="Relationship" icon={UsersRound}><select value={draft.nextOfKin.relationship} onChange={(event) => updateNextOfKin('relationship', event.target.value)} required><option value="">Select relationship</option><option>Parent</option><option>Guardian</option><option>Spouse</option><option>Sibling</option><option>Relative</option><option>Other</option></select></ApplicationField>
-        <ApplicationField label="Phone number" icon={Phone}><div className="application-phone-fields"><select aria-label="Next of kin country calling code" value={draft.nextOfKin.phoneCountry} onChange={(event) => updateNextOfKin('phoneCountry', event.target.value as CountryCode)} required>{phoneCountries.map((country) => <option key={country.code} value={country.code}>{country.code} +{country.callingCode} · {country.name}</option>)}</select><input type="tel" autoComplete="tel-national" inputMode="tel" placeholder="e.g. 700 123 456" aria-label="Next of kin phone number" value={draft.nextOfKin.phoneNumber} onChange={(event) => updateNextOfKin('phoneNumber', event.target.value)} required /></div></ApplicationField>
+        <ApplicationField label="Phone number"><div className="application-phone-fields"><select aria-label="Next of kin country calling code" value={draft.nextOfKin.phoneCountry} onChange={(event) => updateNextOfKin('phoneCountry', event.target.value as CountryCode)} required>{phoneCountries.map((country) => <option key={country.code} value={country.code}>{country.code} +{country.callingCode} · {country.name}</option>)}</select><input type="tel" autoComplete="tel-national" inputMode="tel" placeholder="e.g. 700 123 456" aria-label="Next of kin phone number" value={draft.nextOfKin.phoneNumber} onChange={(event) => updateNextOfKin('phoneNumber', event.target.value)} required /></div></ApplicationField>
         <ApplicationField label="Email address" icon={Mail} optional><input type="email" value={draft.nextOfKin.email} onChange={(event) => updateNextOfKin('email', event.target.value)} /></ApplicationField>
       </section>}
       {step === 1 && <section className="application-step-content">
@@ -549,10 +566,10 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
   </div>
 }
 
-function ApplicationField({ label, icon: Icon, children, className = '', optional = false }: { label: string; icon: LucideIcon; children: ReactNode; className?: string; optional?: boolean }) {
+function ApplicationField({ label, icon: Icon, children, className = '', optional = false }: { label: string; icon?: LucideIcon; children: ReactNode; className?: string; optional?: boolean }) {
   return <label className={`application-field ${className}`}>
     <span className="application-field-label">{label}{optional && <small>Optional</small>}</span>
-    <span className="application-input-control"><span className="application-input-icon"><Icon size={15} aria-hidden="true" /></span>{children}</span>
+    <span className={`application-input-control${Icon ? '' : ' application-input-control-no-icon'}`}>{Icon && <span className="application-input-icon"><Icon size={15} aria-hidden="true" /></span>}{children}</span>
   </label>
 }
 
