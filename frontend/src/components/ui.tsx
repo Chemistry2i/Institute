@@ -1,5 +1,5 @@
 import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
-import { LoaderCircle, TrendingUp, type LucideIcon } from 'lucide-react'
+import { LoaderCircle, Search, TrendingUp, type LucideIcon } from 'lucide-react'
 
 export function Button({ className, variant = 'primary', size = 'md', loading = false, loadingLabel = 'Loading', disabled, children, ...props }: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'outline' | 'ghost' | 'soft' | 'danger'; size?: 'sm' | 'md'; loading?: boolean; loadingLabel?: string }) {
   return <button className={cn('ui-button', `ui-button-${variant}`, `ui-button-${size}`, className)} disabled={disabled || loading} aria-busy={loading || undefined} {...props}>
@@ -60,6 +60,24 @@ export function TableSkeleton({ rows = 5, columns = 5, label = 'Loading records'
     </table>
     <div className="skeleton-loading-label"><LoadingSpinner size="sm" label={label} /><span>{label}</span></div>
   </div>
+}
+
+export function EmptyState({ title, description, actionLabel = 'Refresh', onAction }: { title: string; description: string; actionLabel?: string; onAction?: () => void }) {
+  return <Card className="empty-state-panel">
+    <div className="empty-state-icon"><Search size={18} /></div>
+    <h3>{title}</h3>
+    <p>{description}</p>
+    {onAction && <Button variant="outline" size="sm" onClick={onAction}>{actionLabel}</Button>}
+  </Card>
+}
+
+export function ErrorState({ title, description, onRetry }: { title: string; description: string; onRetry?: () => void }) {
+  return <Card className="error-state-panel">
+    <div className="error-state-icon"><LoaderCircle size={18} /></div>
+    <h3>{title}</h3>
+    <p>{description}</p>
+    {onRetry && <Button variant="outline" size="sm" onClick={onRetry}>Retry</Button>}
+  </Card>
 }
 
 export function cn(...classes: Array<string | false | null | undefined>) {

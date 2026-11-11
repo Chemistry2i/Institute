@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, CircleHelp, Download, Filter, Layers, MoreHorizontal, Plus, RefreshCw, Search, X } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { Badge, Button, Card, KpiCard, KpiSkeleton, Skeleton, TableSkeleton } from './ui'
+import { Badge, Button, Card, EmptyState, ErrorState, KpiCard, KpiSkeleton, Skeleton, TableSkeleton } from './ui'
 import { moduleIcons, moduleKpis, moduleRows, navigationItems, pageMeta } from '../data'
 import { useAppContext } from '../app-context'
 
@@ -22,13 +22,23 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
   const permission = path.startsWith('/academics/') ? 'academics.view' : navigationItems.find((item) => item.href === path)?.permission
   const [modal, setModal] = useState<ModalMode>(null)
   const [selectedRow, setSelectedRow] = useState<ModuleRow | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
+
+  const refreshData = () => {
+    setError(null)
+    setRefreshing(true)
+    window.setTimeout(() => setRefreshing(false), 500)
+  }
 
   if (permission && !can(permission)) return <PermissionEmpty />
-  if (loading) return <>
+  if (loading || refreshing) return <>
     <div className="stats-grid module-kpi-strip" aria-label={`Loading ${meta.title} metrics`}>{Array.from({ length: 4 }, (_, index) => <KpiSkeleton key={index} />)}</div>
     <div className="module-toolbar" aria-hidden="true"><Skeleton className="skeleton-search" /><div className="toolbar-actions"><Skeleton className="skeleton-toolbar-button" /><Skeleton className="skeleton-toolbar-button" /></div></div>
     <TableSkeleton label={`Loading ${meta.title.toLowerCase()}`} />
   </>
+  if (error) return <ErrorState title={`${meta.title} unavailable`} description={error} onRetry={refreshData} />
+  if (!rows.length) return <EmptyState title={`No ${meta.title.toLowerCase()} found`} description="Try refreshing the view or adding a new record to begin tracking this module." actionLabel="Refresh" onAction={refreshData} />
 
   const openDetails = (row: ModuleRow) => {
     setSelectedRow(row)
@@ -69,8 +79,17 @@ export function ModalShell({ title, description, children, onClose, footer }: { 
 
 export function FormModal({ meta, onClose }: { meta: { title: string }; onClose: () => void }) {
   const [saved, setSaved] = useState(false)
-  const submit = () => { setSaved(true); toast.success(`${meta.title} draft created.`); window.setTimeout(onClose, 450) }
-  return <ModalShell title={`Create ${meta.title.toLowerCase()} record`} description="Capture the core information now; validation and API persistence will be connected in the backend phase." onClose={onClose} footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={submit}>{saved ? <><Check size={14} /> Saved</> : 'Save draft'}</Button></>}><div className="modal-form-grid"><label>Record name<input placeholder="Enter a name or title" autoFocus /></label><label>Reference ID<input placeholder="e.g. 2025-001" /></label><label className="modal-form-wide">Description<textarea placeholder="Add context for colleagues who will review this record" rows={3} /></label><label>Status<select defaultValue="Draft"><option>Draft</option><option>Under review</option><option>Active</option></select></label><label>Effective date<input type="date" /></label></div><div className="modal-info"><CircleHelp size={15} /><span>This is a frontend-only modal workflow using local demo state. It is ready for typed API integration.</span></div></ModalShell>
+  const [saving, setSaving] = useState(false)
+  const submit = () => {
+    setSaving(true)
+    window.setTimeout(() => {
+      setSaved(true)
+      setSaving(false)
+      toast.success(`${meta.title} draft created.`)
+      window.setTimeout(onClose, 450)
+    }, 500)
+  }
+  return <ModalShell title={`Create ${meta.title.toLowerCase()} record`} description="Capture the core information now; validation and API persistence will be connected in the backend phase." onClose={onClose} footer={<><Button variant="ghost" onClick={onClose}>Cancel</Button><Button onClick={submit} loading={saving}>{saved ? <><Check size={14} /> Saved</> : 'Save draft'}</Button></>}><div className="modal-form-grid"><label>Record name<input placeholder="Enter a name or title" autoFocus /></label><label>Reference ID<input placeholder="e.g. 2025-001" /></label><label className="modal-form-wide">Description<textarea placeholder="Add context for colleagues who will review this record" rows={3} /></label><label>Status<select defaultValue="Draft"><option>Draft</option><option>Under review</option><option>Active</option></select></label><label>Effective date<input type="date" /></label></div><div className="modal-info"><CircleHelp size={15} /><span>This is a frontend-only modal workflow using local demo state. It is ready for typed API integration.</span></div></ModalShell>
 }
 
 export function FilterModal({ onClose }: { onClose: () => void }) {

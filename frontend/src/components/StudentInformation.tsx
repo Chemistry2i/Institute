@@ -3,7 +3,7 @@ import { BadgeCheck, Building2, CalendarDays, Check, CircleAlert, CircleCheck, C
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
 import { studentProfiles, students as initialStudents, type StudentProfileData, type StudentRecord } from '../data'
-import { Badge, Button, Card, KpiCard } from './ui'
+import { Badge, Button, Card, EmptyState, KpiCard } from './ui'
 import { ModalShell } from './ModuleWorkspace'
 
 type ProfileTab = 'overview' | 'documents'
@@ -25,6 +25,10 @@ export function StudentInformation() {
     return matchesSearch && (statusFilter === 'All statuses' || student.status === statusFilter)
   })
   const countForStatus = (status: StudentRecord['status']) => records.filter((student) => student.status === status).length
+  const clearFilters = () => {
+    setSearch('')
+    setStatusFilter('All statuses')
+  }
 
   const addStudent = (student: StudentRecord, profile: StudentProfileData) => {
     if (records.some((record) => record.id.toLowerCase() === student.id.toLowerCase())) {
@@ -54,22 +58,22 @@ export function StudentInformation() {
       </div>
     </div>
 
-    <Card className="module-table-card student-directory-card">
+    {visibleRecords.length === 0 ? <EmptyState title="No student records found" description="The current filters do not match any students. Clear the search or adjust the status filter to continue." actionLabel="Clear filters" onAction={clearFilters} /> : <Card className="module-table-card student-directory-card">
       <div className="table-card-head">
         <div className="module-title"><div className="module-title-icon module-icon-teal"><UsersRound size={19} /></div><div><h2>Student directory</h2><p>{visibleRecords.length} of {records.length} student records</p></div></div>
         <Button variant="ghost" size="sm" onClick={() => toast.success('Student import workflow is ready for backend integration.')}><FileText size={14} /> Import records</Button>
       </div>
       <div className="table-responsive"><table className="data-table student-table">
         <thead><tr><th>Student</th><th>Programme</th><th>Year</th><th>Status</th><th>Account balance</th><th>Last activity</th><th aria-label="Actions" /></tr></thead>
-        <tbody>{visibleRecords.length ? visibleRecords.map((student) => <tr key={student.id}>
+        <tbody>{visibleRecords.map((student) => <tr key={student.id}>
           <td><div className="table-person"><span className="table-avatar table-avatar-photo">{student.name.split(' ').map((word) => word[0]).join('').slice(0, 2)}</span><div><button className="student-name-link" onClick={() => setSelectedStudent(student)}>{student.name}</button><small>{student.id}</small></div></div></td>
           <td>{student.programme}</td><td>{student.year}</td><td><StudentStatusBadge status={student.status} /></td>
           <td className={student.balance === 'UGX 0' ? 'balance-clear' : ''}>{student.balance}</td><td>{student.lastSeen}</td>
           <td><button className="row-more" aria-label={`View ${student.name} profile`} onClick={() => setSelectedStudent(student)}><Eye size={17} /></button></td>
-        </tr>) : <tr><td className="student-empty-cell" colSpan={7}>No student records match those filters.</td></tr>}</tbody>
+        </tr>)}</tbody>
       </table></div>
       <div className="table-footer"><span>Showing {visibleRecords.length} of {records.length} preview records</span></div>
-    </Card>
+    </Card>}
 
     {selectedStudent && <StudentProfileDialog student={selectedStudent} profile={profiles[selectedStudent.id]} onClose={() => setSelectedStudent(null)} />}
     {createOpen && <StudentCreateModal onClose={() => setCreateOpen(false)} onCreate={addStudent} />}
@@ -113,8 +117,12 @@ function ProfileField({ label, children }: { label: string; children: ReactNode 
 }
 
 function StudentCreateModal({ onClose, onCreate }: { onClose: () => void; onCreate: (student: StudentRecord, profile: StudentProfileData) => boolean }) {
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setIsSubmitting(true)
+
     const formData = new FormData(event.currentTarget)
     const student: StudentRecord = {
       id: String(formData.get('studentId')).trim(),
@@ -143,10 +151,20 @@ function StudentCreateModal({ onClose, onCreate }: { onClose: () => void; onCrea
         { name: 'Academic transcript', status: 'Pending', updated: 'Awaiting upload' },
       ],
     }
-    onCreate(student, profile)
+
+    const created = onCreate(student, profile)
+    if (!created) {
+      setIsSubmitting(false)
+      return
+    }
+
+    window.setTimeout(() => {
+      setIsSubmitting(false)
+      onClose()
+    }, 500)
   }
 
-  return <ModalShell title="Add student record" description="Create a student profile with academic placement and emergency contact details." onClose={onClose} footer={<><Button variant="ghost" type="button" onClick={onClose}>Cancel</Button><Button type="submit" form="student-create-form"><Plus size={14} /> Create student</Button></>}>
+  return <ModalShell title="Add student record" description="Create a student profile with academic placement and emergency contact details." onClose={onClose} footer={<><Button variant="ghost" type="button" onClick={onClose}>Cancel</Button><Button type="submit" form="student-create-form" loading={isSubmitting}><Plus size={14} /> Create student</Button></>}>
     <form className="modal-form-grid student-create-form" id="student-create-form" onSubmit={submit}>
       <label>Student ID<input name="studentId" placeholder="e.g. 25/BCS/0142" required /></label>
       <label>Full name<input name="fullName" placeholder="Student full name" required /></label>

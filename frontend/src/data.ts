@@ -13,6 +13,10 @@ import {
   ListTree,
   Network,
   BookOpenText,
+  ArrowRightLeft,
+  CirclePause,
+  FileText,
+  MapPin,
   Settings2,
   ShieldCheck,
   UserRound,
@@ -135,7 +139,7 @@ export interface KpiMetric {
 export const navigationItems: NavigationItem[] = [
   { label: 'Dashboard', href: '/', icon: LayoutDashboard, permission: 'dashboard.view' },
   { label: 'Admissions', href: '/admissions', icon: ClipboardList, permission: 'admissions.view', badge: '24' },
-  { label: 'Students', href: '/students', icon: UsersRound, permission: 'students.view' },
+  { label: 'Student management', href: '/students', icon: UsersRound, permission: 'students.view' },
   { label: 'Academic structure', href: '/academics', icon: BookOpen, permission: 'academics.view' },
   { label: 'Registration', href: '/registration', icon: GraduationCap, permission: 'registration.view', badge: '8' },
   { label: 'Timetabling', href: '/timetabling', icon: ClipboardList, permission: 'timetabling.view' },
@@ -155,6 +159,14 @@ export const navigationItems: NavigationItem[] = [
   { label: 'Procurement & inventory', href: '/procurement', icon: Building2, permission: 'procurement.view' },
   { label: 'Reports', href: '/reports', icon: ChartNoAxesCombined, permission: 'reports.view' },
 ]
+
+export const studentManagementItems = [
+  { label: 'Overview', href: '/students', icon: ChartNoAxesCombined, description: 'Student counts, status distribution, and records needing attention.' },
+  { label: 'Student directory', href: '/students/directory', icon: UserRound, description: 'Search student records and open full profiles.' },
+  { label: 'Placement & status', href: '/students/placement', icon: MapPin, description: 'Review programme, campus, cohort, and student status.' },
+  { label: 'Lifecycle requests', href: '/students/lifecycle', icon: ArrowRightLeft, description: 'Review transfers, deferments, withdrawals, and reinstatements.' },
+  { label: 'Documents & verification', href: '/students/documents', icon: FileText, description: 'Track student documents and verification progress.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
 
 export const academicStructureItems = [
   { label: 'Overview', href: '/academics', icon: LayoutDashboard, description: 'See the complete academic setup and how its parts connect.' },
@@ -367,7 +379,11 @@ export const facultyData = [
 
 export const pageMeta: Record<string, { eyebrow: string; title: string; description: string }> = {
   '/admissions': { eyebrow: 'Admissions office', title: 'Keep every application moving', description: 'Review intake activity, missing documents, and decision queues from one place.' },
-  '/students': { eyebrow: 'Student information', title: 'Student records', description: 'A governed view of active, graduating, and at-risk student records.' },
+  '/students': { eyebrow: 'Student management', title: 'Student overview', description: 'Monitor student records, status distribution, and pending lifecycle work.' },
+  '/students/directory': { eyebrow: 'Student management', title: 'Student directory', description: 'Search student records and review academic, contact, and document details.' },
+  '/students/placement': { eyebrow: 'Student management', title: 'Placement & status', description: 'Review each student’s programme, campus, year, and current status.' },
+  '/students/lifecycle': { eyebrow: 'Student management', title: 'Lifecycle requests', description: 'Coordinate student transfers, deferments, withdrawals, and reinstatements.' },
+  '/students/documents': { eyebrow: 'Student management', title: 'Documents & verification', description: 'Monitor student document completeness and verification state.' },
   '/academics': { eyebrow: 'Academic structure', title: 'Academic structure overview', description: 'Explore how your institution, academic organisation, programmes, and policies fit together.' },
   '/academics/institutions': { eyebrow: 'Academic structure', title: 'Institutions & campuses', description: 'Manage institutional identity and the campuses where academic activity takes place.' },
   '/academics/faculties': { eyebrow: 'Academic structure', title: 'Faculties & schools', description: 'Organise academic departments under faculties, schools, and colleges.' },
@@ -405,6 +421,36 @@ export const moduleRows: Record<string, Array<Record<string, string>>> = {
     { reference: 'APP-2025-0938', applicant: 'Isaac Kato', programme: 'Diploma in Business', intake: 'August 2025', status: 'Missing documents' },
     { reference: 'APP-2025-0926', applicant: 'Lydia Auma', programme: 'Bachelor of Education', intake: 'August 2025', status: 'Offer ready' },
     { reference: 'APP-2025-0890', applicant: 'Moses Tumusiime', programme: 'BSc Information Technology', intake: 'August 2025', status: 'Accepted' },
+  ],
+  '/students': [
+    { reference: 'INT-2025-001', applicant: 'Student lifecycle overview', programme: '2,846 active students', intake: 'Semester II · 2025', status: 'Active' },
+    { reference: 'INT-2025-002', applicant: 'Placement review', programme: '184 students awaiting final placement', intake: 'Faculty review', status: 'Under review' },
+    { reference: 'INT-2025-003', applicant: 'Document verification', programme: '37 records pending', intake: 'Registry queue', status: 'Needs attention' },
+    { reference: 'INT-2025-004', applicant: 'Lifecycle actions', programme: '12 transfer requests', intake: 'Academic registrar', status: 'Active' },
+  ],
+  '/students/directory': [
+    { reference: '24/BCS/0142', applicant: 'Aisha Namukasa', programme: 'BSc Computer Science', intake: 'Year 2', status: 'Active' },
+    { reference: '23/BBA/0871', applicant: 'Daniel Okello', programme: 'Bachelor of Business Admin', intake: 'Year 3', status: 'Graduating' },
+    { reference: '24/DCS/0256', applicant: 'Mariam Atim', programme: 'Diploma in Computing', intake: 'Year 1', status: 'Active' },
+    { reference: '22/BED/0319', applicant: 'Peter Ssekabira', programme: 'Bachelor of Education', intake: 'Year 4', status: 'On hold' },
+  ],
+  '/students/placement': [
+    { reference: 'PL-2025-204', applicant: 'Faculty placement review', programme: 'Computing · 920 students', intake: 'Main campus', status: 'Active' },
+    { reference: 'PL-2025-118', applicant: 'Programme allocation', programme: 'Business · 714 students', intake: 'Main campus', status: 'Under review' },
+    { reference: 'PL-2025-092', applicant: 'Year-level status', programme: 'Year 3 learners', intake: 'Faculty review', status: 'Needs attention' },
+    { reference: 'PL-2025-047', applicant: 'Campus distribution', programme: '2,846 records', intake: 'All campuses', status: 'Active' },
+  ],
+  '/students/lifecycle': [
+    { reference: 'LIF-2025-014', applicant: 'Transfer requests', programme: '6 pending approvals', intake: 'Registrar office', status: 'Under review' },
+    { reference: 'LIF-2025-021', applicant: 'Deferment cases', programme: '12 students', intake: 'Academic board', status: 'Needs attention' },
+    { reference: 'LIF-2025-033', applicant: 'Withdrawal review', programme: '4 students', intake: 'Welfare committee', status: 'Active' },
+    { reference: 'LIF-2025-041', applicant: 'Reinstatement requests', programme: '3 cases', intake: 'Academic registrar', status: 'Active' },
+  ],
+  '/students/documents': [
+    { reference: 'DOC-2025-221', applicant: 'Identity document verification', programme: '18 pending', intake: 'Admissions office', status: 'Needs attention' },
+    { reference: 'DOC-2025-333', applicant: 'Academic transcripts', programme: '96 received', intake: 'Registry', status: 'Active' },
+    { reference: 'DOC-2025-412', applicant: 'Finance clearance', programme: '42 pending', intake: 'Accounts office', status: 'Under review' },
+    { reference: 'DOC-2025-508', applicant: 'Graduation packs', programme: '184 ready for check', intake: 'Final clearance', status: 'Active' },
   ],
   '/academics': [
     { reference: 'BSC-CS', applicant: 'BSc Computer Science', programme: 'Faculty of Computing', intake: '4 years · 128 credits', status: 'Active' },
@@ -568,6 +614,10 @@ Object.assign(moduleRows, {
 export const moduleIcons: Record<string, LucideIcon> = {
   '/admissions': ClipboardList,
   '/students': UserRound,
+  '/students/directory': UserRound,
+  '/students/placement': MapPin,
+  '/students/lifecycle': ArrowRightLeft,
+  '/students/documents': FileText,
   '/academics': LayoutDashboard,
   '/academics/institutions': Building2,
   '/academics/faculties': Landmark,
@@ -598,6 +648,36 @@ export const moduleIcons: Record<string, LucideIcon> = {
 }
 
 export const moduleKpis: Record<string, KpiMetric[]> = {
+  '/students': [
+    { label: 'Student records', value: '2,846', detail: 'Active student register', icon: UsersRound, tone: 'blue' },
+    { label: 'On hold', value: '82', detail: 'Need follow-up', icon: CirclePause, tone: 'amber' },
+    { label: 'Graduating', value: '184', detail: 'Completion review', icon: GraduationCap, tone: 'purple' },
+    { label: 'Verified documents', value: '94%', detail: 'Current document completion', icon: FileText, tone: 'teal' },
+  ],
+  '/students/directory': [
+    { label: 'Student records', value: '2,846', detail: 'Visible in preview directory', icon: UsersRound, tone: 'blue' },
+    { label: 'Active', value: '2,138', detail: 'Currently enrolled', icon: ShieldCheck, tone: 'teal' },
+    { label: 'On hold', value: '82', detail: 'Require follow-up', icon: CirclePause, tone: 'amber' },
+    { label: 'Graduating', value: '184', detail: 'Completion review', icon: GraduationCap, tone: 'purple' },
+  ],
+  '/students/placement': [
+    { label: 'Placed students', value: '2,642', detail: 'Allocated to current cohort', icon: MapPin, tone: 'blue' },
+    { label: 'Pending placement', value: '184', detail: 'Need faculty review', icon: ClipboardList, tone: 'amber' },
+    { label: 'Campuses', value: '3', detail: 'Across all campuses', icon: Building2, tone: 'teal' },
+    { label: 'Cohorts active', value: '6', detail: 'Current programme intakes', icon: GraduationCap, tone: 'purple' },
+  ],
+  '/students/lifecycle': [
+    { label: 'Transfer requests', value: '6', detail: 'Awaiting approvals', icon: ArrowRightLeft, tone: 'blue' },
+    { label: 'Deferments', value: '12', detail: 'Academic consideration', icon: CalendarDays, tone: 'amber' },
+    { label: 'Withdrawals', value: '4', detail: 'Current processing queue', icon: CirclePause, tone: 'purple' },
+    { label: 'Reinstatements', value: '3', detail: 'Ready for board review', icon: ShieldCheck, tone: 'teal' },
+  ],
+  '/students/documents': [
+    { label: 'Verified docs', value: '94%', detail: 'Across active student register', icon: FileText, tone: 'blue' },
+    { label: 'Pending', value: '37', detail: 'Awaiting verification', icon: CirclePause, tone: 'amber' },
+    { label: 'Received today', value: '118', detail: 'Submitted in current cycle', icon: ClipboardList, tone: 'teal' },
+    { label: 'Clearance ready', value: '184', detail: 'Graduation pack checks', icon: GraduationCap, tone: 'purple' },
+  ],
   '/academics/institutions': [
     { label: 'Institutions', value: '1', detail: 'Institution profile configured', icon: Building2, tone: 'blue' },
     { label: 'Campuses', value: '2', detail: 'Main and East campus', icon: Landmark, tone: 'teal' },

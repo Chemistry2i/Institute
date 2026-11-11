@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { BrowserRouter, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import toast, { Toaster } from 'react-hot-toast'
 import Swal from 'sweetalert2'
@@ -38,7 +38,7 @@ import {
   Zap,
 } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-import { Badge, Button, Card, KpiCard } from './components/ui'
+import { Badge, Button, Card, KpiCard, LoadingSpinner } from './components/ui'
 import { AppProvider, defaultColors, useAppContext, type ThemeColors } from './app-context'
 import { AcademicStructureNav, AcademicStructureRoute } from './components/AcademicStructure'
 import { FilterModal, FormModal, ModuleWorkspace } from './components/ModuleWorkspace'
@@ -55,6 +55,7 @@ import {
   navigationItems,
   pageMeta,
   roles,
+  studentManagementItems,
   type Permission,
   type RoleName,
 } from './data'
@@ -66,7 +67,7 @@ function App() {
     <Route element={<Shell />}>
       <Route path="/" element={<Dashboard />} />
       <Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} />
-      <Route path="/students" element={<StudentsPage />} />
+      <Route path="/students/*" element={<StudentManagementRoute />} />
       <Route path="/academics/*" element={<AcademicStructureRoute />} />
       <Route path="/registration" element={<ModuleWorkspace path="/registration" />} />
       <Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} />
@@ -137,9 +138,15 @@ function Shell() {
           </button>
         </div>
         {modulesOpen && <nav className="sidebar-nav" aria-label="Module navigation">
-          {visibleMain.map((item) => item.href === '/academics'
-            ? <AcademicStructureNav key={item.href} item={item} items={academicStructureItems} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
-            : <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}
+          {visibleMain.map((item) => {
+            if (item.href === '/academics') {
+              return <AcademicStructureNav key={item.href} item={item} items={academicStructureItems} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
+            }
+            if (item.href === '/students') {
+              return <StudentManagementNav key={item.href} item={item} items={studentManagementItems} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
+            }
+            return <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
+          })}
         </nav>}
         {visibleAdmin.length > 0 && <>
           <div className="sidebar-section-label sidebar-section-admin">Administration</div>
@@ -167,6 +174,7 @@ function Shell() {
       </header>
       <div className="content-wrap">
         <div className="page-intro"><div><div className="eyebrow">{currentMeta.eyebrow}</div><h1>{currentMeta.title}</h1><p>{currentMeta.description}</p></div><div className="page-intro-actions"><span className="live-chip"><i /> Live data preview</span><button className="icon-button only-desktop" aria-label="Panel options"><SlidersHorizontal size={18} /></button></div></div>
+        <RouteTransitionLoader />
         <RoutesOutlet />
       </div>
     </main>
@@ -178,8 +186,97 @@ function NavItem({ item, collapsed, onNavigate }: { item: typeof navigationItems
   return <NavLink to={item.href} onClick={onNavigate} className={({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`} title={collapsed ? item.label : undefined}><Icon size={18} strokeWidth={1.8} /><span>{item.label}</span>{item.badge && !collapsed && <small>{item.badge}</small>}</NavLink>
 }
 
+function StudentManagementNav({ item, items, collapsed, onNavigate }: { item: typeof navigationItems[number]; items: typeof studentManagementItems; collapsed: boolean; onNavigate: () => void }) {
+  const location = useLocation()
+  const [open, setOpen] = useState(location.pathname.startsWith('/students'))
+  const Icon = item.icon
+  const active = location.pathname.startsWith('/students')
+
+  if (collapsed) {
+    return <NavLink to="/students" onClick={onNavigate} title={item.label} aria-label={item.label} className={({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`}>
+      <Icon size={18} strokeWidth={1.8} />
+    </NavLink>
+  }
+
+  return <div className={`academic-nav-group ${active ? 'academic-nav-group-active' : ''}`}>
+    <button className={`nav-item academic-nav-trigger ${active ? 'academic-nav-trigger-active' : ''}`} type="button" aria-expanded={open} aria-controls="student-management-links" onClick={() => setOpen((value) => !value)}>
+      <Icon size={18} strokeWidth={1.8} />
+      <span>{item.label}</span>
+      <ChevronDown size={14} className={open ? 'academic-nav-chevron-open' : ''} />
+    </button>
+    {open && <div className="academic-subnav" id="student-management-links">
+      {items.map((subItem) => { const SubIcon = subItem.icon; return <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>
+        <SubIcon size={14} strokeWidth={1.8} aria-hidden="true" />
+        <span>{subItem.label}</span>
+      </NavLink> })}
+    </div>}
+  </div>
+}
+
+function StudentManagementRoute() {
+  const { pathname } = useLocation()
+
+  if (pathname === '/students') return <StudentManagementOverview />
+  if (pathname === '/students/directory') return <StudentInformation />
+
+  return <ModuleWorkspace path={pathname} />
+}
+
+function StudentManagementOverview() {
+  const { can } = useAppContext()
+  if (!can('students.view')) return <Card className="permission-empty"><div className="permission-empty-icon"><ShieldCheck size={28} /></div><h2>Permission required</h2><p>Your current role does not have access to student management.</p></Card>
+
+  return <div className="academic-overview">
+    <section className="academic-hierarchy" aria-label="Student management hierarchy">
+      {[
+        { label: 'Student directory', href: '/students/directory' },
+        { label: 'Placement data', href: '/students/placement' },
+        { label: 'Lifecycle', href: '/students/lifecycle' },
+        { label: 'Documents', href: '/students/documents' },
+      ].map((step, index, steps) => <div className="academic-hierarchy-step" key={step.href}>
+        <Link to={step.href}>{step.label}</Link>
+        {index < steps.length - 1 && <ChevronRight size={15} aria-hidden="true" />}
+      </div>)}
+    </section>
+
+    <section className="academic-area-group">
+      <div className="academic-area-heading"><h2>Student management areas</h2><span>{studentManagementItems.length} areas</span></div>
+      <div className="academic-area-grid">
+        {studentManagementItems.map((area) => {
+          const AreaIcon = area.icon
+          return <Link className="academic-area-link" to={area.href} key={area.href}>
+            <span className="academic-area-icon"><AreaIcon size={17} /></span>
+            <span className="academic-area-copy"><strong>{area.label}</strong><small>{area.description}</small></span>
+            <ChevronRight size={16} className="academic-area-arrow" />
+          </Link>
+        })}
+      </div>
+    </section>
+  </div>
+}
+
 function RoutesOutlet() {
-  return <div className="route-content"><Routes><Route path="/" element={<Dashboard />} /><Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} /><Route path="/students" element={<StudentsPage />} /><Route path="/academics/*" element={<AcademicStructureRoute />} /><Route path="/registration" element={<ModuleWorkspace path="/registration" />} /><Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} /><Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} /><Route path="/examinations" element={<ModuleWorkspace path="/examinations" />} /><Route path="/finance" element={<ModuleWorkspace path="/finance" />} /><Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} /><Route path="/learning" element={<ModuleWorkspace path="/learning" />} /><Route path="/library" element={<ModuleWorkspace path="/library" />} /><Route path="/staff" element={<ModuleWorkspace path="/staff" />} /><Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} /><Route path="/internship" element={<ModuleWorkspace path="/internship" />} /><Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} /><Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} /><Route path="/communications" element={<ModuleWorkspace path="/communications" />} /><Route path="/quality" element={<ModuleWorkspace path="/quality" />} /><Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} /><Route path="/reports" element={<ModuleWorkspace path="/reports" />} /><Route path="/users" element={<UsersPage />} /><Route path="/administration" element={<ModuleWorkspace path="/administration" />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Dashboard />} /></Routes></div>
+  return <div className="route-content"><Routes><Route path="/" element={<Dashboard />} /><Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} /><Route path="/students/*" element={<StudentManagementRoute />} /><Route path="/academics/*" element={<AcademicStructureRoute />} /><Route path="/registration" element={<ModuleWorkspace path="/registration" />} /><Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} /><Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} /><Route path="/examinations" element={<ModuleWorkspace path="/examinations" />} /><Route path="/finance" element={<ModuleWorkspace path="/finance" />} /><Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} /><Route path="/learning" element={<ModuleWorkspace path="/learning" />} /><Route path="/library" element={<ModuleWorkspace path="/library" />} /><Route path="/staff" element={<ModuleWorkspace path="/staff" />} /><Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} /><Route path="/internship" element={<ModuleWorkspace path="/internship" />} /><Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} /><Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} /><Route path="/communications" element={<ModuleWorkspace path="/communications" />} /><Route path="/quality" element={<ModuleWorkspace path="/quality" />} /><Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} /><Route path="/reports" element={<ModuleWorkspace path="/reports" />} /><Route path="/users" element={<UsersPage />} /><Route path="/administration" element={<ModuleWorkspace path="/administration" />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Dashboard />} /></Routes></div>
+}
+
+function RouteTransitionLoader() {
+  const location = useLocation()
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    setLoading(true)
+    const timer = window.setTimeout(() => setLoading(false), 260)
+    return () => window.clearTimeout(timer)
+  }, [location.pathname])
+
+  if (!loading) return null
+
+  return <div className="route-transition-loader" role="status" aria-live="polite">
+    <div className="route-transition-card">
+      <LoadingSpinner size="sm" label="Loading module" />
+      <span>Loading module…</span>
+    </div>
+  </div>
 }
 
 function Dashboard() {
