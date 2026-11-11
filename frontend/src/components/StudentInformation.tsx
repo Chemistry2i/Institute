@@ -1,5 +1,5 @@
-import { useState, type FormEvent, type ReactNode } from 'react'
-import { BadgeCheck, Building2, CalendarDays, Check, CircleAlert, CircleCheck, CirclePause, Eye, FileText, Filter, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, UserRound, UsersRound, X } from 'lucide-react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { BadgeCheck, Building2, CalendarDays, Check, CircleAlert, CircleCheck, CirclePause, Download, Eye, FileText, Filter, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, UserRound, UsersRound, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
 import { studentProfiles, students as initialStudents, type StudentProfileData, type StudentRecord } from '../data'
@@ -15,7 +15,9 @@ export function StudentInformation() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All statuses')
   const [selectedStudent, setSelectedStudent] = useState<StudentRecord | null>(null)
+  const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([])
   const [createOpen, setCreateOpen] = useState(false)
+  const selectAllRef = useRef<HTMLInputElement>(null)
 
   if (!can('students.view')) return <Card className="permission-empty"><div className="permission-empty-icon"><ShieldCheck size={28} /></div><h2>Permission required</h2><p>Your current role does not have access to student records. Switch the RBAC preview role or ask an administrator to grant access.</p></Card>
 
@@ -25,6 +27,20 @@ export function StudentInformation() {
     return matchesSearch && (statusFilter === 'All statuses' || student.status === statusFilter)
   })
   const countForStatus = (status: StudentRecord['status']) => records.filter((student) => student.status === status).length
+  const selectedVisibleStudents = visibleRecords.filter((student) => selectedStudentIds.includes(student.id))
+  const allVisibleStudentsSelected = visibleRecords.length > 0 && selectedVisibleStudents.length === visibleRecords.length
+  useEffect(() => {
+    if (selectAllRef.current) selectAllRef.current.indeterminate = selectedVisibleStudents.length > 0 && !allVisibleStudentsSelected
+  }, [selectedVisibleStudents.length, allVisibleStudentsSelected])
+  const toggleStudentSelection = (studentId: string) => setSelectedStudentIds((current) => current.includes(studentId)
+    ? current.filter((selectedId) => selectedId !== studentId)
+    : [...current, studentId])
+  const toggleAllVisibleStudents = () => {
+    const visibleIds = new Set(visibleRecords.map((student) => student.id))
+    setSelectedStudentIds((current) => allVisibleStudentsSelected
+      ? current.filter((studentId) => !visibleIds.has(studentId))
+      : [...new Set([...current, ...visibleIds])])
+  }
   const clearFilters = () => {
     setSearch('')
     setStatusFilter('All statuses')
@@ -57,6 +73,7 @@ export function StudentInformation() {
         <Button size="sm" onClick={() => setCreateOpen(true)}><Plus size={15} /> Add student</Button>
       </div>
     </div>
+    {selectedVisibleStudents.length > 0 && <div className="bulk-selection-toolbar" aria-live="polite"><span>{selectedVisibleStudents.length} students selected</span><Button variant="outline" size="sm" onClick={() => toast.success(`Export queued for ${selectedVisibleStudents.length} selected students.`)}><Download size={14} /> Export selected</Button><Button variant="ghost" size="sm" onClick={() => setSelectedStudentIds([])}>Clear selection</Button></div>}
 
     {visibleRecords.length === 0 ? <EmptyState title="No student records found" description="The current filters do not match any students. Clear the search or adjust the status filter to continue." actionLabel="Clear filters" onAction={clearFilters} /> : <Card className="module-table-card student-directory-card">
       <div className="table-card-head">
@@ -64,8 +81,9 @@ export function StudentInformation() {
         <Button variant="ghost" size="sm" onClick={() => toast.success('Student import workflow is ready for backend integration.')}><FileText size={14} /> Import records</Button>
       </div>
       <div className="table-responsive"><table className="data-table student-table">
-        <thead><tr><th>Student</th><th>Programme</th><th>Year</th><th>Status</th><th>Account balance</th><th>Last activity</th><th aria-label="Actions" /></tr></thead>
+        <thead><tr><th className="bulk-select-cell"><input ref={selectAllRef} type="checkbox" checked={allVisibleStudentsSelected} onChange={toggleAllVisibleStudents} aria-label="Select all visible students" /></th><th>Student</th><th>Programme</th><th>Year</th><th>Status</th><th>Account balance</th><th>Last activity</th><th aria-label="Actions" /></tr></thead>
         <tbody>{visibleRecords.map((student) => <tr key={student.id}>
+          <td className="bulk-select-cell"><input type="checkbox" checked={selectedStudentIds.includes(student.id)} onChange={() => toggleStudentSelection(student.id)} aria-label={`Select ${student.name}`} /></td>
           <td><div className="table-person"><span className="table-avatar table-avatar-photo">{student.name.split(' ').map((word) => word[0]).join('').slice(0, 2)}</span><div><button className="student-name-link" onClick={() => setSelectedStudent(student)}>{student.name}</button><small>{student.id}</small></div></div></td>
           <td>{student.programme}</td><td>{student.year}</td><td><StudentStatusBadge status={student.status} /></td>
           <td className={student.balance === 'UGX 0' ? 'balance-clear' : ''}>{student.balance}</td><td>{student.lastSeen}</td>

@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, CircleHelp, Download, Filter, Layers, MoreHorizontal, Plus, RefreshCw, Search, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Badge, Button, Card, EmptyState, ErrorState, KpiCard, KpiSkeleton, Skeleton, TableSkeleton } from './ui'
@@ -24,8 +24,22 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
     : [...navigationItems, ...adminNavigationItems].find((item) => path === item.href || path.startsWith(`${item.href}/`))?.permission
   const [modal, setModal] = useState<ModalMode>(null)
   const [selectedRow, setSelectedRow] = useState<ModuleRow | null>(null)
+  const [selectedReferences, setSelectedReferences] = useState<string[]>([])
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const selectAllRef = useRef<HTMLInputElement>(null)
+  const selectedCount = rows.filter((row) => selectedReferences.includes(row.reference)).length
+  const allRowsSelected = rows.length > 0 && selectedCount === rows.length
+
+  useEffect(() => setSelectedReferences([]), [path])
+  useEffect(() => {
+    if (selectAllRef.current) selectAllRef.current.indeterminate = selectedCount > 0 && !allRowsSelected
+  }, [selectedCount, allRowsSelected])
+
+  const toggleRowSelection = (reference: string) => setSelectedReferences((current) => current.includes(reference)
+    ? current.filter((selectedReference) => selectedReference !== reference)
+    : [...current, reference])
+  const toggleAllRows = () => setSelectedReferences(allRowsSelected ? [] : rows.map((row) => row.reference))
 
   const refreshData = () => {
     setError(null)
@@ -59,9 +73,10 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
         <Button size="sm" onClick={() => setModal('create')}><Plus size={15} /> New record</Button>
       </div>
     </div>
+    {selectedCount > 0 && <div className="bulk-selection-toolbar" aria-live="polite"><span>{selectedCount} selected</span><Button variant="outline" size="sm" onClick={() => toast.success(`Export queued for ${selectedCount} selected records.`)}><Download size={14} /> Export selected</Button><Button variant="ghost" size="sm" onClick={() => setSelectedReferences([])}>Clear selection</Button></div>}
     <Card className="module-table-card">
       <div className="table-card-head"><div className="module-title"><div className="module-title-icon"><Icon size={19} /></div><div><h2>{meta.title}</h2><p>{rows.length * 126 + 238} records in this view</p></div></div><button className="card-menu" aria-label="More options" onClick={() => setModal('filters')}><MoreHorizontal size={18} /></button></div>
-      <div className="table-responsive"><table className="data-table"><thead><tr>{Object.keys(rows[0] ?? {}).map((header) => <th key={header}>{header === 'reference' ? 'Reference' : header[0].toUpperCase() + header.slice(1)}</th>)}<th aria-label="Actions" /></tr></thead><tbody>{rows.map((row) => <tr key={row.reference}>{Object.entries(row).map(([key, value]) => <td key={key}>{key === 'status' ? <StatusBadge status={value} /> : key === 'applicant' ? <div className="table-person"><span className="table-avatar">{value.split(' ').map((word) => word[0]).join('').slice(0, 2)}</span><strong>{value}</strong></div> : <span className={key === 'reference' ? 'reference-code' : ''}>{value}</span>}</td>)}<td><button className="row-more" aria-label={`Open details for ${row.reference}`} onClick={() => openDetails(row)}><MoreHorizontal size={17} /></button></td></tr>)}</tbody></table></div>
+      <div className="table-responsive"><table className="data-table"><thead><tr><th className="bulk-select-cell"><input ref={selectAllRef} type="checkbox" checked={allRowsSelected} onChange={toggleAllRows} aria-label={`Select all ${meta.title} records`} /></th>{Object.keys(rows[0] ?? {}).map((header) => <th key={header}>{header === 'reference' ? 'Reference' : header[0].toUpperCase() + header.slice(1)}</th>)}<th aria-label="Actions" /></tr></thead><tbody>{rows.map((row) => <tr key={row.reference}><td className="bulk-select-cell"><input type="checkbox" checked={selectedReferences.includes(row.reference)} onChange={() => toggleRowSelection(row.reference)} aria-label={`Select ${row.reference}`} /></td>{Object.entries(row).map(([key, value]) => <td key={key}>{key === 'status' ? <StatusBadge status={value} /> : key === 'applicant' ? <div className="table-person"><span className="table-avatar">{value.split(' ').map((word) => word[0]).join('').slice(0, 2)}</span><strong>{value}</strong></div> : <span className={key === 'reference' ? 'reference-code' : ''}>{value}</span>}</td>)}<td><button className="row-more" aria-label={`Open details for ${row.reference}`} onClick={() => openDetails(row)}><MoreHorizontal size={17} /></button></td></tr>)}</tbody></table></div>
       <div className="table-footer"><span>Showing 1–{rows.length} of {rows.length * 126 + 238} records</span><div className="pagination"><button aria-label="Previous page"><ChevronLeft size={15} /></button><button className="page-active">1</button><button>2</button><button>3</button><span>…</span><button>24</button><button aria-label="Next page"><ChevronRight size={15} /></button></div></div>
     </Card>
     {modal === 'create' && <FormModal meta={meta} onClose={() => setModal(null)} />}

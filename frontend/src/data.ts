@@ -609,6 +609,11 @@ export const pageMeta: Record<string, { eyebrow: string; title: string; descript
   '/reports': { eyebrow: 'Institutional intelligence', title: 'Reports & analytics', description: 'Build a clear view of institutional performance and operational health.' },
   '/users': { eyebrow: 'Access governance', title: 'Users & roles', description: 'Configure permission-led access for staff and institutional users.' },
   '/settings': { eyebrow: 'Institution configuration', title: 'Settings', description: 'Shape the institution identity, visual system, and operational preferences.' },
+  '/settings/identity': { eyebrow: 'Institution configuration', title: 'Institution identity', description: 'Maintain the institution name, logo, location, and official contact details.' },
+  '/settings/appearance': { eyebrow: 'Institution configuration', title: 'Theme & appearance', description: 'Configure the visual system and display mode for the workspace.' },
+  '/settings/calendar': { eyebrow: 'Institution configuration', title: 'Academic calendar', description: 'Set the active academic year, semester, and teaching period dates.' },
+  '/settings/notifications': { eyebrow: 'Institution configuration', title: 'Notifications', description: 'Choose which operational updates reach this workspace.' },
+  '/settings/roles': { eyebrow: 'Institution configuration', title: 'Roles & permissions', description: 'Review access templates and permission governance.' },
 }
 
 export const moduleRows: Record<string, Array<Record<string, string>>> = {
@@ -1029,6 +1034,12 @@ export const moduleIcons: Record<string, LucideIcon> = {
 }
 
 export const moduleKpis: Record<string, KpiMetric[]> = {
+  '/academics': [
+    { label: 'Institutions', value: '1', detail: 'Institution profile configured', icon: Building2, tone: 'blue' },
+    { label: 'Faculties & schools', value: '3', detail: 'Academic divisions', icon: Landmark, tone: 'teal' },
+    { label: 'Departments', value: '10', detail: 'Across active faculties', icon: Network, tone: 'purple' },
+    { label: 'Programmes', value: '3', detail: 'Available for delivery', icon: GraduationCap, tone: 'amber' },
+  ],
   '/attendance': [
     { label: 'Sessions this week', value: '186', detail: 'Linked to published timetable', icon: CalendarDays, tone: 'blue' },
     { label: 'Registers submitted', value: '94%', detail: 'Lecturer submission rate', icon: ShieldCheck, tone: 'teal' },

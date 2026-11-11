@@ -44,6 +44,7 @@ import { AcademicStructureRoute } from './components/AcademicStructure'
 import { FilterModal, FormModal, ModuleWorkspace } from './components/ModuleWorkspace'
 import { ModuleLanding, OperationalModuleRoute } from './components/OperationalModule'
 import { Sidebar } from './components/Sidebar'
+import { SettingsPage as SettingsWorkspace } from './components/SettingsPage'
 import { StudentInformation } from './components/StudentInformation'
 import {
   admissionsItems,
@@ -148,7 +149,7 @@ function RoutesOutlet() {
     <Route path="/attendance/*" element={<OperationalModuleRoute basePath="/attendance" items={attendanceItems} />} />
     {genericOperationalGroups.map(({ basePath, items }) => <Route key={basePath} path={`${basePath}/*`} element={<OperationalModuleRoute basePath={basePath} items={items} />} />)}
     <Route path="/users" element={<UsersPage />} />
-    <Route path="/settings" element={<SettingsPage />} />
+    <Route path="/settings/*" element={<SettingsWorkspace />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></div>
 }

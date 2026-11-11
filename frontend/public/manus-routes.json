@@ -84,6 +84,11 @@
     { "path": "/reports/academic-performance", "title": "Academic outcomes" },
     { "path": "/reports/finance-analytics", "title": "Finance analytics" },
     { "path": "/reports/operations", "title": "Operations reports" },
-    { "path": "/settings", "title": "Settings" }
+    { "path": "/settings", "title": "Settings" },
+    { "path": "/settings/identity", "title": "Institution identity" },
+    { "path": "/settings/appearance", "title": "Theme & appearance" },
+    { "path": "/settings/calendar", "title": "Academic calendar" },
+    { "path": "/settings/notifications", "title": "Notifications" },
+    { "path": "/settings/roles", "title": "Roles & permissions" }
   ]
 }

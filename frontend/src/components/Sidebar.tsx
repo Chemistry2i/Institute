@@ -56,7 +56,7 @@ export function Sidebar({ collapsed, mobileOpen, role, onCollapsedChange, onMobi
       <div className="sidebar-section-toggle-wrap">
         <button className="sidebar-section-toggle" type="button" aria-expanded={modulesOpen} onClick={() => setModulesOpen((open) => !open)}>
           <span className="sidebar-section-label">Modules</span>
-          {!collapsed && <ChevronDown size={14} className={modulesOpen ? 'sidebar-chevron-open' : ''} />}
+          {!collapsed && <ChevronRight size={14} className={modulesOpen ? 'sidebar-chevron-open' : ''} />}
         </button>
       </div>
       {modulesOpen && <nav className="sidebar-nav" aria-label="Module navigation">
@@ -141,7 +141,7 @@ function ModuleNavigationGroup({ item, items, collapsed, onNavigate }: {
     <button className={`nav-item academic-nav-trigger ${active ? 'academic-nav-trigger-active' : ''}`} type="button" aria-expanded={open} aria-controls={linksId} onClick={() => setOpen((value) => !value)}>
       <Icon size={18} strokeWidth={1.8} />
       <span>{item.label}</span>
-      <ChevronDown size={14} className={open ? 'academic-nav-chevron-open' : ''} />
+      <ChevronRight size={14} className={open ? 'academic-nav-chevron-open' : ''} />
     </button>
     {open && <div className="academic-subnav" id={linksId}>
       {items.map((subItem) => { const SubIcon = subItem.icon; return <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>

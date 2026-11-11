@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { ChevronDown, ChevronRight, CircleHelp } from 'lucide-react'
-import { academicStructureItems, type NavigationItem } from '../data'
+import { ChevronRight, CircleHelp } from 'lucide-react'
+import { academicStructureItems, moduleKpis, type NavigationItem } from '../data'
 import { useAppContext } from '../app-context'
-import { Card } from './ui'
+import { Card, KpiCard } from './ui'
 import { ModuleWorkspace } from './ModuleWorkspace'
 
 const areaGroups = [
@@ -35,7 +35,7 @@ export function AcademicStructureNav({ item, items, collapsed, onNavigate }: {
     <button className={`nav-item academic-nav-trigger ${active ? 'academic-nav-trigger-active' : ''}`} type="button" aria-expanded={open} aria-controls="academic-structure-links" onClick={() => setOpen((value) => !value)}>
       <Icon size={18} strokeWidth={1.8} />
       <span>{item.label}</span>
-      <ChevronDown size={14} className={open ? 'academic-nav-chevron-open' : ''} />
+      <ChevronRight size={14} className={open ? 'academic-nav-chevron-open' : ''} />
     </button>
     {open && <div className="academic-subnav" id="academic-structure-links">
       {items.map((subItem) => { const SubIcon = subItem.icon; return <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>
@@ -56,6 +56,9 @@ function AcademicStructureOverview() {
   if (!can('academics.view')) return <Card className="permission-empty"><div className="permission-empty-icon"><CircleHelp size={28} /></div><h2>Permission required</h2><p>Your current role does not have access to academic structure.</p></Card>
 
   return <div className="academic-overview">
+    <div className="stats-grid module-kpi-strip">
+      {(moduleKpis['/academics'] ?? []).map((metric) => <KpiCard key={metric.label} {...metric} />)}
+    </div>
     <section className="academic-hierarchy" aria-label="Academic structure hierarchy">
       {[
         { label: 'Institution', href: '/academics/institutions' },
