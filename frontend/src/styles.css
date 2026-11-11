@@ -418,17 +418,23 @@ button.settings-role-row { cursor: pointer; }
 .application-declaration input { width: 14px !important; min-height: 14px !important; margin: 0; accent-color: var(--primary); }
 .application-step-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 20px; padding-top: 13px; border-top: 1px solid var(--border); }
 .application-step-actions > span { color: var(--muted); font-size: 8px; }
-.application-field { display: grid; min-width: 0; gap: 7px; color: var(--muted); font-size: 11px; }
+.application-field { display: grid; width: 100%; min-width: 0; gap: 7px; color: var(--muted); font-size: 11px; }
 .application-field-label { display: flex; align-items: center; gap: 7px; font-size: 11px; line-height: 1.4; }
 .application-field-label small { color: var(--muted); font-size: 9px; font-weight: 400; }
-.application-input-control { display: flex; min-width: 0; min-height: 42px; align-items: center; gap: 9px; padding: 0 11px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--primary); }
+.application-input-control { display: flex; width: 100%; min-width: 0; min-height: 44px; align-items: center; gap: 9px; padding: 0 10px 0 6px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--primary); }
 .application-input-control:focus-within { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 10%, transparent); }
-.application-input-control > svg { flex: 0 0 auto; }
-.application-input-control input, .application-input-control select, .application-input-control textarea { width: 100%; min-width: 0; min-height: 40px; padding: 8px 0; border: 0; border-radius: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; font-size: 12px; }
+.application-input-icon { display: grid; width: 31px; height: 31px; flex: 0 0 auto; place-items: center; border-radius: 6px; background: color-mix(in srgb, var(--primary) 10%, var(--surface)); color: var(--primary); }
+.application-input-control > input, .application-input-control > select, .application-input-control > textarea { flex: 1; width: 100%; min-width: 0; min-height: 40px; padding: 8px 0; border: 0; border-radius: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; font-size: 12px; }
 .application-input-control select { cursor: pointer; }
 .application-input-control textarea { min-height: 58px; resize: vertical; }
-.application-input-control:has(textarea) { align-items: flex-start; padding-top: 8px; }
-.application-input-control:has(textarea) > svg { margin-top: 10px; }
+.application-input-control:has(> textarea) { align-items: flex-start; padding-top: 6px; padding-bottom: 6px; }
+.application-input-control:has(> textarea) .application-input-icon { margin-top: 7px; }
+.application-phone-fields { display: flex; flex: 1; min-width: 0; align-items: center; gap: 8px; }
+.application-phone-fields input, .application-phone-fields select { min-height: 40px; padding: 8px 0; border: 0; border-radius: 0; outline: 0; background: transparent; color: var(--ink); font: inherit; font-size: 12px; }
+.application-input-control .application-phone-fields select { flex: 0 1 45%; width: 45%; min-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.application-input-control .application-phone-fields input { flex: 1; width: 52%; min-width: 0; }
+.application-step-content { grid-column: 1 / -1; width: 100%; min-width: 0; }
+.application-step-form { width: 100%; min-width: 0; }
 .application-section-heading p, .application-subsection-heading p { font-size: 11px; line-height: 1.5; }
 .application-step-actions > span { font-size: 10px; }
 .student-admission-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; margin-top: 12px; }

@@ -113,6 +113,8 @@ export interface StudentProfileData {
   intake: string
   email: string
   phone: string
+  phoneCountry?: string
+  phoneNumber?: string
   firstName?: string
   middleName?: string
   lastName?: string
@@ -120,7 +122,9 @@ export interface StudentProfileData {
   gender: string
   nationality?: string
   address: string
-  nextOfKin: { name: string; firstName?: string; middleName?: string; lastName?: string; relationship: string; phone: string; email: string }
+  district?: string
+  location?: string
+  nextOfKin: { name: string; firstName?: string; middleName?: string; lastName?: string; relationship: string; phone: string; phoneCountry?: string; phoneNumber?: string; email: string }
   statusHistory: Array<{ date: string; status: string; detail: string }>
   documents: Array<{ name: string; status: 'Verified' | 'Received' | 'Pending'; updated: string }>
   previousEducation?: Array<{ institution: string; qualification: string; completionYear: string }>

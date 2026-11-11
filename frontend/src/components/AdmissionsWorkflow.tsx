@@ -1,6 +1,7 @@
 import { useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Award, BadgeCheck, BookOpen, Building2, CalendarDays, Check, ChevronLeft, ChevronRight, ClipboardCheck, Clock3, Download, Eye, FileText, Globe2, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, Trash2, Upload, UserRound, UsersRound, X, type LucideIcon } from 'lucide-react'
+import { getCountries, getCountryCallingCode, type CountryCode } from 'libphonenumber-js/min'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
 import { type StudentProfileData } from '../data'
@@ -20,6 +21,8 @@ type Application = {
   lastName: string
   email: string
   phone: string
+  phoneCountry?: CountryCode
+  phoneNumber?: string
   programme: string
   intake: string
   stage: ApplicationStage
@@ -32,22 +35,30 @@ type Application = {
   gender?: string
   nationality?: string
   address?: string
-  nextOfKin?: { firstName: string; middleName: string; lastName: string; relationship: string; phone: string; email: string }
+  district?: string
+  location?: string
+  nextOfKin?: { firstName: string; middleName: string; lastName: string; relationship: string; phone: string; phoneCountry?: CountryCode; phoneNumber?: string; email: string }
   previousEducation?: Array<{ institution: string; qualification: string; completionYear: string }>
   academicResults?: AcademicResult[]
   secondChoice?: string
   studyMode?: string
 }
 
-type ApplicationDraft = Pick<Application, 'email' | 'phone' | 'programme' | 'intake'> & {
+type ApplicationDraft = Pick<Application, 'email' | 'programme' | 'intake'> & {
+  phoneCountry: CountryCode
+  phoneNumber: string
   firstName: string
   middleName: string
   lastName: string
   dateOfBirth: string
   gender: string
   nationality: string
-  address: string
-  nextOfKin: NonNullable<Application['nextOfKin']>
+  district: string
+  location: string
+  nextOfKin: Omit<NonNullable<Application['nextOfKin']>, 'phone' | 'phoneCountry' | 'phoneNumber'> & {
+    phoneCountry: CountryCode
+    phoneNumber: string
+  }
   institution: string
   qualification: string
   completionYear: string
@@ -58,6 +69,11 @@ type ApplicationDraft = Pick<Application, 'email' | 'phone' | 'programme' | 'int
 }
 
 const storageKey = 'tims-demo-admissions-applications'
+const countryNames = new Intl.DisplayNames(['en'], { type: 'region' })
+const phoneCountries = getCountries()
+  .map((code) => ({ code, name: countryNames.of(code) ?? code, callingCode: getCountryCallingCode(code) }))
+  .sort((left, right) => left.name.localeCompare(right.name))
+const formatPhone = (country: CountryCode, number: string) => `+${getCountryCallingCode(country)} ${number.trim()}`
 const requiredDocuments = ['Identity document', 'Academic certificate', 'Academic transcript']
 const initialDocuments = requiredDocuments.map((name) => ({ name, status: 'Received' as const, fileName: `${name.toLowerCase().replace(/ /g, '-')}.pdf`, required: true }))
 const splitName = (name: string) => {
@@ -237,6 +253,8 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       intake: app.intake,
       email: app.email,
       phone: app.phone,
+      phoneCountry: app.phoneCountry,
+      phoneNumber: app.phoneNumber,
       firstName: app.firstName,
       middleName: app.middleName,
       lastName: app.lastName,
@@ -244,6 +262,8 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       gender: app.gender ?? 'Not specified',
       nationality: app.nationality ?? '',
       address: app.address ?? '',
+      district: app.district ?? '',
+      location: app.location ?? app.address ?? '',
       nextOfKin: app.nextOfKin ? {
         ...app.nextOfKin,
         name: [app.nextOfKin.firstName, app.nextOfKin.middleName, app.nextOfKin.lastName].filter(Boolean).join(' '),
@@ -329,12 +349,18 @@ export function OnlineApplicationPage() {
       id: `APP-${new Date().getFullYear()}-${String(Date.now()).slice(-6)}`,
       firstName: draft.firstName.trim(), middleName: draft.middleName.trim(), lastName: draft.lastName.trim(),
       name: [draft.firstName, draft.middleName, draft.lastName].filter(Boolean).join(' '),
-      email: draft.email.trim(), phone: draft.phone.trim(),
+      email: draft.email.trim(), phone: formatPhone(draft.phoneCountry, draft.phoneNumber),
+      phoneCountry: draft.phoneCountry, phoneNumber: draft.phoneNumber.trim(),
       programme: draft.programme, intake: draft.intake, stage: 'Submitted',
       documents: draft.documents, identityVerified: false, feesCleared: false,
       studentId: '', history: ['Application submitted online'],
       dateOfBirth: draft.dateOfBirth, gender: draft.gender, nationality: draft.nationality,
-      address: draft.address, nextOfKin: draft.nextOfKin,
+      district: draft.district, location: draft.location, address: draft.location,
+      nextOfKin: {
+        ...draft.nextOfKin,
+        phone: formatPhone(draft.nextOfKin.phoneCountry, draft.nextOfKin.phoneNumber),
+        phoneNumber: draft.nextOfKin.phoneNumber.trim(),
+      },
       previousEducation: [{ institution: draft.institution, qualification: draft.qualification, completionYear: draft.completionYear }],
       academicResults: draft.academicResults, secondChoice: draft.secondChoice, studyMode: draft.studyMode,
     }
@@ -403,16 +429,16 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
   const [declarationAccepted, setDeclarationAccepted] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const [draft, setDraft] = useState<ApplicationDraft>({
-    firstName: '', middleName: '', lastName: '', email: '', phone: '', programme: '', intake: 'August 2026',
-    dateOfBirth: '', gender: '', nationality: 'Ugandan', address: '',
-    nextOfKin: { firstName: '', middleName: '', lastName: '', relationship: '', phone: '', email: '' },
+    firstName: '', middleName: '', lastName: '', email: '', phoneCountry: 'UG', phoneNumber: '', programme: '', intake: 'August 2026',
+    dateOfBirth: '', gender: '', nationality: 'Uganda', district: '', location: '',
+    nextOfKin: { firstName: '', middleName: '', lastName: '', relationship: '', phoneCountry: 'UG', phoneNumber: '', email: '' },
     institution: '', qualification: '', completionYear: '',
     academicResults: [{ subject: '', grade: '', examinationBody: 'UNEB' }],
     secondChoice: '', studyMode: 'Day',
     documents: [...requiredDocuments.map((name) => ({ name, status: 'Missing' as const, fileName: '', required: true })), { name: 'Passport photo', status: 'Missing', fileName: '', required: false }],
   })
   const update = <K extends keyof ApplicationDraft>(key: K, value: ApplicationDraft[K]) => setDraft((current) => ({ ...current, [key]: value }))
-  const updateNextOfKin = (key: keyof ApplicationDraft['nextOfKin'], value: string) => setDraft((current) => ({ ...current, nextOfKin: { ...current.nextOfKin, [key]: value } }))
+  const updateNextOfKin = <K extends keyof ApplicationDraft['nextOfKin']>(key: K, value: ApplicationDraft['nextOfKin'][K]) => setDraft((current) => ({ ...current, nextOfKin: { ...current.nextOfKin, [key]: value } }))
   const updateName = (key: 'firstName' | 'middleName' | 'lastName', value: string) => setDraft((current) => ({ ...current, [key]: value }))
   const updateResult = (index: number, patch: Partial<AcademicResult>) => setDraft((current) => ({ ...current, academicResults: current.academicResults.map((result, currentIndex) => currentIndex === index ? { ...result, ...patch } : result) }))
   const updateDocument = (index: number, event: ChangeEvent<HTMLInputElement>) => {
@@ -463,17 +489,18 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
         <ApplicationField label="Middle name" icon={UserRound} optional><input autoComplete="additional-name" value={draft.middleName} onChange={(event) => updateName('middleName', event.target.value)} /></ApplicationField>
         <ApplicationField label="Last name" icon={UserRound}><input autoComplete="family-name" value={draft.lastName} onChange={(event) => updateName('lastName', event.target.value)} required /></ApplicationField>
         <ApplicationField label="Email address" icon={Mail}><input type="email" autoComplete="email" value={draft.email} onChange={(event) => update('email', event.target.value)} required /></ApplicationField>
-        <ApplicationField label="Phone number" icon={Phone}><input type="tel" autoComplete="tel" value={draft.phone} onChange={(event) => update('phone', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Phone number" icon={Phone}><div className="application-phone-fields"><select aria-label="Phone country calling code" value={draft.phoneCountry} onChange={(event) => update('phoneCountry', event.target.value as CountryCode)} required>{phoneCountries.map((country) => <option key={country.code} value={country.code}>{country.code} +{country.callingCode} · {country.name}</option>)}</select><input type="tel" autoComplete="tel-national" inputMode="tel" placeholder="e.g. 700 123 456" aria-label="Phone number" value={draft.phoneNumber} onChange={(event) => update('phoneNumber', event.target.value)} required /></div></ApplicationField>
         <ApplicationField label="Date of birth" icon={CalendarDays}><input type="date" value={draft.dateOfBirth} onChange={(event) => update('dateOfBirth', event.target.value)} required /></ApplicationField>
         <ApplicationField label="Gender" icon={UserRound}><select value={draft.gender} onChange={(event) => update('gender', event.target.value)} required><option value="">Select gender</option><option>Female</option><option>Male</option><option>Prefer not to say</option></select></ApplicationField>
-        <ApplicationField label="Nationality" icon={Globe2}><select value={draft.nationality} onChange={(event) => update('nationality', event.target.value)} required><option value="">Select nationality</option><option>Ugandan</option><option>Kenyan</option><option>Tanzanian</option><option>Rwandan</option><option>South Sudanese</option><option>Other</option></select></ApplicationField>
-        <ApplicationField label="Residential address" icon={MapPin} className="application-field-wide"><textarea rows={2} autoComplete="street-address" value={draft.address} onChange={(event) => update('address', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Nationality" icon={Globe2}><select autoComplete="country-name" value={draft.nationality} onChange={(event) => update('nationality', event.target.value)} required><option value="">Select country</option>{phoneCountries.map((country) => <option key={country.code}>{country.name}</option>)}</select></ApplicationField>
+        <ApplicationField label="District" icon={Building2}><input autoComplete="address-level1" value={draft.district} onChange={(event) => update('district', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Location (village, town or area)" icon={MapPin}><input autoComplete="address-level2" value={draft.location} onChange={(event) => update('location', event.target.value)} required /></ApplicationField>
         <div className="application-subsection-heading"><h4>Next of kin / emergency contact</h4></div>
         <ApplicationField label="First name" icon={UsersRound}><input value={draft.nextOfKin.firstName} onChange={(event) => updateNextOfKin('firstName', event.target.value)} required /></ApplicationField>
         <ApplicationField label="Middle name" icon={UsersRound} optional><input value={draft.nextOfKin.middleName} onChange={(event) => updateNextOfKin('middleName', event.target.value)} /></ApplicationField>
         <ApplicationField label="Last name" icon={UsersRound}><input value={draft.nextOfKin.lastName} onChange={(event) => updateNextOfKin('lastName', event.target.value)} required /></ApplicationField>
         <ApplicationField label="Relationship" icon={UsersRound}><select value={draft.nextOfKin.relationship} onChange={(event) => updateNextOfKin('relationship', event.target.value)} required><option value="">Select relationship</option><option>Parent</option><option>Guardian</option><option>Spouse</option><option>Sibling</option><option>Relative</option><option>Other</option></select></ApplicationField>
-        <ApplicationField label="Phone number" icon={Phone}><input type="tel" value={draft.nextOfKin.phone} onChange={(event) => updateNextOfKin('phone', event.target.value)} required /></ApplicationField>
+        <ApplicationField label="Phone number" icon={Phone}><div className="application-phone-fields"><select aria-label="Next of kin country calling code" value={draft.nextOfKin.phoneCountry} onChange={(event) => updateNextOfKin('phoneCountry', event.target.value as CountryCode)} required>{phoneCountries.map((country) => <option key={country.code} value={country.code}>{country.code} +{country.callingCode} · {country.name}</option>)}</select><input type="tel" autoComplete="tel-national" inputMode="tel" placeholder="e.g. 700 123 456" aria-label="Next of kin phone number" value={draft.nextOfKin.phoneNumber} onChange={(event) => updateNextOfKin('phoneNumber', event.target.value)} required /></div></ApplicationField>
         <ApplicationField label="Email address" icon={Mail} optional><input type="email" value={draft.nextOfKin.email} onChange={(event) => updateNextOfKin('email', event.target.value)} /></ApplicationField>
       </section>}
       {step === 1 && <section className="application-step-content">
@@ -507,7 +534,7 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
       {step === 4 && <section className="application-step-content">
         <div className="application-section-heading"><h3>Review your application</h3><p>Check your details before sending this application to admissions.</p></div>
         <div className="application-review-grid">
-          <section><h4>Personal details</h4><dl><dt>First name</dt><dd>{draft.firstName}</dd><dt>Middle name</dt><dd>{draft.middleName || 'Not provided'}</dd><dt>Last name</dt><dd>{draft.lastName}</dd><dt>Email / phone</dt><dd>{draft.email} · {draft.phone}</dd><dt>Date of birth</dt><dd>{draft.dateOfBirth}</dd><dt>Nationality</dt><dd>{draft.nationality}</dd><dt>Address</dt><dd>{draft.address}</dd><dt>Next of kin</dt><dd>{[draft.nextOfKin.firstName, draft.nextOfKin.middleName, draft.nextOfKin.lastName].filter(Boolean).join(' ')} · {draft.nextOfKin.relationship} · {draft.nextOfKin.phone}</dd></dl></section>
+          <section><h4>Personal details</h4><dl><dt>First name</dt><dd>{draft.firstName}</dd><dt>Middle name</dt><dd>{draft.middleName || 'Not provided'}</dd><dt>Last name</dt><dd>{draft.lastName}</dd><dt>Email / phone</dt><dd>{draft.email} · {formatPhone(draft.phoneCountry, draft.phoneNumber)}</dd><dt>Date of birth</dt><dd>{draft.dateOfBirth}</dd><dt>Nationality</dt><dd>{draft.nationality}</dd><dt>District</dt><dd>{draft.district}</dd><dt>Location</dt><dd>{draft.location}</dd><dt>Next of kin</dt><dd>{[draft.nextOfKin.firstName, draft.nextOfKin.middleName, draft.nextOfKin.lastName].filter(Boolean).join(' ')} · {draft.nextOfKin.relationship} · {formatPhone(draft.nextOfKin.phoneCountry, draft.nextOfKin.phoneNumber)}</dd></dl></section>
           <section><h4>Education and programme</h4><dl><dt>Prior qualification</dt><dd>{draft.qualification} · {draft.institution} · {draft.completionYear}</dd><dt>Results recorded</dt><dd>{draft.academicResults.map((result) => `${result.subject}: ${result.grade}`).join(' · ')}</dd><dt>First choice</dt><dd>{draft.programme}</dd><dt>Second choice</dt><dd>{draft.secondChoice || 'None'}</dd><dt>Intake / mode</dt><dd>{draft.intake} · {draft.studyMode}</dd></dl></section>
           <section className="application-review-documents"><h4>Documents</h4>{draft.documents.map((document) => <p key={document.name}><FileText size={13} />{document.name}: {document.fileName || 'Not attached'}{document.required && !document.fileName && <em>Required</em>}</p>)}</section>
         </div>
@@ -525,7 +552,7 @@ function OnlineApplicationWizard({ onSubmit }: { onSubmit: (draft: ApplicationDr
 function ApplicationField({ label, icon: Icon, children, className = '', optional = false }: { label: string; icon: LucideIcon; children: ReactNode; className?: string; optional?: boolean }) {
   return <label className={`application-field ${className}`}>
     <span className="application-field-label">{label}{optional && <small>Optional</small>}</span>
-    <span className="application-input-control"><Icon size={15} aria-hidden="true" />{children}</span>
+    <span className="application-input-control"><span className="application-input-icon"><Icon size={15} aria-hidden="true" /></span>{children}</span>
   </label>
 }
 
