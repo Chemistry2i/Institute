@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
-import { ChevronDown, ChevronRight, MoreHorizontal, X, type LucideIcon } from 'lucide-react'
+import { ChevronDown, ChevronRight, Minus, MoreHorizontal, Plus, X, type LucideIcon } from 'lucide-react'
 import { useAppContext } from '../app-context'
 import {
   academicStructureItems,
@@ -38,6 +38,7 @@ export function Sidebar({ collapsed, mobileOpen, role, onCollapsedChange, onMobi
   const [modulesOpen, setModulesOpen] = useState(true)
   const { can } = useAppContext()
   const navigate = useNavigate()
+  const ModulesDisclosure = modulesOpen ? Minus : Plus
   const visibleMain = navigationItems.filter((item) => can(item.permission))
   const visibleAdmin = adminNavigationItems.filter((item) => can(item.permission))
 
@@ -56,7 +57,7 @@ export function Sidebar({ collapsed, mobileOpen, role, onCollapsedChange, onMobi
       <div className="sidebar-section-toggle-wrap">
         <button className="sidebar-section-toggle" type="button" aria-expanded={modulesOpen} onClick={() => setModulesOpen((open) => !open)}>
           <span className="sidebar-section-label">Modules</span>
-          {!collapsed && <ChevronRight size={14} className={modulesOpen ? 'sidebar-chevron-open' : ''} />}
+          {!collapsed && <ModulesDisclosure size={14} className="sidebar-disclosure-icon" aria-hidden="true" />}
         </button>
       </div>
       {modulesOpen && <nav className="sidebar-nav" aria-label="Module navigation">
@@ -129,6 +130,7 @@ function ModuleNavigationGroup({ item, items, collapsed, onNavigate }: {
   const [open, setOpen] = useState(location.pathname.startsWith(item.href))
   const Icon = item.icon
   const active = location.pathname.startsWith(item.href)
+  const DisclosureIcon = open ? Minus : Plus
   const linksId = `${item.href.slice(1).replace(/\//g, '-')}-links`
 
   if (collapsed) {
@@ -141,7 +143,7 @@ function ModuleNavigationGroup({ item, items, collapsed, onNavigate }: {
     <button className={`nav-item academic-nav-trigger ${active ? 'academic-nav-trigger-active' : ''}`} type="button" aria-expanded={open} aria-controls={linksId} onClick={() => setOpen((value) => !value)}>
       <Icon size={18} strokeWidth={1.8} />
       <span>{item.label}</span>
-      <ChevronRight size={14} className={open ? 'academic-nav-chevron-open' : ''} />
+      <DisclosureIcon size={14} className="academic-nav-disclosure" aria-hidden="true" />
     </button>
     {open && <div className="academic-subnav" id={linksId}>
       {items.map((subItem) => { const SubIcon = subItem.icon; return <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>

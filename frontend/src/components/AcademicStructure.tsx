@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { ChevronRight, CircleHelp } from 'lucide-react'
+import { ChevronRight, CircleHelp, Minus, Plus } from 'lucide-react'
 import { academicStructureItems, moduleKpis, type NavigationItem } from '../data'
 import { useAppContext } from '../app-context'
 import { Card, KpiCard } from './ui'
@@ -24,6 +24,7 @@ export function AcademicStructureNav({ item, items, collapsed, onNavigate }: {
   const [open, setOpen] = useState(location.pathname.startsWith('/academics'))
   const Icon = item.icon
   const active = location.pathname.startsWith('/academics')
+  const DisclosureIcon = open ? Minus : Plus
 
   if (collapsed) {
     return <NavLink to="/academics" onClick={onNavigate} title={item.label} aria-label={item.label} className={({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`}>
@@ -35,7 +36,7 @@ export function AcademicStructureNav({ item, items, collapsed, onNavigate }: {
     <button className={`nav-item academic-nav-trigger ${active ? 'academic-nav-trigger-active' : ''}`} type="button" aria-expanded={open} aria-controls="academic-structure-links" onClick={() => setOpen((value) => !value)}>
       <Icon size={18} strokeWidth={1.8} />
       <span>{item.label}</span>
-      <ChevronRight size={14} className={open ? 'academic-nav-chevron-open' : ''} />
+      <DisclosureIcon size={14} className="academic-nav-disclosure" aria-hidden="true" />
     </button>
     {open && <div className="academic-subnav" id="academic-structure-links">
       {items.map((subItem) => { const SubIcon = subItem.icon; return <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>
