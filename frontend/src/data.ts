@@ -614,6 +614,10 @@ export const pageMeta: Record<string, { eyebrow: string; title: string; descript
   '/settings/calendar': { eyebrow: 'Institution configuration', title: 'Academic calendar', description: 'Set the active academic year, semester, and teaching period dates.' },
   '/settings/notifications': { eyebrow: 'Institution configuration', title: 'Notifications', description: 'Choose which operational updates reach this workspace.' },
   '/settings/roles': { eyebrow: 'Institution configuration', title: 'Roles & permissions', description: 'Review access templates and permission governance.' },
+  '/settings/security': { eyebrow: 'Institution configuration', title: 'Security policy', description: 'Configure session policy, password guidance, and privileged action review.' },
+  '/settings/defaults': { eyebrow: 'Institution configuration', title: 'System defaults', description: 'Set record formats, academic defaults, and retention periods.' },
+  '/settings/integrations': { eyebrow: 'Institution configuration', title: 'Integrations', description: 'Review connector endpoints, environment settings, and preview checks.' },
+  '/settings/backups': { eyebrow: 'Institution configuration', title: 'Backups & restore', description: 'Export local settings, configure retention, and restore an approved settings backup.' },
 }
 
 export const moduleRows: Record<string, Array<Record<string, string>>> = {

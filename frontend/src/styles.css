@@ -161,6 +161,64 @@ button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
 
 /* Modular workspace and dialog surfaces */
+.settings-unsaved-note { margin: 0 7px 8px; padding: 8px; border: 1px solid rgba(180,83,9,.2); border-radius: 7px; color: var(--warning); background: rgba(180,83,9,.07); font-size: 8px; line-height: 1.45; }
+.settings-form-message { margin: 12px 0; padding: 10px 12px; border-radius: 7px; font-size: 9px; line-height: 1.5; }
+.settings-form-error { color: var(--danger); background: rgba(185,28,28,.08); border: 1px solid rgba(185,28,28,.18); }
+.settings-form-success { color: var(--success); background: rgba(21,128,61,.08); border: 1px solid rgba(21,128,61,.18); }
+.settings-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; flex-wrap: wrap; padding-top: 16px; }
+.settings-actions .ui-button:disabled { cursor: not-allowed; opacity: .5; }
+.settings-info-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
+.settings-info-grid > div { display: flex; flex-direction: column; gap: 5px; padding: 11px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface-muted); }
+.settings-info-grid span, .settings-muted-copy { color: var(--muted); font-size: 8px; }
+.settings-info-grid strong { color: var(--ink); font-size: 9px; font-weight: 600; }
+.settings-upload-button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 30px; padding: 0 10px; border: 1px solid var(--border); border-radius: 7px; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 9px; font-weight: 600; }
+.settings-upload-button input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.identity-logo img { width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
+.settings-campus-list, .settings-term-list, .settings-holiday-list, .settings-template-list, .integration-list, .settings-backup-history { display: grid; gap: 10px; }
+.settings-campus-row, .settings-holiday-row, .settings-template-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto auto; align-items: end; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; }
+.settings-campus-row > label:not(.settings-inline-toggle), .settings-holiday-row > label, .settings-template-row > label { display: flex; flex-direction: column; gap: 5px; color: var(--muted); font-size: 8px; }
+.settings-campus-row input, .settings-holiday-row input, .settings-template-row input, .settings-role-toolbar input, .integration-card input, .integration-card select, .settings-role-toolbar select { width: 100%; min-height: 34px; padding: 7px 9px; border: 1px solid var(--border); border-radius: 6px; outline: 0; color: var(--ink); background: var(--surface); font: inherit; font-size: 9px; }
+.settings-campus-row input:focus, .settings-holiday-row input:focus, .settings-template-row input:focus, .settings-role-toolbar input:focus, .integration-card input:focus, .integration-card select:focus, .settings-role-toolbar select:focus, .identity-fields select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(23,74,132,.1); }
+.settings-inline-toggle { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; color: var(--muted); font-size: 9px; white-space: nowrap; }
+.settings-inline-toggle input, .settings-toggle-row input { width: 16px; height: 16px; margin: 0; accent-color: var(--primary); }
+.settings-term-card { padding: 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-muted); }
+.settings-term-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.settings-term-heading label { display: flex; flex: 1; flex-direction: column; gap: 5px; color: var(--muted); font-size: 8px; }
+.settings-term-heading input, .identity-fields select { width: 100%; min-height: 35px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; outline: 0; color: var(--ink); background: var(--surface); font: inherit; font-size: 10px; }
+.settings-role-toolbar { display: flex; align-items: end; gap: 12px; margin: 14px 0; }
+.settings-role-toolbar .toolbar-search { max-width: none; }
+.settings-role-toolbar > label { display: grid; min-width: 220px; gap: 5px; color: var(--muted); font-size: 8px; }
+.settings-role-list { max-height: 390px; overflow: auto; margin: 10px 0 18px; border-top: 1px solid var(--border); }
+.settings-role-row { display: flex; width: 100%; align-items: center; gap: 10px; padding: 10px; border: 0; border-bottom: 1px solid var(--border); background: transparent; text-align: left; }
+button.settings-role-row { cursor: pointer; }
+.settings-role-row.selected, .settings-role-row:hover { background: var(--surface-muted); }
+.settings-role-row > span:nth-child(2) { display: flex; flex: 1; flex-direction: column; gap: 4px; }
+.settings-role-row strong { color: var(--ink); font-size: 9px; }
+.settings-role-row small { color: var(--muted); font-size: 8px; line-height: 1.4; }
+.settings-permission-matrix { border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.settings-permission-row { display: grid; grid-template-columns: minmax(0,2fr) minmax(90px,1fr) minmax(90px,1fr); gap: 9px; padding: 8px 10px; border-bottom: 1px solid var(--border); color: var(--muted); font-size: 8px; }
+.settings-permission-row:last-child { border-bottom: 0; }
+.settings-permission-header { color: var(--ink); background: var(--surface-muted); font-weight: 600; }
+.settings-toggle-list { display: grid; }
+.settings-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.settings-toggle-row > span { display: flex; flex-direction: column; gap: 4px; }
+.settings-toggle-row strong { color: var(--ink); font-size: 9px; }
+.settings-toggle-row small { color: var(--muted); font-size: 8px; }
+.integration-card { padding: 14px; border: 1px solid var(--border); border-radius: 8px; }
+.integration-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.integration-heading .eyebrow { margin-bottom: 3px; }
+.integration-heading h3 { margin: 0; color: var(--ink); font-size: 11px; }
+.integration-card .identity-fields { margin-top: 12px; }
+.integration-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.integration-test-result { margin: 10px 0 0; color: var(--success); font-size: 9px; }
+.settings-backup-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+.settings-backup-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--border); }
+.settings-backup-row > div { display: flex; flex-direction: column; gap: 4px; }
+.settings-backup-row strong { color: var(--ink); font-size: 9px; }
+.settings-backup-row small { color: var(--muted); font-size: 8px; }
+.settings-muted-copy { padding: 10px 0; }
+.identity-fields select { width: 100%; min-height: 35px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 7px; outline: 0; color: var(--ink); background: var(--surface); font: inherit; font-size: 10px; }
+@media (max-width: 640px) { .settings-info-grid { grid-template-columns: 1fr; }.settings-campus-row, .settings-holiday-row, .settings-template-row { grid-template-columns: 1fr; align-items: stretch; }.settings-role-toolbar { align-items: stretch; flex-direction: column; }.settings-role-toolbar > label { min-width: 0; }.settings-permission-row { grid-template-columns: minmax(0,1.5fr) minmax(65px,1fr) minmax(65px,1fr); }.settings-role-row { flex-wrap: wrap; }.settings-role-row .ui-badge { margin-left: 39px; } }
 .module-kpi-strip { margin-bottom: 14px; }
 .modal-backdrop { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 20px; background: rgba(8, 24, 42, .45); backdrop-filter: blur(3px); }
 .workflow-modal { width: min(100%, 570px); max-height: min(760px, calc(100vh - 40px)); overflow: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 15px; box-shadow: 0 24px 80px rgba(9, 28, 48, .27); }

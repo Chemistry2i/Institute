@@ -89,6 +89,10 @@
     { "path": "/settings/appearance", "title": "Theme & appearance" },
     { "path": "/settings/calendar", "title": "Academic calendar" },
     { "path": "/settings/notifications", "title": "Notifications" },
-    { "path": "/settings/roles", "title": "Roles & permissions" }
+    { "path": "/settings/roles", "title": "Roles & permissions" },
+    { "path": "/settings/security", "title": "Security policy" },
+    { "path": "/settings/defaults", "title": "System defaults" },
+    { "path": "/settings/integrations", "title": "Integrations" },
+    { "path": "/settings/backups", "title": "Backups & restore" }
   ]
 }
