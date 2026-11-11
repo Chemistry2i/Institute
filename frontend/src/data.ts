@@ -100,12 +100,36 @@ export interface StudentRecord {
   lastSeen: string
 }
 
+export interface StudentProfileData {
+  campus: string
+  faculty: string
+  department: string
+  semester: string
+  intake: string
+  email: string
+  phone: string
+  dateOfBirth: string
+  gender: string
+  address: string
+  nextOfKin: { name: string; relationship: string; phone: string; email: string }
+  statusHistory: Array<{ date: string; status: string; detail: string }>
+  documents: Array<{ name: string; status: 'Verified' | 'Received' | 'Pending'; updated: string }>
+}
+
 export interface ActivityItem {
   title: string
   detail: string
   time: string
   tone: 'blue' | 'teal' | 'amber' | 'violet'
   icon: LucideIcon
+}
+
+export interface KpiMetric {
+  label: string
+  value: string
+  detail: string
+  icon: LucideIcon
+  tone: 'blue' | 'teal' | 'purple' | 'amber'
 }
 
 export const navigationItems: NavigationItem[] = [
@@ -232,6 +256,84 @@ export const students: StudentRecord[] = [
   { id: '22/BED/0319', name: 'Peter Ssekabira', programme: 'Bachelor of Education', year: 'Year 4', status: 'On hold', balance: 'UGX 1,240,000', lastSeen: 'Yesterday, 15:27' },
   { id: '24/BIT/0053', name: 'Sarah Achieng', programme: 'BSc Information Technology', year: 'Year 1', status: 'Active', balance: 'UGX 0', lastSeen: '12 Nov, 10:56' },
 ]
+
+export const studentProfiles: Record<string, StudentProfileData> = {
+  '24/BCS/0142': {
+    campus: 'Main campus', faculty: 'Faculty of Computing', department: 'Computer Science', semester: 'Semester II · 2025', intake: 'August 2024',
+    email: 'aisha.namukasa@students.mmi.ac.ug', phone: '+256 772 410 284', dateOfBirth: '18 Mar 2005', gender: 'Female', address: 'Ntinda, Kampala',
+    nextOfKin: { name: 'Margaret Namukasa', relationship: 'Mother', phone: '+256 701 338 290', email: 'margaret.namukasa@example.com' },
+    statusHistory: [
+      { date: '03 Feb 2025', status: 'Active', detail: 'Registered for Semester II · 2025' },
+      { date: '12 Aug 2024', status: 'Active', detail: 'Student record activated after admission' },
+      { date: '05 Aug 2024', status: 'Admitted', detail: 'Offer accepted for BSc Computer Science' },
+    ],
+    documents: [
+      { name: 'National identity document', status: 'Verified', updated: '12 Aug 2024' },
+      { name: 'UACE certificate', status: 'Verified', updated: '12 Aug 2024' },
+      { name: 'Passport photograph', status: 'Received', updated: '10 Aug 2024' },
+    ],
+  },
+  '23/BBA/0871': {
+    campus: 'Main campus', faculty: 'Faculty of Business', department: 'Business Management', semester: 'Semester II · 2025', intake: 'August 2023',
+    email: 'daniel.okello@students.mmi.ac.ug', phone: '+256 783 215 904', dateOfBirth: '02 Jul 2002', gender: 'Male', address: 'Kawempe, Kampala',
+    nextOfKin: { name: 'Peter Okello', relationship: 'Father', phone: '+256 772 112 608', email: 'peter.okello@example.com' },
+    statusHistory: [
+      { date: '10 Jun 2025', status: 'Graduating', detail: 'Added to November graduation readiness review' },
+      { date: '03 Feb 2025', status: 'Active', detail: 'Registered for Semester II · 2025' },
+      { date: '14 Aug 2023', status: 'Active', detail: 'Student record activated after admission' },
+    ],
+    documents: [
+      { name: 'National identity document', status: 'Verified', updated: '14 Aug 2023' },
+      { name: 'UACE certificate', status: 'Verified', updated: '14 Aug 2023' },
+      { name: 'Graduation clearance form', status: 'Pending', updated: '10 Jun 2025' },
+    ],
+  },
+  '24/DCS/0256': {
+    campus: 'Main campus', faculty: 'Faculty of Computing', department: 'Computer Science', semester: 'Semester II · 2025', intake: 'August 2024',
+    email: 'mariam.atim@students.mmi.ac.ug', phone: '+256 758 204 117', dateOfBirth: '29 Nov 2006', gender: 'Female', address: 'Kira, Wakiso',
+    nextOfKin: { name: 'Josephine Atim', relationship: 'Guardian', phone: '+256 704 603 421', email: 'josephine.atim@example.com' },
+    statusHistory: [
+      { date: '03 Feb 2025', status: 'Active', detail: 'Registered for Semester II · 2025' },
+      { date: '15 Aug 2024', status: 'Active', detail: 'Student record activated after admission' },
+      { date: '08 Aug 2024', status: 'Admitted', detail: 'Offer accepted for Diploma in Computing' },
+    ],
+    documents: [
+      { name: 'National identity document', status: 'Received', updated: '15 Aug 2024' },
+      { name: 'UCE certificate', status: 'Verified', updated: '15 Aug 2024' },
+      { name: 'Passport photograph', status: 'Received', updated: '12 Aug 2024' },
+    ],
+  },
+  '22/BED/0319': {
+    campus: 'East campus', faculty: 'Faculty of Education', department: 'Teacher Education', semester: 'Semester II · 2025', intake: 'August 2022',
+    email: 'peter.ssekabira@students.mmi.ac.ug', phone: '+256 772 551 806', dateOfBirth: '07 Jan 2001', gender: 'Male', address: 'Njeru, Buikwe',
+    nextOfKin: { name: 'Ruth Ssekabira', relationship: 'Mother', phone: '+256 703 882 514', email: 'ruth.ssekabira@example.com' },
+    statusHistory: [
+      { date: '19 May 2025', status: 'On hold', detail: 'Registration paused pending finance review' },
+      { date: '03 Feb 2025', status: 'Active', detail: 'Registered for Semester II · 2025' },
+      { date: '16 Aug 2022', status: 'Active', detail: 'Student record activated after admission' },
+    ],
+    documents: [
+      { name: 'National identity document', status: 'Verified', updated: '16 Aug 2022' },
+      { name: 'UACE certificate', status: 'Verified', updated: '16 Aug 2022' },
+      { name: 'Finance clearance', status: 'Pending', updated: '19 May 2025' },
+    ],
+  },
+  '24/BIT/0053': {
+    campus: 'Main campus', faculty: 'Faculty of Computing', department: 'Information Systems', semester: 'Semester II · 2025', intake: 'August 2024',
+    email: 'sarah.achieng@students.mmi.ac.ug', phone: '+256 759 421 377', dateOfBirth: '11 Sep 2005', gender: 'Female', address: 'Kansanga, Kampala',
+    nextOfKin: { name: 'Alice Achieng', relationship: 'Mother', phone: '+256 772 291 834', email: 'alice.achieng@example.com' },
+    statusHistory: [
+      { date: '03 Feb 2025', status: 'Active', detail: 'Registered for Semester II · 2025' },
+      { date: '18 Aug 2024', status: 'Active', detail: 'Student record activated after admission' },
+      { date: '09 Aug 2024', status: 'Admitted', detail: 'Offer accepted for BSc Information Technology' },
+    ],
+    documents: [
+      { name: 'National identity document', status: 'Verified', updated: '18 Aug 2024' },
+      { name: 'UACE certificate', status: 'Verified', updated: '18 Aug 2024' },
+      { name: 'Passport photograph', status: 'Received', updated: '16 Aug 2024' },
+    ],
+  },
+}
 
 export const activities: ActivityItem[] = [
   { title: 'New application received', detail: 'Grace Nabbosa applied for BSc Computer Science', time: '12 min ago', tone: 'blue', icon: ClipboardList },
@@ -493,6 +595,57 @@ export const moduleIcons: Record<string, LucideIcon> = {
   '/quality': ChartNoAxesCombined,
   '/procurement': Building2,
   '/administration': Settings2,
+}
+
+export const moduleKpis: Record<string, KpiMetric[]> = {
+  '/academics/institutions': [
+    { label: 'Institutions', value: '1', detail: 'Institution profile configured', icon: Building2, tone: 'blue' },
+    { label: 'Campuses', value: '2', detail: 'Main and East campus', icon: Landmark, tone: 'teal' },
+    { label: 'Faculties & schools', value: '3', detail: 'Academic divisions', icon: Network, tone: 'purple' },
+    { label: 'Institution status', value: 'Active', detail: 'Current institution', icon: ShieldCheck, tone: 'amber' },
+  ],
+  '/academics/faculties': [
+    { label: 'Faculties & schools', value: '3', detail: 'Academic divisions listed', icon: Landmark, tone: 'blue' },
+    { label: 'Departments', value: '10', detail: 'Across listed faculties', icon: Network, tone: 'teal' },
+    { label: 'Programmes', value: '3', detail: 'Sample programme records', icon: GraduationCap, tone: 'purple' },
+    { label: 'Campuses represented', value: '2', detail: 'Main and East campus', icon: Building2, tone: 'amber' },
+  ],
+  '/academics/departments': [
+    { label: 'Departments', value: '3', detail: 'Department records shown', icon: Network, tone: 'blue' },
+    { label: 'Active departments', value: '3', detail: 'All shown departments active', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Parent faculties', value: '2', detail: 'Computing and Business', icon: Landmark, tone: 'purple' },
+    { label: 'Linked course units', value: '21', detail: 'Across shown departments', icon: BookOpenText, tone: 'amber' },
+  ],
+  '/academics/programmes': [
+    { label: 'Programmes', value: '3', detail: 'Programme records shown', icon: GraduationCap, tone: 'blue' },
+    { label: 'Active programmes', value: '2', detail: 'Available for delivery', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Draft programmes', value: '1', detail: 'Awaiting approval', icon: ClipboardList, tone: 'purple' },
+    { label: 'Defined credit units', value: '316', detail: 'Across shown programmes', icon: ListTree, tone: 'amber' },
+  ],
+  '/academics/courses': [
+    { label: 'Course units', value: '3', detail: 'Course records shown', icon: BookOpenText, tone: 'blue' },
+    { label: 'Active course units', value: '3', detail: 'Available in curricula', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Credit units', value: '11', detail: 'Across shown courses', icon: ListTree, tone: 'purple' },
+    { label: 'Academic periods', value: '3', detail: 'Year and semester placements', icon: CalendarDays, tone: 'amber' },
+  ],
+  '/academics/curricula': [
+    { label: 'Curricula', value: '3', detail: 'Curriculum records shown', icon: ListTree, tone: 'blue' },
+    { label: 'Active curricula', value: '2', detail: 'Approved programme plans', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Draft curricula', value: '1', detail: 'Still being prepared', icon: ClipboardList, tone: 'purple' },
+    { label: 'Mapped credit units', value: '316', detail: 'Across shown curricula', icon: BookOpenText, tone: 'amber' },
+  ],
+  '/academics/calendar': [
+    { label: 'Academic years', value: '1', detail: '2025/26 currently active', icon: CalendarDays, tone: 'blue' },
+    { label: 'Semester periods', value: '2', detail: 'Semester II active, Semester I planning', icon: BookOpenText, tone: 'teal' },
+    { label: 'Active periods', value: '2', detail: 'Current year and semester', icon: ShieldCheck, tone: 'purple' },
+    { label: 'Periods in planning', value: '1', detail: 'Semester I · 2026', icon: ClipboardList, tone: 'amber' },
+  ],
+  '/academics/grading': [
+    { label: 'Grading systems', value: '3', detail: 'Undergraduate, diploma, postgraduate', icon: ShieldCheck, tone: 'blue' },
+    { label: 'Active systems', value: '2', detail: 'Available for results processing', icon: GraduationCap, tone: 'teal' },
+    { label: 'Grade bands', value: '18', detail: 'Across shown grading systems', icon: ListTree, tone: 'purple' },
+    { label: 'Draft systems', value: '1', detail: 'Postgraduate 4-point GPA', icon: ClipboardList, tone: 'amber' },
+  ],
 }
 
 export const institutionDefaults = {

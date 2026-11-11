@@ -42,6 +42,7 @@ import { Badge, Button, Card, KpiCard } from './components/ui'
 import { AppProvider, defaultColors, useAppContext, type ThemeColors } from './app-context'
 import { AcademicStructureNav, AcademicStructureRoute } from './components/AcademicStructure'
 import { FilterModal, FormModal, ModuleWorkspace } from './components/ModuleWorkspace'
+import { StudentInformation } from './components/StudentInformation'
 import {
   academicStructureItems,
   activities,
@@ -54,7 +55,6 @@ import {
   navigationItems,
   pageMeta,
   roles,
-  students,
   type Permission,
   type RoleName,
 } from './data'
@@ -205,15 +205,7 @@ function QuickAction({ label, icon: Icon, count }: { label: string; icon: typeof
 }
 
 function StudentsPage() {
-  const { can } = useAppContext()
-  const [modal, setModal] = useState<'create' | 'filters' | null>(null)
-  if (!can('students.view')) return <PermissionEmpty />
-  return <><div className="module-toolbar"><div className="toolbar-search"><Search size={16} /><input placeholder="Search by name, student ID, or programme" /></div><div className="toolbar-actions"><Button variant="outline" size="sm" onClick={() => setModal('filters')}><Filter size={15} /> Filters <Badge tone="info">2</Badge></Button><Button size="sm" onClick={() => setModal('create')}><Plus size={15} /> Add student</Button></div></div><Card className="module-table-card"><div className="table-card-head"><div className="module-title"><div className="module-title-icon module-icon-teal"><UsersRound size={19} /></div><div><h2>Student directory</h2><p>2,846 active records across 3 campuses</p></div></div><Button variant="ghost" size="sm" onClick={() => toast.success('Student import workflow opened.')}>Import records</Button></div><div className="table-responsive"><table className="data-table"><thead><tr><th>Student</th><th>Programme</th><th>Year</th><th>Status</th><th>Account balance</th><th>Last activity</th><th aria-label="Actions" /></tr></thead><tbody>{students.map((student) => <tr key={student.id}><td><div className="table-person"><span className="table-avatar table-avatar-photo">{student.name.split(' ').map((word) => word[0]).join('').slice(0, 2)}</span><div><strong>{student.name}</strong><small>{student.id}</small></div></div></td><td>{student.programme}</td><td>{student.year}</td><td><StatusBadge status={student.status} /></td><td className={student.balance === 'UGX 0' ? 'balance-clear' : ''}>{student.balance}</td><td>{student.lastSeen}</td><td><button className="row-more" aria-label={`More actions for ${student.name}`}><MoreHorizontal size={17} /></button></td></tr>)}</tbody></table></div><div className="table-footer"><span>Showing 1–5 of 2,846 students</span><div className="pagination"><button aria-label="Previous page"><ChevronLeft size={15} /></button><button className="page-active">1</button><button>2</button><button>3</button><span>…</span><button>285</button><button aria-label="Next page"><ChevronRight size={15} /></button></div></div></Card>{modal === 'create' && <FormModal meta={{ title: 'Student' }} onClose={() => setModal(null)} />}{modal === 'filters' && <FilterModal onClose={() => setModal(null)} />}</>
-}
-
-function StatusBadge({ status }: { status: string }) {
-  const tone = status.toLowerCase().includes('missing') || status.toLowerCase().includes('attention') || status.toLowerCase().includes('hold') ? 'warning' : status.toLowerCase().includes('review') || status.toLowerCase().includes('draft') ? 'info' : status.toLowerCase().includes('published') || status.toLowerCase().includes('accepted') || status.toLowerCase().includes('active') || status.toLowerCase().includes('approved') || status.toLowerCase().includes('ready') || status.toLowerCase().includes('clear') || status.toLowerCase().includes('track') || status.toLowerCase().includes('posted') ? 'success' : 'neutral'
-  return <Badge tone={tone}>{status}</Badge>
+  return <StudentInformation />
 }
 
 function UsersPage() {

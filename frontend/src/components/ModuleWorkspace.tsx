@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react'
 import { CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, CircleHelp, Download, Filter, Layers, MoreHorizontal, Plus, RefreshCw, Search, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { Badge, Button, Card, KpiCard, KpiSkeleton, Skeleton, TableSkeleton } from './ui'
-import { moduleIcons, moduleRows, navigationItems, pageMeta } from '../data'
+import { moduleIcons, moduleKpis, moduleRows, navigationItems, pageMeta } from '../data'
 import { useAppContext } from '../app-context'
 
 type ModuleRow = Record<string, string>
@@ -12,6 +12,12 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
   const meta = pageMeta[path]
   const Icon = moduleIcons[path]
   const rows = moduleRows[path] ?? []
+  const kpis = moduleKpis[path] ?? [
+    { label: 'Total records', value: `${rows.length * 126 + 238}`, detail: 'Across current workspace', tone: 'blue' as const, icon: Layers },
+    { label: 'Needs attention', value: `${Math.max(3, rows.length + 1)}`, detail: 'Requires a follow-up', tone: 'amber' as const, icon: CircleAlert },
+    { label: 'Updated today', value: `${rows.length * 18 + 42}`, detail: 'Fresh activity', tone: 'teal' as const, icon: RefreshCw },
+    { label: 'Active cycle', value: '2025', detail: 'Semester II', tone: 'purple' as const, icon: CalendarDays },
+  ]
   const { can } = useAppContext()
   const permission = path.startsWith('/academics/') ? 'academics.view' : navigationItems.find((item) => item.href === path)?.permission
   const [modal, setModal] = useState<ModalMode>(null)
@@ -31,10 +37,7 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
 
   return <>
     <div className="stats-grid module-kpi-strip">
-      <KpiCard label="Total records" value={`${rows.length * 126 + 238}`} detail="Across current workspace" tone="blue" icon={Layers} />
-      <KpiCard label="Needs attention" value={`${Math.max(3, rows.length + 1)}`} detail="Requires a follow-up" tone="amber" icon={CircleAlert} />
-      <KpiCard label="Updated today" value={`${rows.length * 18 + 42}`} detail="Fresh activity" tone="teal" icon={RefreshCw} />
-      <KpiCard label="Active cycle" value="2025" detail="Semester II" tone="purple" icon={CalendarDays} />
+      {kpis.map((kpi) => <KpiCard key={kpi.label} {...kpi} />)}
     </div>
     <div className="module-toolbar">
       <div className="toolbar-search"><Search size={16} /><input placeholder={`Search ${meta.title.toLowerCase()}`} aria-label={`Search ${meta.title}`} /></div>
