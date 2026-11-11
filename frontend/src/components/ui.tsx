@@ -25,7 +25,7 @@ export function KpiCard({ label, value, detail, icon: Icon, tone, change, classN
   change?: string
   className?: string
 }) {
-  return <Card className={cn('stat-card', 'kpi-card', className)}>
+  return <Card className={cn('stat-card', 'kpi-card', `kpi-card-${tone}`, className)}>
     <div className={`stat-icon stat-icon-${tone}`}><Icon size={19} /></div>
     <div className="stat-label">{label}</div>
     <div className="stat-value-row"><strong>{value}</strong>{change && <span className="stat-change"><TrendingUp size={13} /> {change}</span>}</div>
