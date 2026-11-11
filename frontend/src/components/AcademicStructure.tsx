@@ -38,9 +38,10 @@ export function AcademicStructureNav({ item, items, collapsed, onNavigate }: {
       <ChevronDown size={14} className={open ? 'academic-nav-chevron-open' : ''} />
     </button>
     {open && <div className="academic-subnav" id="academic-structure-links">
-      {items.map((subItem) => <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>
+      {items.map((subItem) => { const SubIcon = subItem.icon; return <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>
+        <SubIcon size={14} strokeWidth={1.8} aria-hidden="true" />
         <span>{subItem.label}</span>
-      </NavLink>)}
+      </NavLink> })}
     </div>}
   </div>
 }

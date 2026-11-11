@@ -1,14 +1,14 @@
 import { useState, type ReactNode } from 'react'
-import { Check, ChevronLeft, ChevronRight, CircleHelp, Download, Filter, MoreHorizontal, Plus, Search, X } from 'lucide-react'
+import { CalendarDays, Check, ChevronLeft, ChevronRight, CircleAlert, CircleHelp, Download, Filter, Layers, MoreHorizontal, Plus, RefreshCw, Search, X } from 'lucide-react'
 import toast from 'react-hot-toast'
-import { Badge, Button, Card } from './ui'
+import { Badge, Button, Card, KpiCard, KpiSkeleton, Skeleton, TableSkeleton } from './ui'
 import { moduleIcons, moduleRows, navigationItems, pageMeta } from '../data'
 import { useAppContext } from '../app-context'
 
 type ModuleRow = Record<string, string>
 type ModalMode = 'create' | 'filters' | 'detail' | null
 
-export function ModuleWorkspace({ path }: { path: string }) {
+export function ModuleWorkspace({ path, loading = false }: { path: string; loading?: boolean }) {
   const meta = pageMeta[path]
   const Icon = moduleIcons[path]
   const rows = moduleRows[path] ?? []
@@ -18,6 +18,11 @@ export function ModuleWorkspace({ path }: { path: string }) {
   const [selectedRow, setSelectedRow] = useState<ModuleRow | null>(null)
 
   if (permission && !can(permission)) return <PermissionEmpty />
+  if (loading) return <>
+    <div className="stats-grid module-kpi-strip" aria-label={`Loading ${meta.title} metrics`}>{Array.from({ length: 4 }, (_, index) => <KpiSkeleton key={index} />)}</div>
+    <div className="module-toolbar" aria-hidden="true"><Skeleton className="skeleton-search" /><div className="toolbar-actions"><Skeleton className="skeleton-toolbar-button" /><Skeleton className="skeleton-toolbar-button" /></div></div>
+    <TableSkeleton label={`Loading ${meta.title.toLowerCase()}`} />
+  </>
 
   const openDetails = (row: ModuleRow) => {
     setSelectedRow(row)
@@ -25,6 +30,12 @@ export function ModuleWorkspace({ path }: { path: string }) {
   }
 
   return <>
+    <div className="stats-grid module-kpi-strip">
+      <KpiCard label="Total records" value={`${rows.length * 126 + 238}`} detail="Across current workspace" tone="blue" icon={Layers} />
+      <KpiCard label="Needs attention" value={`${Math.max(3, rows.length + 1)}`} detail="Requires a follow-up" tone="amber" icon={CircleAlert} />
+      <KpiCard label="Updated today" value={`${rows.length * 18 + 42}`} detail="Fresh activity" tone="teal" icon={RefreshCw} />
+      <KpiCard label="Active cycle" value="2025" detail="Semester II" tone="purple" icon={CalendarDays} />
+    </div>
     <div className="module-toolbar">
       <div className="toolbar-search"><Search size={16} /><input placeholder={`Search ${meta.title.toLowerCase()}`} aria-label={`Search ${meta.title}`} /></div>
       <div className="toolbar-actions">
@@ -32,12 +43,6 @@ export function ModuleWorkspace({ path }: { path: string }) {
         <Button size="sm" onClick={() => toast.success(`${meta.title} export queued.`)}><Download size={15} /> Export</Button>
         <Button size="sm" onClick={() => setModal('create')}><Plus size={15} /> New record</Button>
       </div>
-    </div>
-    <div className="module-kpi-strip">
-      <ModuleKpi label="Total records" value={`${rows.length * 126 + 238}`} detail="Across current workspace" />
-      <ModuleKpi label="Needs attention" value={`${Math.max(3, rows.length + 1)}`} detail="Requires a follow-up" tone="warning" />
-      <ModuleKpi label="Updated today" value={`${rows.length * 18 + 42}`} detail="Fresh activity" tone="success" />
-      <ModuleKpi label="Active cycle" value="2025" detail="Semester II" tone="info" />
     </div>
     <Card className="module-table-card">
       <div className="table-card-head"><div className="module-title"><div className="module-title-icon"><Icon size={19} /></div><div><h2>{meta.title}</h2><p>{rows.length * 126 + 238} records in this view</p></div></div><button className="card-menu" aria-label="More options" onClick={() => setModal('filters')}><MoreHorizontal size={18} /></button></div>
@@ -48,10 +53,6 @@ export function ModuleWorkspace({ path }: { path: string }) {
     {modal === 'filters' && <FilterModal onClose={() => setModal(null)} />}
     {modal === 'detail' && selectedRow && <DetailModal row={selectedRow} onClose={() => setModal(null)} />}
   </>
-}
-
-function ModuleKpi({ label, value, detail, tone = 'primary' }: { label: string; value: string; detail: string; tone?: 'primary' | 'warning' | 'success' | 'info' }) {
-  return <Card className="module-kpi"><span className={`module-kpi-icon module-kpi-${tone}`}><Check size={14} /></span><div><strong>{value}</strong><span>{label}</span><small>{detail}</small></div></Card>
 }
 
 function StatusBadge({ status }: { status: string }) {
