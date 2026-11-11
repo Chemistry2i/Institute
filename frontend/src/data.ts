@@ -214,6 +214,14 @@ export const financeItems = [
   { label: 'Refunds & adjustments', href: '/finance/refunds', icon: FileText, description: 'Process adjustment requests and controlled refund approvals.' },
 ] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
 
+export const timetablingItems = [
+  { label: 'Overview', href: '/timetabling', icon: LayoutDashboard, description: 'Review schedule readiness, venue use, lecturer allocation, and conflicts.' },
+  { label: 'Weekly schedules', href: '/timetabling/schedules', icon: CalendarDays, description: 'Review teaching sessions by course, group, day, and time.' },
+  { label: 'Rooms & venues', href: '/timetabling/venues', icon: Building2, description: 'Track venue capacity, utilization, and room availability.' },
+  { label: 'Lecturer allocation', href: '/timetabling/lecturer-allocation', icon: UserRound, description: 'Balance teaching assignments and lecturer availability.' },
+  { label: 'Conflict resolution', href: '/timetabling/conflicts', icon: ShieldCheck, description: 'Resolve room, lecturer, and cohort scheduling clashes.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
 export const adminNavigationItems: NavigationItem[] = [
   { label: 'Users & roles', href: '/users', icon: ShieldCheck, permission: 'users.manage' },
   { label: 'System administration', href: '/administration', icon: Settings2, permission: 'administration.manage' },
@@ -439,6 +447,10 @@ export const pageMeta: Record<string, { eyebrow: string; title: string; descript
   '/registration/add-drop': { eyebrow: 'Semester operations', title: 'Add/drop requests', description: 'Process course changes within the approved registration window.' },
   '/registration/credit-load': { eyebrow: 'Semester operations', title: 'Credit-load compliance', description: 'Identify students outside programme credit-load rules.' },
   '/timetabling': { eyebrow: 'Teaching operations', title: 'Timetabling', description: 'Coordinate rooms, lecturers, exam slots, and conflict-free academic schedules.' },
+  '/timetabling/schedules': { eyebrow: 'Teaching operations', title: 'Weekly schedules', description: 'Review teaching sessions by course, group, day, and time.' },
+  '/timetabling/venues': { eyebrow: 'Teaching operations', title: 'Rooms & venues', description: 'Track venue capacity, utilization, and room availability.' },
+  '/timetabling/lecturer-allocation': { eyebrow: 'Teaching operations', title: 'Lecturer allocation', description: 'Balance teaching assignments and lecturer availability.' },
+  '/timetabling/conflicts': { eyebrow: 'Teaching operations', title: 'Conflict resolution', description: 'Resolve room, lecturer, and cohort scheduling clashes.' },
   '/attendance': { eyebrow: 'Teaching operations', title: 'Attendance', description: 'Monitor attendance sessions, corrections, and student participation signals.' },
   '/examinations': { eyebrow: 'Assessment & results', title: 'Examinations', description: 'Monitor marks entry, moderation, approvals, and publication readiness.' },
   '/examinations/assessment-setup': { eyebrow: 'Assessment & results', title: 'Assessment setup', description: 'Coordinate assessment components, schedules, and course coverage.' },
@@ -662,10 +674,34 @@ export const moduleRows: Record<string, Array<Record<string, string>>> = {
 
 Object.assign(moduleRows, {
   '/timetabling': [
-    { reference: 'TT-2025-08', applicant: 'Semester II timetable', programme: '412 teaching sessions', intake: '18 venues · 3 campuses', status: 'Published' },
-    { reference: 'TT-ROOM-12', applicant: 'Room conflicts', programme: '12 clashes detected', intake: 'Registrar review', status: 'Needs attention' },
-    { reference: 'TT-EXAM-04', applicant: 'Examination schedule', programme: '86 exam slots', intake: 'November 2025', status: 'Under review' },
-    { reference: 'TT-LECT-19', applicant: 'Lecturer availability', programme: '19 exceptions', intake: 'Faculty review', status: 'Draft' },
+    { reference: 'TT-2026-08', applicant: 'Semester II teaching schedule', programme: '412 sessions · 186 course units', intake: '18 venues · 3 campuses', status: 'Published' },
+    { reference: 'TT-ROOM-12', applicant: 'Room and venue clashes', programme: '12 conflicts detected', intake: 'Scheduling office', status: 'Needs attention' },
+    { reference: 'TT-LECT-19', applicant: 'Lecturer allocation exceptions', programme: '19 assignments to review', intake: 'Faculty review', status: 'Under review' },
+    { reference: 'TT-CAP-03', applicant: 'Venue capacity check', programme: '84% average utilization', intake: 'All campuses', status: 'On track' },
+  ],
+  '/timetabling/schedules': [
+    { reference: 'SCH-2026-0412', applicant: 'CSC 204 · Data Structures', programme: 'Year 2 · Dr. Sarah Nansubuga', intake: 'Mon · 09:00–11:00 · Lab 2', status: 'Published' },
+    { reference: 'SCH-2026-0398', applicant: 'BBA 310 · Strategic Management', programme: 'Year 3 · Mr. Brian Ouma', intake: 'Tue · 11:00–13:00 · Hall A', status: 'Published' },
+    { reference: 'SCH-2026-0376', applicant: 'BED 402 · Education Policy', programme: 'Year 4 · Ms. Irene Akello', intake: 'Wed · 14:00–16:00 · Room E12', status: 'Needs attention' },
+    { reference: 'SCH-2026-0354', applicant: 'HSC 202 · Community Health', programme: 'Year 2 · Dr. Joseph Mugisha', intake: 'Thu · 08:00–10:00 · Hall B', status: 'Under review' },
+  ],
+  '/timetabling/venues': [
+    { reference: 'VEN-MAIN-02', applicant: 'Lecture Hall A', programme: 'Capacity 240 · Main campus', intake: 'Weekly utilization · 91%', status: 'Active' },
+    { reference: 'VEN-MAIN-14', applicant: 'Computing Lab 2', programme: 'Capacity 48 · Main campus', intake: 'Weekly utilization · 86%', status: 'Active' },
+    { reference: 'VEN-EAST-08', applicant: 'East Campus Room E12', programme: 'Capacity 80 · East campus', intake: 'Weekly utilization · 72%', status: 'Active' },
+    { reference: 'VEN-MAIN-21', applicant: 'Science Lab 1', programme: 'Capacity 36 · Main campus', intake: 'Maintenance hold · 2 days', status: 'Needs attention' },
+  ],
+  '/timetabling/lecturer-allocation': [
+    { reference: 'LOAD-2026-018', applicant: 'Dr. Sarah Nansubuga', programme: '18 contact hours · 6 sessions', intake: 'Faculty of Computing', status: 'On track' },
+    { reference: 'LOAD-2026-014', applicant: 'Mr. Brian Ouma', programme: '22 contact hours · 8 sessions', intake: 'Faculty of Business', status: 'Needs attention' },
+    { reference: 'LOAD-2026-011', applicant: 'Ms. Irene Akello', programme: '16 contact hours · 5 sessions', intake: 'Faculty of Education', status: 'On track' },
+    { reference: 'LOAD-2026-006', applicant: 'Dr. Joseph Mugisha', programme: 'Availability not confirmed', intake: 'Health Sciences', status: 'Pending' },
+  ],
+  '/timetabling/conflicts': [
+    { reference: 'CON-2026-012', applicant: 'Lab 2 · CSC 204 / CSC 210', programme: 'Room overlap · Monday 09:00', intake: 'Faculty of Computing', status: 'Needs attention' },
+    { reference: 'CON-2026-009', applicant: 'Dr. Brian Ouma · BBA 310 / BBA 312', programme: 'Lecturer overlap · Tuesday 11:00', intake: 'Faculty of Business', status: 'Under review' },
+    { reference: 'CON-2026-006', applicant: 'Year 1 Computing cohort', programme: 'Cohort overlap · Wednesday 14:00', intake: 'Main campus', status: 'Pending' },
+    { reference: 'CON-2026-003', applicant: 'Hall B capacity check', programme: 'Enrollment exceeds room limit', intake: 'Health Sciences', status: 'Resolved' },
   ],
   '/attendance': [
     { reference: 'ATT-2025-081', applicant: 'Attendance sessions', programme: '186 sessions this week', intake: 'Semester II · 2025', status: 'Active' },
@@ -802,6 +838,10 @@ export const moduleIcons: Record<string, LucideIcon> = {
   '/registration/add-drop': ArrowRightLeft,
   '/registration/credit-load': ListTree,
   '/timetabling': ClipboardList,
+  '/timetabling/schedules': CalendarDays,
+  '/timetabling/venues': Building2,
+  '/timetabling/lecturer-allocation': UsersRound,
+  '/timetabling/conflicts': ShieldCheck,
   '/attendance': UsersRound,
   '/examinations': ClipboardList,
   '/examinations/assessment-setup': ClipboardList,
@@ -829,6 +869,36 @@ export const moduleIcons: Record<string, LucideIcon> = {
 }
 
 export const moduleKpis: Record<string, KpiMetric[]> = {
+  '/timetabling': [
+    { label: 'Scheduled sessions', value: '412', detail: 'Teaching sessions this semester', icon: CalendarDays, tone: 'blue' },
+    { label: 'Open conflicts', value: '12', detail: 'Room, lecturer, or cohort clashes', icon: CirclePause, tone: 'amber' },
+    { label: 'Venue utilization', value: '84%', detail: 'Across active teaching rooms', icon: Building2, tone: 'teal' },
+    { label: 'Lecturer exceptions', value: '19', detail: 'Availability or workload review', icon: UsersRound, tone: 'purple' },
+  ],
+  '/timetabling/schedules': [
+    { label: 'Sessions scheduled', value: '412', detail: 'Across all campuses', icon: CalendarDays, tone: 'blue' },
+    { label: 'Published', value: '386', detail: 'Visible to teaching teams', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Draft sessions', value: '14', detail: 'Awaiting schedule review', icon: ClipboardList, tone: 'purple' },
+    { label: 'Conflicts', value: '12', detail: 'Need resolution before release', icon: CirclePause, tone: 'amber' },
+  ],
+  '/timetabling/venues': [
+    { label: 'Active venues', value: '54', detail: 'Across 3 campuses', icon: Building2, tone: 'blue' },
+    { label: 'Average utilization', value: '84%', detail: 'Scheduled teaching hours', icon: CalendarDays, tone: 'teal' },
+    { label: 'Capacity flags', value: '6', detail: 'Enrollment exceeds venue size', icon: CirclePause, tone: 'amber' },
+    { label: 'Maintenance holds', value: '3', detail: 'Temporarily unavailable', icon: ShieldCheck, tone: 'purple' },
+  ],
+  '/timetabling/lecturer-allocation': [
+    { label: 'Teaching staff', value: '128', detail: 'Assigned this semester', icon: UsersRound, tone: 'blue' },
+    { label: 'Within workload', value: '109', detail: 'Teaching hours in range', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Overloaded', value: '7', detail: 'Above contact-hour limit', icon: CirclePause, tone: 'amber' },
+    { label: 'Availability pending', value: '12', detail: 'Need faculty confirmation', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/timetabling/conflicts': [
+    { label: 'Open conflicts', value: '12', detail: 'Across current schedules', icon: CirclePause, tone: 'amber' },
+    { label: 'Room clashes', value: '5', detail: 'Venue booked more than once', icon: Building2, tone: 'blue' },
+    { label: 'Lecturer clashes', value: '4', detail: 'Overlapping teaching assignments', icon: UsersRound, tone: 'purple' },
+    { label: 'Resolved today', value: '8', detail: 'Scheduling office actions', icon: ShieldCheck, tone: 'teal' },
+  ],
   '/registration': [
     { label: 'Registration started', value: '2,184', detail: 'Current semester', icon: UsersRound, tone: 'blue' },
     { label: 'Completed', value: '1,862', detail: '85% of started records', icon: ShieldCheck, tone: 'teal' },

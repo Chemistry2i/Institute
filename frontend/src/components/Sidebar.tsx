@@ -12,6 +12,7 @@ import {
   navigationItems,
   registrationItems,
   studentManagementItems,
+  timetablingItems,
   type NavigationItem,
   type RoleName,
 } from '../data'
@@ -75,6 +76,9 @@ export function Sidebar({ collapsed, mobileOpen, role, onCollapsedChange, onMobi
           }
           if (item.href === '/finance') {
             return <ModuleNavigationGroup key={item.href} item={item} items={financeItems} collapsed={collapsed} onNavigate={onMobileClose} />
+          }
+          if (item.href === '/timetabling') {
+            return <ModuleNavigationGroup key={item.href} item={item} items={timetablingItems} collapsed={collapsed} onNavigate={onMobileClose} />
           }
           return <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={onMobileClose} />
         })}

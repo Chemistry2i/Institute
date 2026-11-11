@@ -56,6 +56,7 @@ import {
   registrationItems,
   roles,
   studentManagementItems,
+  timetablingItems,
   type Permission,
   type RoleName,
 } from './data'
@@ -141,7 +142,7 @@ function RoutesOutlet() {
     <Route path="/registration/*" element={<OperationalModuleRoute basePath="/registration" items={registrationItems} />} />
     <Route path="/examinations/*" element={<OperationalModuleRoute basePath="/examinations" items={examinationItems} />} />
     <Route path="/finance/*" element={<OperationalModuleRoute basePath="/finance" items={financeItems} />} />
-    <Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} />
+    <Route path="/timetabling/*" element={<OperationalModuleRoute basePath="/timetabling" items={timetablingItems} />} />
     <Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} />
     <Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} />
     <Route path="/learning" element={<ModuleWorkspace path="/learning" />} />
