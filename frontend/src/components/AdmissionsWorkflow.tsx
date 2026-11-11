@@ -679,7 +679,7 @@ function ApplicationActionDialog({ application, path, onClose, onStageChange, on
   const documentsVerified = application.documents.filter((document) => document.required && document.status === 'Verified').length
   const documentsRequired = application.documents.filter((document) => document.required).length
   const initials = application.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase()
-  return <ModalShell title={isMatriculation ? 'Matriculation clearance' : isReview ? 'Applicant review' : isOffer ? 'Offer decision' : 'Application details'} description={`${application.id} · Submitted application record`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Close</Button>{decisionActions}{isMatriculation && application.stage !== 'Enrolled' && <Button type="button" onClick={onMatriculate}><GraduationCap size={14} />Enroll student</Button>}</>}>
+  return <ModalShell className="application-details-modal" title={isMatriculation ? 'Matriculation clearance' : isReview ? 'Applicant review' : isOffer ? 'Offer decision' : 'Application details'} description={`${application.id} · Submitted application record`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Close</Button>{decisionActions}{isMatriculation && application.stage !== 'Enrolled' && <Button type="button" onClick={onMatriculate}><GraduationCap size={14} />Enroll student</Button>}</>}>
     <div className="application-details">
       <section className="application-details-hero">
         <span className="application-details-avatar">{initials || <UserRound size={20} />}</span>

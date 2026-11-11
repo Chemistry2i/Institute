@@ -205,8 +205,8 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge tone={tone}>{status}</Badge>
 }
 
-export function ModalShell({ title, description, children, onClose, footer }: { title: string; description: string; children: ReactNode; onClose: () => void; footer: ReactNode }) {
-  return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}><div className="workflow-modal" role="dialog" aria-modal="true" aria-labelledby="workflow-modal-title"><div className="workflow-modal-head"><div><div className="eyebrow">Frontend workflow</div><h2 id="workflow-modal-title">{title}</h2><p>{description}</p></div><button className="modal-close" onClick={onClose} aria-label="Close dialog"><X size={18} /></button></div><div className="workflow-modal-body">{children}</div><div className="workflow-modal-foot">{footer}</div></div></div>
+export function ModalShell({ title, description, children, onClose, footer, className = '' }: { title: string; description: string; children: ReactNode; onClose: () => void; footer: ReactNode; className?: string }) {
+  return <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose() }}><div className={`workflow-modal ${className}`.trim()} role="dialog" aria-modal="true" aria-labelledby="workflow-modal-title"><div className="workflow-modal-head"><div><div className="eyebrow">Frontend workflow</div><h2 id="workflow-modal-title">{title}</h2><p>{description}</p></div><button className="modal-close" onClick={onClose} aria-label="Close dialog"><X size={18} /></button></div><div className="workflow-modal-body">{children}</div><div className="workflow-modal-foot">{footer}</div></div></div>
 }
 
 export function FormModal({ meta, onClose, onCreate }: { meta: { title: string }; onClose: () => void; onCreate: (record: ModuleRow) => void }) {
