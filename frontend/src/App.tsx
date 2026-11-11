@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BrowserRouter, Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import toast, { Toaster } from 'react-hot-toast'
 import Swal from 'sweetalert2'
@@ -37,23 +37,23 @@ import {
   X,
   Zap,
 } from 'lucide-react'
-import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { Badge, Button, Card, KpiCard, LoadingSpinner } from './components/ui'
 import { AppProvider, defaultColors, useAppContext, type ThemeColors } from './app-context'
-import { AcademicStructureNav, AcademicStructureRoute } from './components/AcademicStructure'
+import { Dashboard } from './components/Dashboard'
+import { AcademicStructureRoute } from './components/AcademicStructure'
 import { FilterModal, FormModal, ModuleWorkspace } from './components/ModuleWorkspace'
+import { ModuleLanding, OperationalModuleRoute } from './components/OperationalModule'
+import { Sidebar } from './components/Sidebar'
 import { StudentInformation } from './components/StudentInformation'
 import {
-  academicStructureItems,
-  activities,
-  adminNavigationItems,
-  enrolmentData,
-  facultyData,
+  admissionsItems,
+  examinationItems,
+  financeItems,
   institutionDefaults,
   moduleIcons,
   moduleRows,
-  navigationItems,
   pageMeta,
+  registrationItems,
   roles,
   studentManagementItems,
   type Permission,
@@ -64,33 +64,7 @@ import './styles.css'
 function App() {
   return <BrowserRouter><AppProvider><Routes>
     <Route path="/login" element={<LoginPage />} />
-    <Route element={<Shell />}>
-      <Route path="/" element={<Dashboard />} />
-      <Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} />
-      <Route path="/students/*" element={<StudentManagementRoute />} />
-      <Route path="/academics/*" element={<AcademicStructureRoute />} />
-      <Route path="/registration" element={<ModuleWorkspace path="/registration" />} />
-      <Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} />
-      <Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} />
-      <Route path="/examinations" element={<ModuleWorkspace path="/examinations" />} />
-      <Route path="/finance" element={<ModuleWorkspace path="/finance" />} />
-      <Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} />
-      <Route path="/learning" element={<ModuleWorkspace path="/learning" />} />
-      <Route path="/library" element={<ModuleWorkspace path="/library" />} />
-      <Route path="/staff" element={<ModuleWorkspace path="/staff" />} />
-      <Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} />
-      <Route path="/internship" element={<ModuleWorkspace path="/internship" />} />
-      <Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} />
-      <Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} />
-      <Route path="/communications" element={<ModuleWorkspace path="/communications" />} />
-      <Route path="/quality" element={<ModuleWorkspace path="/quality" />} />
-      <Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} />
-      <Route path="/reports" element={<ModuleWorkspace path="/reports" />} />
-      <Route path="/users" element={<UsersPage />} />
-      <Route path="/administration" element={<ModuleWorkspace path="/administration" />} />
-      <Route path="/settings" element={<SettingsPage />} />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Route>
+    <Route path="/*" element={<Shell />} />
   </Routes><Toaster position="bottom-right" toastOptions={{ duration: 3200, style: { fontFamily: 'Poppins, sans-serif', borderRadius: '12px' } }} /></AppProvider></BrowserRouter>
 }
 
@@ -105,62 +79,13 @@ function LoginPage() {
 function Shell() {
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [modulesOpen, setModulesOpen] = useState(true)
-  const { role, setRole, can, mode, setMode } = useAppContext()
+  const { role, mode, setMode } = useAppContext()
   const location = useLocation()
   const navigate = useNavigate()
   const currentMeta = location.pathname === '/' ? { eyebrow: 'Institution overview', title: 'Good morning, Sarah', description: 'Here is what needs your attention across the institution today.' } : pageMeta[location.pathname] ?? pageMeta['/students']
-  const visibleMain = navigationItems.filter((item) => can(item.permission))
-  const visibleAdmin = adminNavigationItems.filter((item) => can(item.permission))
-
-  const handleRoleChange = (nextRole: RoleName) => {
-    setRole(nextRole)
-    toast.success(`Previewing ${nextRole} permissions`)
-  }
 
   return <div className={`shell ${collapsed ? 'shell-collapsed' : ''}`}>
-    <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''} ${mobileOpen ? 'sidebar-mobile-open' : ''}`}>
-      <div className="sidebar-brand">
-        <div className="brand-mark"><span>T</span><i /></div>
-        {!collapsed && <div><div className="brand-name">TIMS<span>admin</span></div><div className="brand-caption">Institution operations</div></div>}
-        <button className="sidebar-close d-lg-none" onClick={() => setMobileOpen(false)} aria-label="Close navigation"><X size={18} /></button>
-      </div>
-      <div className="institution-switcher">
-        <div className="institution-avatar">M</div>
-        {!collapsed && <div className="institution-details"><strong>{institutionDefaults.shortName} Campus</strong><span>{institutionDefaults.activeTerm}</span></div>}
-        {!collapsed && <ChevronDown size={15} className="text-muted" />}
-      </div>
-      <div className="sidebar-scroll">
-        <div className="sidebar-section-toggle-wrap">
-          <button className="sidebar-section-toggle" type="button" aria-expanded={modulesOpen} onClick={() => setModulesOpen((open) => !open)}>
-            <span className="sidebar-section-label">Modules</span>
-            {!collapsed && <ChevronDown size={14} className={modulesOpen ? 'sidebar-chevron-open' : ''} />}
-          </button>
-        </div>
-        {modulesOpen && <nav className="sidebar-nav" aria-label="Module navigation">
-          {visibleMain.map((item) => {
-            if (item.href === '/academics') {
-              return <AcademicStructureNav key={item.href} item={item} items={academicStructureItems} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
-            }
-            if (item.href === '/students') {
-              return <StudentManagementNav key={item.href} item={item} items={studentManagementItems} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
-            }
-            return <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />
-          })}
-        </nav>}
-        {visibleAdmin.length > 0 && <>
-          <div className="sidebar-section-label sidebar-section-admin">Administration</div>
-          <nav className="sidebar-nav" aria-label="Administration navigation">{visibleAdmin.map((item) => <NavItem key={item.href} item={item} collapsed={collapsed} onNavigate={() => setMobileOpen(false)} />)}</nav>
-        </>}
-      </div>
-      {!collapsed && <div className="sidebar-status"><div className="status-dot" /><div><strong>All systems operational</strong><span>Last checked 2 min ago</span></div></div>}
-      <div className="sidebar-profile">
-        <div className="profile-avatar">SN</div>
-        {!collapsed && <div className="profile-copy"><strong>Sarah Nansubuga</strong><span>{role}</span></div>}
-        {!collapsed && <button className="profile-more" aria-label="Profile actions" onClick={() => navigate('/settings')}><MoreHorizontal size={18} /></button>}
-      </div>
-      {collapsed && <button className="collapse-button" onClick={() => setCollapsed(false)} aria-label="Expand navigation"><ChevronRight size={18} /></button>}
-    </aside>
+    <Sidebar collapsed={collapsed} mobileOpen={mobileOpen} role={role} onCollapsedChange={setCollapsed} onMobileClose={() => setMobileOpen(false)} />
     <main className="main-panel">
       <header className="topbar">
         <div className="topbar-left"><button className="mobile-menu-button" onClick={() => setMobileOpen(true)} aria-label="Open navigation"><Menu size={20} /></button><div className="breadcrumb"><span>Workspace</span><span>/</span><strong>{currentMeta.title}</strong></div></div>
@@ -181,82 +106,60 @@ function Shell() {
   </div>
 }
 
-function NavItem({ item, collapsed, onNavigate }: { item: typeof navigationItems[number]; collapsed: boolean; onNavigate: () => void }) {
-  const Icon = item.icon
-  return <NavLink to={item.href} onClick={onNavigate} className={({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`} title={collapsed ? item.label : undefined}><Icon size={18} strokeWidth={1.8} /><span>{item.label}</span>{item.badge && !collapsed && <small>{item.badge}</small>}</NavLink>
-}
+function AdmissionsRoute() {
+  const { pathname } = useLocation()
 
-function StudentManagementNav({ item, items, collapsed, onNavigate }: { item: typeof navigationItems[number]; items: typeof studentManagementItems; collapsed: boolean; onNavigate: () => void }) {
-  const location = useLocation()
-  const [open, setOpen] = useState(location.pathname.startsWith('/students'))
-  const Icon = item.icon
-  const active = location.pathname.startsWith('/students')
-
-  if (collapsed) {
-    return <NavLink to="/students" onClick={onNavigate} title={item.label} aria-label={item.label} className={({ isActive }) => `nav-item ${isActive ? 'nav-item-active' : ''}`}>
-      <Icon size={18} strokeWidth={1.8} />
-    </NavLink>
-  }
-
-  return <div className={`academic-nav-group ${active ? 'academic-nav-group-active' : ''}`}>
-    <button className={`nav-item academic-nav-trigger ${active ? 'academic-nav-trigger-active' : ''}`} type="button" aria-expanded={open} aria-controls="student-management-links" onClick={() => setOpen((value) => !value)}>
-      <Icon size={18} strokeWidth={1.8} />
-      <span>{item.label}</span>
-      <ChevronDown size={14} className={open ? 'academic-nav-chevron-open' : ''} />
-    </button>
-    {open && <div className="academic-subnav" id="student-management-links">
-      {items.map((subItem) => { const SubIcon = subItem.icon; return <NavLink key={subItem.href} to={subItem.href} onClick={onNavigate} className={({ isActive }) => `academic-subnav-item ${isActive ? 'academic-subnav-item-active' : ''}`}>
-        <SubIcon size={14} strokeWidth={1.8} aria-hidden="true" />
-        <span>{subItem.label}</span>
-      </NavLink> })}
-    </div>}
-  </div>
+  if (pathname === '/admissions') return <ModuleLanding basePath="/admissions" items={admissionsItems} steps={[
+    { label: 'Application pipeline', href: '/admissions/application-pipeline' },
+    { label: 'Applicant review', href: '/admissions/applicant-review' },
+    { label: 'Document verification', href: '/admissions/document-verification' },
+    { label: 'Offers & decisions', href: '/admissions/offers-decisions' },
+  ]} />
+  return <ModuleWorkspace path={pathname} />
 }
 
 function StudentManagementRoute() {
   const { pathname } = useLocation()
 
-  if (pathname === '/students') return <StudentManagementOverview />
+  if (pathname === '/students') return <ModuleLanding basePath="/students" items={studentManagementItems} steps={[
+    { label: 'Student directory', href: '/students/directory' },
+    { label: 'Placement data', href: '/students/placement' },
+    { label: 'Lifecycle', href: '/students/lifecycle' },
+    { label: 'Documents', href: '/students/documents' },
+  ]} />
   if (pathname === '/students/directory') return <StudentInformation />
 
   return <ModuleWorkspace path={pathname} />
 }
 
-function StudentManagementOverview() {
-  const { can } = useAppContext()
-  if (!can('students.view')) return <Card className="permission-empty"><div className="permission-empty-icon"><ShieldCheck size={28} /></div><h2>Permission required</h2><p>Your current role does not have access to student management.</p></Card>
-
-  return <div className="academic-overview">
-    <section className="academic-hierarchy" aria-label="Student management hierarchy">
-      {[
-        { label: 'Student directory', href: '/students/directory' },
-        { label: 'Placement data', href: '/students/placement' },
-        { label: 'Lifecycle', href: '/students/lifecycle' },
-        { label: 'Documents', href: '/students/documents' },
-      ].map((step, index, steps) => <div className="academic-hierarchy-step" key={step.href}>
-        <Link to={step.href}>{step.label}</Link>
-        {index < steps.length - 1 && <ChevronRight size={15} aria-hidden="true" />}
-      </div>)}
-    </section>
-
-    <section className="academic-area-group">
-      <div className="academic-area-heading"><h2>Student management areas</h2><span>{studentManagementItems.length} areas</span></div>
-      <div className="academic-area-grid">
-        {studentManagementItems.map((area) => {
-          const AreaIcon = area.icon
-          return <Link className="academic-area-link" to={area.href} key={area.href}>
-            <span className="academic-area-icon"><AreaIcon size={17} /></span>
-            <span className="academic-area-copy"><strong>{area.label}</strong><small>{area.description}</small></span>
-            <ChevronRight size={16} className="academic-area-arrow" />
-          </Link>
-        })}
-      </div>
-    </section>
-  </div>
-}
-
 function RoutesOutlet() {
-  return <div className="route-content"><Routes><Route path="/" element={<Dashboard />} /><Route path="/admissions" element={<ModuleWorkspace path="/admissions" />} /><Route path="/students/*" element={<StudentManagementRoute />} /><Route path="/academics/*" element={<AcademicStructureRoute />} /><Route path="/registration" element={<ModuleWorkspace path="/registration" />} /><Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} /><Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} /><Route path="/examinations" element={<ModuleWorkspace path="/examinations" />} /><Route path="/finance" element={<ModuleWorkspace path="/finance" />} /><Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} /><Route path="/learning" element={<ModuleWorkspace path="/learning" />} /><Route path="/library" element={<ModuleWorkspace path="/library" />} /><Route path="/staff" element={<ModuleWorkspace path="/staff" />} /><Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} /><Route path="/internship" element={<ModuleWorkspace path="/internship" />} /><Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} /><Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} /><Route path="/communications" element={<ModuleWorkspace path="/communications" />} /><Route path="/quality" element={<ModuleWorkspace path="/quality" />} /><Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} /><Route path="/reports" element={<ModuleWorkspace path="/reports" />} /><Route path="/users" element={<UsersPage />} /><Route path="/administration" element={<ModuleWorkspace path="/administration" />} /><Route path="/settings" element={<SettingsPage />} /><Route path="*" element={<Dashboard />} /></Routes></div>
+  return <div className="route-content"><Routes>
+    <Route path="/" element={<Dashboard />} />
+    <Route path="/admissions/*" element={<AdmissionsRoute />} />
+    <Route path="/students/*" element={<StudentManagementRoute />} />
+    <Route path="/academics/*" element={<AcademicStructureRoute />} />
+    <Route path="/registration/*" element={<OperationalModuleRoute basePath="/registration" items={registrationItems} />} />
+    <Route path="/examinations/*" element={<OperationalModuleRoute basePath="/examinations" items={examinationItems} />} />
+    <Route path="/finance/*" element={<OperationalModuleRoute basePath="/finance" items={financeItems} />} />
+    <Route path="/timetabling" element={<ModuleWorkspace path="/timetabling" />} />
+    <Route path="/attendance" element={<ModuleWorkspace path="/attendance" />} />
+    <Route path="/scholarships" element={<ModuleWorkspace path="/scholarships" />} />
+    <Route path="/learning" element={<ModuleWorkspace path="/learning" />} />
+    <Route path="/library" element={<ModuleWorkspace path="/library" />} />
+    <Route path="/staff" element={<ModuleWorkspace path="/staff" />} />
+    <Route path="/accommodation" element={<ModuleWorkspace path="/accommodation" />} />
+    <Route path="/internship" element={<ModuleWorkspace path="/internship" />} />
+    <Route path="/welfare" element={<ModuleWorkspace path="/welfare" />} />
+    <Route path="/graduation" element={<ModuleWorkspace path="/graduation" />} />
+    <Route path="/communications" element={<ModuleWorkspace path="/communications" />} />
+    <Route path="/quality" element={<ModuleWorkspace path="/quality" />} />
+    <Route path="/procurement" element={<ModuleWorkspace path="/procurement" />} />
+    <Route path="/reports" element={<ModuleWorkspace path="/reports" />} />
+    <Route path="/users" element={<UsersPage />} />
+    <Route path="/administration" element={<ModuleWorkspace path="/administration" />} />
+    <Route path="/settings" element={<SettingsPage />} />
+    <Route path="*" element={<Navigate to="/" replace />} />
+  </Routes></div>
 }
 
 function RouteTransitionLoader() {
@@ -277,28 +180,6 @@ function RouteTransitionLoader() {
       <span>Loading module…</span>
     </div>
   </div>
-}
-
-function Dashboard() {
-  const { role } = useAppContext()
-  return <>
-    <div className="role-banner"><div className="role-banner-icon"><ShieldCheck size={18} /></div><div><strong>RBAC preview active</strong><span>You are viewing the workspace as <b>{role}</b>. Permissions are ready to connect to your authentication service.</span></div><button className="role-banner-link">View access matrix <ExternalLink size={14} /></button></div>
-    <section className="stats-grid">
-      <KpiCard label="Total students" value="2,846" change="12.8%" tone="blue" icon={UsersRound} detail="vs. last academic year" />
-      <KpiCard label="Fees collected" value="UGX 4.82B" change="8.4%" tone="teal" icon={CreditCard} detail="of UGX 6.1B billed" />
-      <KpiCard label="Applications" value="968" change="24.6%" tone="purple" icon={ClipboardList} detail="August 2025 intake" />
-      <KpiCard label="Graduation ready" value="184" change="6.2%" tone="amber" icon={GraduationCap} detail="pending final clearance" />
-    </section>
-    <section className="dashboard-grid dashboard-grid-main">
-      <Card className="chart-card enrolment-card"><div className="card-header"><div><h2>Enrolment movement</h2><p>Active students and new applications over the last 12 months</p></div><button className="card-menu" aria-label="Chart options"><MoreHorizontal size={18} /></button></div><div className="legend-row"><span><i className="legend-dot legend-blue" /> Active students</span><span><i className="legend-dot legend-teal" /> Applications</span><span className="chart-period">2025 <ChevronDown size={14} /></span></div><div className="chart-area"><ResponsiveContainer width="100%" height="100%"><AreaChart data={enrolmentData} margin={{ top: 12, right: 8, left: -20, bottom: 0 }}><defs><linearGradient id="studentFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--primary)" stopOpacity={0.22} /><stop offset="100%" stopColor="var(--primary)" stopOpacity={0} /></linearGradient><linearGradient id="appFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="var(--secondary)" stopOpacity={0.16} /><stop offset="100%" stopColor="var(--secondary)" stopOpacity={0} /></linearGradient></defs><CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="4 4" /><XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'var(--muted)', fontSize: 11, fontFamily: 'Poppins' }} /><YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--muted)', fontSize: 11, fontFamily: 'Poppins' }} /><Tooltip contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', fontFamily: 'Poppins', fontSize: 12 }} /><Area type="monotone" dataKey="students" stroke="var(--primary)" strokeWidth={2.5} fill="url(#studentFill)" /><Area type="monotone" dataKey="applications" stroke="var(--secondary)" strokeWidth={2.5} fill="url(#appFill)" /></AreaChart></ResponsiveContainer></div></Card>
-      <Card className="chart-card faculty-card"><div className="card-header"><div><h2>Students by faculty</h2><p>Current active enrolment</p></div><button className="card-menu" aria-label="Chart options"><MoreHorizontal size={18} /></button></div><div className="donut-area"><ResponsiveContainer width="100%" height="100%"><PieChart><Pie data={facultyData} innerRadius={65} outerRadius={92} paddingAngle={3} dataKey="value" stroke="none">{facultyData.map((entry) => <Cell key={entry.name} fill={entry.color} />)}</Pie><Tooltip formatter={(value) => `${value}%`} contentStyle={{ borderRadius: 12, border: '1px solid var(--border)', fontFamily: 'Poppins', fontSize: 12 }} /></PieChart></ResponsiveContainer><div className="donut-center"><strong>2,846</strong><span>students</span></div></div><div className="faculty-legend">{facultyData.map((entry) => <div key={entry.name}><span><i style={{ background: entry.color }} />{entry.name}</span><strong>{entry.value}%</strong></div>)}</div></Card>
-    </section>
-    <section className="dashboard-grid dashboard-grid-bottom"><Card className="activity-card"><div className="card-header"><div><h2>Today at a glance</h2><p>Recent activity across your workspace</p></div><Button variant="ghost" size="sm">View all <ExternalLink size={14} /></Button></div><div className="activity-list">{activities.map((item) => { const Icon = item.icon; return <div className="activity-item" key={item.title}><div className={`activity-icon activity-${item.tone}`}><Icon size={16} /></div><div className="activity-copy"><strong>{item.title}</strong><span>{item.detail}</span></div><time>{item.time}</time></div> })}</div></Card><Card className="quick-card"><div className="card-header"><div><h2>Quick actions</h2><p>Common tasks for this role</p></div><Zap size={18} className="quick-bolt" /></div><div className="quick-actions"><QuickAction label="Add student record" icon={Plus} /><QuickAction label="Review applications" icon={ClipboardList} count="24" /><QuickAction label="Export a report" icon={Download} /><QuickAction label="Manage access" icon={ShieldCheck} /></div></Card></section>
-  </>
-}
-
-function QuickAction({ label, icon: Icon, count }: { label: string; icon: typeof Plus; count?: string }) {
-  return <button className="quick-action" onClick={() => toast.success(`${label} is ready to connect to your workflow.`)}><span className="quick-icon"><Icon size={16} /></span><span>{label}</span>{count && <Badge tone="warning">{count}</Badge>}<ChevronRight size={15} className="ms-auto" /></button>
 }
 
 function StudentsPage() {

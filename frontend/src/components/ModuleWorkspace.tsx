@@ -19,7 +19,9 @@ export function ModuleWorkspace({ path, loading = false }: { path: string; loadi
     { label: 'Active cycle', value: '2025', detail: 'Semester II', tone: 'purple' as const, icon: CalendarDays },
   ]
   const { can } = useAppContext()
-  const permission = path.startsWith('/academics/') ? 'academics.view' : navigationItems.find((item) => item.href === path)?.permission
+  const permission = path.startsWith('/academics/')
+    ? 'academics.view'
+    : navigationItems.find((item) => path === item.href || path.startsWith(`${item.href}/`))?.permission
   const [modal, setModal] = useState<ModalMode>(null)
   const [selectedRow, setSelectedRow] = useState<ModuleRow | null>(null)
   const [error, setError] = useState<string | null>(null)

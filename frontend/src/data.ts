@@ -180,6 +180,40 @@ export const academicStructureItems = [
   { label: 'Grading systems', href: '/academics/grading', icon: ShieldCheck, description: 'Grading scales and result interpretation rules.' },
 ] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
 
+export const admissionsItems = [
+  { label: 'Overview', href: '/admissions', icon: LayoutDashboard, description: 'See the intake funnel, decision queue, and current admissions pressure points.' },
+  { label: 'Application pipeline', href: '/admissions/application-pipeline', icon: ClipboardList, description: 'Track new applications, review stages, and applicant demand by intake.' },
+  { label: 'Applicant review', href: '/admissions/applicant-review', icon: UserRound, description: 'Review applicant quality, faculty preferences, and shortlist decisions.' },
+  { label: 'Document verification', href: '/admissions/document-verification', icon: FileText, description: 'Confirm missing, received, and verified applicant documents.' },
+  { label: 'Offers & decisions', href: '/admissions/offers-decisions', icon: ShieldCheck, description: 'Issue offers, manage waitlists, acceptances, and release windows.' },
+  { label: 'Intake planning', href: '/admissions/intake-planning', icon: CalendarDays, description: 'Align applicant volume, capacity, and enrolment planning by intake.' },
+  { label: 'Reports & trends', href: '/admissions/reports', icon: ChartNoAxesCombined, description: 'Measure conversion and performance across the admissions intake cycle.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const registrationItems = [
+  { label: 'Overview', href: '/registration', icon: LayoutDashboard, description: 'Monitor registration progress, outstanding actions, and credit compliance.' },
+  { label: 'Course registration', href: '/registration/course-registration', icon: GraduationCap, description: 'Track student course selections and registration completion.' },
+  { label: 'Approvals & exceptions', href: '/registration/approvals', icon: ShieldCheck, description: 'Review pending approvals and resolve registration exceptions.' },
+  { label: 'Add/drop requests', href: '/registration/add-drop', icon: ArrowRightLeft, description: 'Process course changes within the approved registration window.' },
+  { label: 'Credit-load compliance', href: '/registration/credit-load', icon: ListTree, description: 'Identify students outside programme credit-load rules.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const examinationItems = [
+  { label: 'Overview', href: '/examinations', icon: LayoutDashboard, description: 'See assessment readiness, marks progress, moderation, and publication queues.' },
+  { label: 'Assessment setup', href: '/examinations/assessment-setup', icon: ClipboardList, description: 'Coordinate assessment components, schedules, and course coverage.' },
+  { label: 'Marks entry', href: '/examinations/marks-entry', icon: FileText, description: 'Monitor marks submission and resolve missing result records.' },
+  { label: 'Moderation & approvals', href: '/examinations/moderation', icon: ShieldCheck, description: 'Review moderated results and approval readiness.' },
+  { label: 'Results publication', href: '/examinations/publication', icon: CalendarDays, description: 'Control approved result release and publication status.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
+export const financeItems = [
+  { label: 'Overview', href: '/finance', icon: LayoutDashboard, description: 'Monitor billed fees, collections, reconciliation, and account exceptions.' },
+  { label: 'Fees & billing', href: '/finance/billing', icon: CreditCard, description: 'Review fee schedules, invoices, and billing batches.' },
+  { label: 'Payments & reconciliation', href: '/finance/reconciliation', icon: ArrowRightLeft, description: 'Match received payments and resolve unmatched transactions.' },
+  { label: 'Student accounts', href: '/finance/accounts', icon: UsersRound, description: 'Review balances, statements, and account holds.' },
+  { label: 'Refunds & adjustments', href: '/finance/refunds', icon: FileText, description: 'Process adjustment requests and controlled refund approvals.' },
+] satisfies Array<{ label: string; href: string; icon: LucideIcon; description: string }>
+
 export const adminNavigationItems: NavigationItem[] = [
   { label: 'Users & roles', href: '/users', icon: ShieldCheck, permission: 'users.manage' },
   { label: 'System administration', href: '/administration', icon: Settings2, permission: 'administration.manage' },
@@ -379,6 +413,12 @@ export const facultyData = [
 
 export const pageMeta: Record<string, { eyebrow: string; title: string; description: string }> = {
   '/admissions': { eyebrow: 'Admissions office', title: 'Keep every application moving', description: 'Review intake activity, missing documents, and decision queues from one place.' },
+  '/admissions/application-pipeline': { eyebrow: 'Admissions office', title: 'Application pipeline', description: 'Follow applicants from submission through review and decision stages.' },
+  '/admissions/applicant-review': { eyebrow: 'Admissions office', title: 'Applicant review', description: 'Review shortlist quality, programme fit, and faculty-level decision readiness.' },
+  '/admissions/document-verification': { eyebrow: 'Admissions office', title: 'Document verification', description: 'Monitor required documents, missing files, and verification completion.' },
+  '/admissions/offers-decisions': { eyebrow: 'Admissions office', title: 'Offers & decisions', description: 'Manage offers, acceptances, waitlists, and programme allocation decisions.' },
+  '/admissions/intake-planning': { eyebrow: 'Admissions office', title: 'Intake planning', description: 'Plan capacity, intakes, and applicant volume for each programme and campus.' },
+  '/admissions/reports': { eyebrow: 'Admissions office', title: 'Reports & trends', description: 'Measure conversion rates and track admissions performance over time.' },
   '/students': { eyebrow: 'Student management', title: 'Student overview', description: 'Monitor student records, status distribution, and pending lifecycle work.' },
   '/students/directory': { eyebrow: 'Student management', title: 'Student directory', description: 'Search student records and review academic, contact, and document details.' },
   '/students/placement': { eyebrow: 'Student management', title: 'Placement & status', description: 'Review each student’s programme, campus, year, and current status.' },
@@ -394,10 +434,22 @@ export const pageMeta: Record<string, { eyebrow: string; title: string; descript
   '/academics/calendar': { eyebrow: 'Academic structure', title: 'Academic years & semesters', description: 'Configure academic years, semesters, and their key dates.' },
   '/academics/grading': { eyebrow: 'Academic structure', title: 'Grading systems', description: 'Configure grading scales and the rules used to interpret academic results.' },
   '/registration': { eyebrow: 'Semester operations', title: 'Registration control room', description: 'Track registration progress, exceptions, and credit-load compliance.' },
+  '/registration/course-registration': { eyebrow: 'Semester operations', title: 'Course registration', description: 'Track student course selections and registration completion.' },
+  '/registration/approvals': { eyebrow: 'Semester operations', title: 'Approvals & exceptions', description: 'Review pending approvals and resolve registration exceptions.' },
+  '/registration/add-drop': { eyebrow: 'Semester operations', title: 'Add/drop requests', description: 'Process course changes within the approved registration window.' },
+  '/registration/credit-load': { eyebrow: 'Semester operations', title: 'Credit-load compliance', description: 'Identify students outside programme credit-load rules.' },
   '/timetabling': { eyebrow: 'Teaching operations', title: 'Timetabling', description: 'Coordinate rooms, lecturers, exam slots, and conflict-free academic schedules.' },
   '/attendance': { eyebrow: 'Teaching operations', title: 'Attendance', description: 'Monitor attendance sessions, corrections, and student participation signals.' },
   '/examinations': { eyebrow: 'Assessment & results', title: 'Examinations', description: 'Monitor marks entry, moderation, approvals, and publication readiness.' },
+  '/examinations/assessment-setup': { eyebrow: 'Assessment & results', title: 'Assessment setup', description: 'Coordinate assessment components, schedules, and course coverage.' },
+  '/examinations/marks-entry': { eyebrow: 'Assessment & results', title: 'Marks entry', description: 'Monitor marks submission and resolve missing result records.' },
+  '/examinations/moderation': { eyebrow: 'Assessment & results', title: 'Moderation & approvals', description: 'Review moderated results and approval readiness.' },
+  '/examinations/publication': { eyebrow: 'Assessment & results', title: 'Results publication', description: 'Control approved result release and publication status.' },
   '/finance': { eyebrow: 'Student finance', title: 'Finance overview', description: 'See fees, reconciliations, collections, and student account exceptions.' },
+  '/finance/billing': { eyebrow: 'Student finance', title: 'Fees & billing', description: 'Review fee schedules, invoices, and billing batches.' },
+  '/finance/reconciliation': { eyebrow: 'Student finance', title: 'Payments & reconciliation', description: 'Match received payments and resolve unmatched transactions.' },
+  '/finance/accounts': { eyebrow: 'Student finance', title: 'Student accounts', description: 'Review balances, statements, and account holds.' },
+  '/finance/refunds': { eyebrow: 'Student finance', title: 'Refunds & adjustments', description: 'Process adjustment requests and controlled refund approvals.' },
   '/scholarships': { eyebrow: 'Student finance', title: 'Scholarships & sponsorships', description: 'Manage approved awards, sponsor allocations, limits, and student funding.' },
   '/learning': { eyebrow: 'Learning resources', title: 'Learning resources', description: 'Organize course materials, assignments, submissions, and learner access.' },
   '/library': { eyebrow: 'Library services', title: 'Library management', description: 'Keep catalogues, circulation, overdue items, and clearance visible.' },
@@ -421,6 +473,42 @@ export const moduleRows: Record<string, Array<Record<string, string>>> = {
     { reference: 'APP-2025-0938', applicant: 'Isaac Kato', programme: 'Diploma in Business', intake: 'August 2025', status: 'Missing documents' },
     { reference: 'APP-2025-0926', applicant: 'Lydia Auma', programme: 'Bachelor of Education', intake: 'August 2025', status: 'Offer ready' },
     { reference: 'APP-2025-0890', applicant: 'Moses Tumusiime', programme: 'BSc Information Technology', intake: 'August 2025', status: 'Accepted' },
+  ],
+  '/admissions/application-pipeline': [
+    { reference: 'APP-2025-1102', applicant: 'Annette Muwonge', programme: 'BSc Computer Science', intake: 'August 2025', status: 'Fresh application' },
+    { reference: 'APP-2025-1098', applicant: 'Benard Sserunjogi', programme: 'BBA', intake: 'August 2025', status: 'Screening' },
+    { reference: 'APP-2025-1087', applicant: 'Patricia Kintu', programme: 'Bachelor of Education', intake: 'August 2025', status: 'Faculty review' },
+    { reference: 'APP-2025-1074', applicant: 'Joseph Kasozi', programme: 'BSc Information Technology', intake: 'August 2025', status: 'Under review' },
+  ],
+  '/admissions/applicant-review': [
+    { reference: 'REV-2025-204', applicant: 'Sharon Nalubega', programme: 'BSC-Computer Science', intake: 'Top candidate', status: 'Shortlisted' },
+    { reference: 'REV-2025-198', applicant: 'Allan Lwanga', programme: 'Diploma in Business', intake: 'Needs interview', status: 'Pending' },
+    { reference: 'REV-2025-189', applicant: 'Florence Nakato', programme: 'Bachelor of Education', intake: 'Strong academic fit', status: 'Approved' },
+    { reference: 'REV-2025-176', applicant: 'Martin Kafuko', programme: 'BSc Information Technology', intake: 'Faculty follow-up', status: 'Needs attention' },
+  ],
+  '/admissions/document-verification': [
+    { reference: 'DOC-ADM-522', applicant: 'Diana Nakyanzi', programme: 'BSC-Computer Science', intake: 'Identity + certificate', status: 'Missing documents' },
+    { reference: 'DOC-ADM-519', applicant: 'Ronald Mwesigwa', programme: 'Bachelor of Education', intake: 'Transcript review', status: 'Under review' },
+    { reference: 'DOC-ADM-501', applicant: 'Mildred Nalubwama', programme: 'BBA', intake: 'Verified', status: 'Completed' },
+    { reference: 'DOC-ADM-487', applicant: 'Emmanuel Tusiime', programme: 'BSc Information Technology', intake: 'Passport photo', status: 'Pending' },
+  ],
+  '/admissions/offers-decisions': [
+    { reference: 'OFR-2025-011', applicant: 'Ruth Atim', programme: 'BSc Computer Science', intake: 'Offer issued', status: 'Offer ready' },
+    { reference: 'OFR-2025-009', applicant: 'Michael Opio', programme: 'Diploma in Business', intake: 'Awaiting acceptance', status: 'Pending' },
+    { reference: 'OFR-2025-003', applicant: 'Benedict Kibirige', programme: 'BBA', intake: 'Waitlist', status: 'Waitlist' },
+    { reference: 'OFR-2025-001', applicant: 'Faith Nakitto', programme: 'Bachelor of Education', intake: 'Accepted', status: 'Accepted' },
+  ],
+  '/admissions/intake-planning': [
+    { reference: 'INT-2025-A', applicant: 'August 2025 intake', programme: 'Capacity tracking', intake: 'Main campus', status: 'On track' },
+    { reference: 'INT-2025-B', applicant: 'East campus', programme: 'Education programmes', intake: 'Quota review', status: 'Needs attention' },
+    { reference: 'INT-2025-C', applicant: 'Computer science', programme: 'High demand cohort', intake: 'Capacity warning', status: 'At risk' },
+    { reference: 'INT-2025-D', applicant: 'Business faculty', programme: 'Seats still open', intake: 'Healthy demand', status: 'Open' },
+  ],
+  '/admissions/reports': [
+    { reference: 'RPT-ADM-01', applicant: 'Application conversion', programme: 'Aug 2025 intake', intake: '67% conversion', status: 'Ready' },
+    { reference: 'RPT-ADM-02', applicant: 'Decision turnaround', programme: 'Average 9 days', intake: 'Review cycle', status: 'Ready' },
+    { reference: 'RPT-ADM-03', applicant: 'Campus split', programme: 'Main 68% · East 32%', intake: 'Applicant mix', status: 'Ready' },
+    { reference: 'RPT-ADM-04', applicant: 'Document completion', programme: '89% complete', intake: 'Current cycle', status: 'Needs attention' },
   ],
   '/students': [
     { reference: 'INT-2025-001', applicant: 'Student lifecycle overview', programme: '2,846 active students', intake: 'Semester II · 2025', status: 'Active' },
@@ -611,8 +699,89 @@ Object.assign(moduleRows, {
   ],
 })
 
+Object.assign(moduleRows, {
+  '/registration/course-registration': [
+    { reference: 'REG-2026-1824', applicant: 'Aisha Namukasa', programme: 'BSc Computer Science · 6 courses', intake: 'Year 2 · Semester II', status: 'Registered' },
+    { reference: 'REG-2026-1816', applicant: 'Daniel Okello', programme: 'BBA · 5 courses', intake: 'Year 3 · Semester II', status: 'Pending approval' },
+    { reference: 'REG-2026-1789', applicant: 'Mariam Atim', programme: 'Diploma in Computing · 7 courses', intake: 'Year 1 · Semester II', status: 'Needs attention' },
+    { reference: 'REG-2026-1762', applicant: 'Sarah Achieng', programme: 'BSc Information Technology · 6 courses', intake: 'Year 1 · Semester II', status: 'Registered' },
+  ],
+  '/registration/approvals': [
+    { reference: 'APR-2026-088', applicant: 'Peter Ssekabira', programme: 'Credit-load exception', intake: 'Faculty of Education', status: 'Under review' },
+    { reference: 'APR-2026-081', applicant: 'Mariam Atim', programme: 'Late registration request', intake: 'Registry queue', status: 'Pending' },
+    { reference: 'APR-2026-076', applicant: 'Daniel Okello', programme: 'Prerequisite override', intake: 'Faculty of Business', status: 'Needs attention' },
+    { reference: 'APR-2026-069', applicant: 'Aisha Namukasa', programme: 'Programme coordinator sign-off', intake: 'Computing', status: 'Approved' },
+  ],
+  '/registration/add-drop': [
+    { reference: 'ADD-2026-042', applicant: 'Sarah Achieng', programme: 'Add CSC 204', intake: 'Closes 18 Nov 2026', status: 'Under review' },
+    { reference: 'ADD-2026-039', applicant: 'Aisha Namukasa', programme: 'Drop MAT 210', intake: 'Computing', status: 'Approved' },
+    { reference: 'ADD-2026-031', applicant: 'Peter Ssekabira', programme: 'Add EDU 311', intake: 'Education', status: 'Pending' },
+    { reference: 'ADD-2026-024', applicant: 'Daniel Okello', programme: 'Course swap request', intake: 'Business', status: 'Needs attention' },
+  ],
+  '/registration/credit-load': [
+    { reference: 'CRL-2026-018', applicant: 'Mariam Atim', programme: '28 credits · maximum 24', intake: 'Diploma in Computing', status: 'Needs attention' },
+    { reference: 'CRL-2026-012', applicant: 'Peter Ssekabira', programme: '10 credits · minimum 12', intake: 'Bachelor of Education', status: 'Under review' },
+    { reference: 'CRL-2026-009', applicant: 'Daniel Okello', programme: '24 credits · within range', intake: 'Business', status: 'Approved' },
+    { reference: 'CRL-2026-004', applicant: 'Sarah Achieng', programme: '21 credits · within range', intake: 'Information Technology', status: 'Compliant' },
+  ],
+  '/examinations/assessment-setup': [
+    { reference: 'ASM-2026-104', applicant: 'CSC 204 · Data Structures', programme: 'Coursework 40% · Exam 60%', intake: 'Semester II · 2026', status: 'Approved' },
+    { reference: 'ASM-2026-098', applicant: 'BBA 310 · Strategic Management', programme: 'Coursework 30% · Exam 70%', intake: 'Semester II · 2026', status: 'Under review' },
+    { reference: 'ASM-2026-087', applicant: 'BED 402 · Education Policy', programme: 'Coursework 40% · Exam 60%', intake: 'Semester II · 2026', status: 'Draft' },
+    { reference: 'ASM-2026-074', applicant: 'HSC 202 · Community Health', programme: 'Coursework 50% · Exam 50%', intake: 'Semester II · 2026', status: 'Approved' },
+  ],
+  '/examinations/marks-entry': [
+    { reference: 'MRK-2026-204', applicant: 'CSC 204 · Dr. Sarah Nansubuga', programme: '86 of 92 marks entered', intake: 'Faculty of Computing', status: 'Under review' },
+    { reference: 'MRK-2026-198', applicant: 'BBA 310 · Mr. Brian Ouma', programme: '124 of 124 marks entered', intake: 'Faculty of Business', status: 'Ready to approve' },
+    { reference: 'MRK-2026-189', applicant: 'BED 402 · Ms. Irene Akello', programme: '78 of 84 marks entered', intake: 'Faculty of Education', status: 'Missing marks' },
+    { reference: 'MRK-2026-176', applicant: 'HSC 202 · Dr. Joseph Mugisha', programme: '96 of 96 marks entered', intake: 'Health Sciences', status: 'Complete' },
+  ],
+  '/examinations/moderation': [
+    { reference: 'MOD-2026-046', applicant: 'CSC 204 · Data Structures', programme: 'Variance review · 4 scripts', intake: 'External moderator', status: 'Under review' },
+    { reference: 'MOD-2026-039', applicant: 'BBA 310 · Strategic Management', programme: 'Sample approved', intake: 'Faculty board', status: 'Approved' },
+    { reference: 'MOD-2026-031', applicant: 'BED 402 · Education Policy', programme: 'Grade distribution check', intake: 'Department review', status: 'Needs attention' },
+    { reference: 'MOD-2026-024', applicant: 'HSC 202 · Community Health', programme: 'Awaiting moderator', intake: 'Health Sciences', status: 'Pending' },
+  ],
+  '/examinations/publication': [
+    { reference: 'PUB-2026-021', applicant: 'Computing · Year 2', programme: '6 of 8 course results approved', intake: 'Registrar sign-off', status: 'Under review' },
+    { reference: 'PUB-2026-018', applicant: 'Business · Year 3', programme: 'All results approved', intake: 'Release window 20 Nov', status: 'Ready to publish' },
+    { reference: 'PUB-2026-014', applicant: 'Education · Year 4', programme: '2 courses awaiting moderation', intake: 'Faculty board', status: 'Needs attention' },
+    { reference: 'PUB-2026-009', applicant: 'Health Sciences · Year 2', programme: 'Results released 10 Nov', intake: 'Student portal', status: 'Published' },
+  ],
+  '/finance/billing': [
+    { reference: 'INV-2026-0921', applicant: 'Semester II tuition batch', programme: 'UGX 5.14B · 2,184 invoices', intake: 'Posted 02 Nov 2026', status: 'Posted' },
+    { reference: 'INV-2026-0916', applicant: 'Accommodation charges', programme: 'UGX 428M · 312 accounts', intake: 'Main campus', status: 'Under review' },
+    { reference: 'INV-2026-0908', applicant: 'Late registration fees', programme: 'UGX 18.6M · 94 accounts', intake: 'Approval required', status: 'Pending' },
+    { reference: 'FEE-2026-0042', applicant: '2026/27 fee schedule', programme: 'Undergraduate programmes', intake: 'Next academic year', status: 'Draft' },
+  ],
+  '/finance/reconciliation': [
+    { reference: 'REC-2026-1107', applicant: 'Bank statement · Stanbic', programme: 'UGX 186.4M unmatched', intake: '07 Nov 2026', status: 'Needs attention' },
+    { reference: 'REC-2026-1106', applicant: 'Mobile money · Airtel', programme: '428 of 436 matched', intake: '06 Nov 2026', status: 'Under review' },
+    { reference: 'REC-2026-1105', applicant: 'Bank statement · Centenary', programme: 'UGX 92.1M matched', intake: '05 Nov 2026', status: 'Complete' },
+    { reference: 'PAY-2026-8821', applicant: 'Unidentified deposit', programme: 'UGX 640,000 · 1 transaction', intake: 'Student account lookup', status: 'Pending' },
+  ],
+  '/finance/accounts': [
+    { reference: 'ACC-2026-0142', applicant: 'Aisha Namukasa', programme: 'UGX 680,000 due', intake: 'BSc Computer Science · Year 2', status: 'Active' },
+    { reference: 'ACC-2026-0871', applicant: 'Daniel Okello', programme: 'UGX 0 due', intake: 'Bachelor of Business · Year 3', status: 'Clear' },
+    { reference: 'ACC-2026-0256', applicant: 'Mariam Atim', programme: 'UGX 420,000 due', intake: 'Diploma in Computing · Year 1', status: 'Needs attention' },
+    { reference: 'ACC-2026-0319', applicant: 'Peter Ssekabira', programme: 'UGX 1,240,000 due', intake: 'Bachelor of Education · Year 4', status: 'On hold' },
+  ],
+  '/finance/refunds': [
+    { reference: 'REF-2026-047', applicant: 'Tuition overpayment', programme: 'UGX 1,240,000', intake: 'Finance officer review', status: 'Under review' },
+    { reference: 'REF-2026-043', applicant: 'Accommodation deposit', programme: 'UGX 350,000', intake: 'Residence clearance attached', status: 'Approved' },
+    { reference: 'ADJ-2026-028', applicant: 'Duplicate mobile payment', programme: 'UGX 180,000', intake: 'Payment trace required', status: 'Needs attention' },
+    { reference: 'REF-2026-019', applicant: 'Cancelled course adjustment', programme: 'UGX 96,000', intake: 'Accounts office', status: 'Pending' },
+  ],
+})
+
 export const moduleIcons: Record<string, LucideIcon> = {
   '/admissions': ClipboardList,
+  '/admissions/application-pipeline': ClipboardList,
+  '/admissions/applicant-review': UserRound,
+  '/admissions/document-verification': FileText,
+  '/admissions/offers-decisions': ShieldCheck,
+  '/admissions/intake-planning': CalendarDays,
+  '/admissions/reports': ChartNoAxesCombined,
   '/students': UserRound,
   '/students/directory': UserRound,
   '/students/placement': MapPin,
@@ -628,10 +797,22 @@ export const moduleIcons: Record<string, LucideIcon> = {
   '/academics/calendar': CalendarDays,
   '/academics/grading': ShieldCheck,
   '/registration': GraduationCap,
+  '/registration/course-registration': GraduationCap,
+  '/registration/approvals': ShieldCheck,
+  '/registration/add-drop': ArrowRightLeft,
+  '/registration/credit-load': ListTree,
   '/timetabling': ClipboardList,
   '/attendance': UsersRound,
   '/examinations': ClipboardList,
+  '/examinations/assessment-setup': ClipboardList,
+  '/examinations/marks-entry': FileText,
+  '/examinations/moderation': ShieldCheck,
+  '/examinations/publication': CalendarDays,
   '/finance': CreditCard,
+  '/finance/billing': CreditCard,
+  '/finance/reconciliation': ArrowRightLeft,
+  '/finance/accounts': UsersRound,
+  '/finance/refunds': FileText,
   '/scholarships': GraduationCap,
   '/reports': ChartNoAxesCombined,
   '/learning': BookOpen,
@@ -648,6 +829,138 @@ export const moduleIcons: Record<string, LucideIcon> = {
 }
 
 export const moduleKpis: Record<string, KpiMetric[]> = {
+  '/registration': [
+    { label: 'Registration started', value: '2,184', detail: 'Current semester', icon: UsersRound, tone: 'blue' },
+    { label: 'Completed', value: '1,862', detail: '85% of started records', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Awaiting approval', value: '146', detail: 'Registrar and faculty queues', icon: ClipboardList, tone: 'amber' },
+    { label: 'Credit exceptions', value: '38', detail: 'Require academic review', icon: ListTree, tone: 'purple' },
+  ],
+  '/registration/course-registration': [
+    { label: 'Started', value: '2,184', detail: 'Student registration records', icon: UsersRound, tone: 'blue' },
+    { label: 'Registered', value: '1,862', detail: 'Course selection complete', icon: ShieldCheck, tone: 'teal' },
+    { label: 'In progress', value: '176', detail: 'Student action required', icon: ClipboardList, tone: 'amber' },
+    { label: 'Not started', value: '146', detail: 'Current semester cohort', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/registration/approvals': [
+    { label: 'Pending', value: '146', detail: 'Awaiting decision', icon: ClipboardList, tone: 'blue' },
+    { label: 'Urgent', value: '24', detail: 'Near registration deadline', icon: CalendarDays, tone: 'amber' },
+    { label: 'Approved today', value: '58', detail: 'Across faculty queues', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Average age', value: '2.4 days', detail: 'Open approval requests', icon: ArrowRightLeft, tone: 'purple' },
+  ],
+  '/registration/add-drop': [
+    { label: 'Open requests', value: '212', detail: 'Current change window', icon: ArrowRightLeft, tone: 'blue' },
+    { label: 'Awaiting review', value: '68', detail: 'Faculty decision required', icon: ClipboardList, tone: 'amber' },
+    { label: 'Approved', value: '124', detail: 'Processed this cycle', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Window closes', value: '18 Nov', detail: 'Current academic period', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/registration/credit-load': [
+    { label: 'Exceptions', value: '38', detail: 'Outside credit rules', icon: ListTree, tone: 'blue' },
+    { label: 'Over limit', value: '16', detail: 'Excess credit units', icon: CirclePause, tone: 'amber' },
+    { label: 'Below minimum', value: '22', detail: 'Need programme review', icon: GraduationCap, tone: 'purple' },
+    { label: 'Resolved', value: '74%', detail: 'This registration cycle', icon: ShieldCheck, tone: 'teal' },
+  ],
+  '/examinations': [
+    { label: 'Assessments', value: '184', detail: 'Current semester', icon: ClipboardList, tone: 'blue' },
+    { label: 'Marks complete', value: '82%', detail: 'Across all course units', icon: FileText, tone: 'teal' },
+    { label: 'Awaiting moderation', value: '26', detail: 'Faculty review queue', icon: ShieldCheck, tone: 'amber' },
+    { label: 'Ready to publish', value: '18', detail: 'Approved result sets', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/examinations/assessment-setup': [
+    { label: 'Assessment plans', value: '184', detail: 'Current semester courses', icon: ClipboardList, tone: 'blue' },
+    { label: 'Approved', value: '142', detail: 'Ready for delivery', icon: ShieldCheck, tone: 'teal' },
+    { label: 'In review', value: '26', detail: 'Faculty approval required', icon: FileText, tone: 'amber' },
+    { label: 'Draft', value: '16', detail: 'Not yet submitted', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/examinations/marks-entry': [
+    { label: 'Course units', value: '184', detail: 'Marks entry in scope', icon: ClipboardList, tone: 'blue' },
+    { label: 'Complete', value: '151', detail: 'All marks submitted', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Missing marks', value: '12', detail: 'Require lecturer follow-up', icon: CirclePause, tone: 'amber' },
+    { label: 'Submission rate', value: '82%', detail: 'Current semester', icon: FileText, tone: 'purple' },
+  ],
+  '/examinations/moderation': [
+    { label: 'In moderation', value: '26', detail: 'Current faculty queue', icon: ShieldCheck, tone: 'blue' },
+    { label: 'Variance flags', value: '7', detail: 'Require additional review', icon: CirclePause, tone: 'amber' },
+    { label: 'Approved today', value: '18', detail: 'Ready for release checks', icon: ClipboardList, tone: 'teal' },
+    { label: 'Moderated', value: '74%', detail: 'Semester results', icon: FileText, tone: 'purple' },
+  ],
+  '/examinations/publication': [
+    { label: 'Ready to publish', value: '18', detail: 'Approved result sets', icon: ShieldCheck, tone: 'blue' },
+    { label: 'Awaiting approval', value: '9', detail: 'Registrar sign-off', icon: ClipboardList, tone: 'amber' },
+    { label: 'Published', value: '42', detail: 'Current semester to date', icon: CalendarDays, tone: 'teal' },
+    { label: 'Release window', value: '20 Nov', detail: 'Next planned release', icon: FileText, tone: 'purple' },
+  ],
+  '/finance': [
+    { label: 'Fees billed', value: 'UGX 5.14B', detail: 'Semester II · 2026', icon: CreditCard, tone: 'blue' },
+    { label: 'Collected', value: 'UGX 3.86B', detail: '75% of billed fees', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Unmatched payments', value: 'UGX 186.4M', detail: 'Reconciliation queue', icon: ArrowRightLeft, tone: 'amber' },
+    { label: 'Refund requests', value: '6', detail: 'Awaiting approval', icon: FileText, tone: 'purple' },
+  ],
+  '/finance/billing': [
+    { label: 'Invoices posted', value: '2,184', detail: 'Current semester batch', icon: CreditCard, tone: 'blue' },
+    { label: 'Total billed', value: 'UGX 5.14B', detail: 'Across active students', icon: FileText, tone: 'teal' },
+    { label: 'Billing exceptions', value: '28', detail: 'Need account review', icon: CirclePause, tone: 'amber' },
+    { label: 'Draft schedules', value: '2', detail: 'Next academic year', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/finance/reconciliation': [
+    { label: 'Matched today', value: '428', detail: 'Across payment channels', icon: ShieldCheck, tone: 'blue' },
+    { label: 'Unmatched', value: 'UGX 186.4M', detail: 'Needs account allocation', icon: ArrowRightLeft, tone: 'amber' },
+    { label: 'Statements', value: '4', detail: 'Awaiting import', icon: FileText, tone: 'purple' },
+    { label: 'Match rate', value: '96.8%', detail: 'Current reconciliation', icon: CreditCard, tone: 'teal' },
+  ],
+  '/finance/accounts': [
+    { label: 'Student accounts', value: '2,846', detail: 'Current register', icon: UsersRound, tone: 'blue' },
+    { label: 'Accounts clear', value: '1,942', detail: 'No outstanding balance', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Payment plans', value: '184', detail: 'Active arrangements', icon: CalendarDays, tone: 'purple' },
+    { label: 'Account holds', value: '82', detail: 'Need follow-up', icon: CirclePause, tone: 'amber' },
+  ],
+  '/finance/refunds': [
+    { label: 'Open requests', value: '6', detail: 'Pending review', icon: FileText, tone: 'blue' },
+    { label: 'Value requested', value: 'UGX 4.8M', detail: 'All open requests', icon: CreditCard, tone: 'purple' },
+    { label: 'Awaiting approval', value: '3', detail: 'Finance officer queue', icon: ShieldCheck, tone: 'amber' },
+    { label: 'Processed this month', value: '14', detail: 'Completed adjustments', icon: ArrowRightLeft, tone: 'teal' },
+  ],
+  '/admissions': [
+    { label: 'Applications', value: '968', detail: 'Current intake pipeline', icon: ClipboardList, tone: 'blue' },
+    { label: 'Under review', value: '342', detail: 'Awaiting faculty decision', icon: UserRound, tone: 'amber' },
+    { label: 'Offer ready', value: '186', detail: 'Ready to issue or release', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Yield forecast', value: '61%', detail: 'Expected conversion rate', icon: ChartNoAxesCombined, tone: 'purple' },
+  ],
+  '/admissions/application-pipeline': [
+    { label: 'Fresh applications', value: '412', detail: 'Submitted in current cycle', icon: ClipboardList, tone: 'blue' },
+    { label: 'Screening', value: '186', detail: 'Needs first-pass review', icon: UserRound, tone: 'amber' },
+    { label: 'Faculty review', value: '98', detail: 'Awaiting staff decisions', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Decision window', value: '9 days', detail: 'Average time to outcome', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/admissions/applicant-review': [
+    { label: 'Shortlisted', value: '214', detail: 'Ready for final decision', icon: UserRound, tone: 'blue' },
+    { label: 'Flagged', value: '48', detail: 'Need follow-up review', icon: CirclePause, tone: 'amber' },
+    { label: 'Approved', value: '132', detail: 'Offer or acceptance ready', icon: ShieldCheck, tone: 'teal' },
+    { label: 'Top programmes', value: '5', detail: 'Highest demand faculties', icon: GraduationCap, tone: 'purple' },
+  ],
+  '/admissions/document-verification': [
+    { label: 'Verified', value: '89%', detail: 'Documents completed', icon: FileText, tone: 'blue' },
+    { label: 'Missing', value: '42', detail: 'Require action', icon: CirclePause, tone: 'amber' },
+    { label: 'Urgent queue', value: '18', detail: 'Priority follow-up', icon: ClipboardList, tone: 'teal' },
+    { label: 'Last check', value: 'Today', detail: 'Updated in current cycle', icon: CalendarDays, tone: 'purple' },
+  ],
+  '/admissions/offers-decisions': [
+    { label: 'Offers issued', value: '186', detail: 'Current offer cycle', icon: ShieldCheck, tone: 'blue' },
+    { label: 'Accepted', value: '122', detail: 'Confirmed students', icon: GraduationCap, tone: 'teal' },
+    { label: 'Waitlisted', value: '31', detail: 'Waiting for seat release', icon: CirclePause, tone: 'amber' },
+    { label: 'Pending', value: '41', detail: 'Awaiting response', icon: ClipboardList, tone: 'purple' },
+  ],
+  '/admissions/intake-planning': [
+    { label: 'Capacity target', value: '420', detail: 'Planned student seats', icon: CalendarDays, tone: 'blue' },
+    { label: 'Confirmed', value: '288', detail: 'Seats already committed', icon: ShieldCheck, tone: 'teal' },
+    { label: 'At risk', value: '18', detail: 'Programs under pressure', icon: CirclePause, tone: 'amber' },
+    { label: 'Open seats', value: '132', detail: 'Still available', icon: ChartNoAxesCombined, tone: 'purple' },
+  ],
+  '/admissions/reports': [
+    { label: 'Conversion', value: '61%', detail: 'Application to admission', icon: ChartNoAxesCombined, tone: 'blue' },
+    { label: 'Average decision', value: '9 days', detail: 'From submission to verdict', icon: CalendarDays, tone: 'teal' },
+    { label: 'Main campus', value: '68%', detail: 'Current applicant share', icon: Building2, tone: 'purple' },
+    { label: 'Completion', value: '89%', detail: 'Document readiness', icon: FileText, tone: 'amber' },
+  ],
   '/students': [
     { label: 'Student records', value: '2,846', detail: 'Active student register', icon: UsersRound, tone: 'blue' },
     { label: 'On hold', value: '82', detail: 'Need follow-up', icon: CirclePause, tone: 'amber' },
