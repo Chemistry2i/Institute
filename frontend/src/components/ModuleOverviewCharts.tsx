@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { moduleRows } from '../data'
+import { demoDataChangedEvent, readModuleRows } from '../demo-store'
 import { Card } from './ui'
 
 type OverviewChartProfile = {
@@ -37,9 +39,20 @@ const chartColors = ['var(--primary)', 'var(--secondary)', 'var(--warning)', 'va
 
 export function ModuleOverviewCharts({ path }: { path: string }) {
   const profile = overviewChartProfiles[path]
+  const [rows, setRows] = useState(() => readModuleRows(path, moduleRows[path] ?? []))
+
+  useEffect(() => {
+    const refresh = (event?: Event) => {
+      const changedPaths = (event as CustomEvent<{ paths?: string[] }> | undefined)?.detail?.paths
+      if (!changedPaths || changedPaths.includes(path)) setRows(readModuleRows(path, moduleRows[path] ?? []))
+    }
+    refresh()
+    window.addEventListener(demoDataChangedEvent, refresh)
+    return () => window.removeEventListener(demoDataChangedEvent, refresh)
+  }, [path])
+
   if (!profile) return null
 
-  const rows = moduleRows[path] ?? []
   const statusCounts = rows.reduce<Record<string, number>>((counts, row) => {
     const status = row.status || 'Unspecified'
     counts[status] = (counts[status] ?? 0) + 1

@@ -1,23 +1,65 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react'
 import { BadgeCheck, Building2, CalendarDays, Check, CircleAlert, CircleCheck, CirclePause, Download, Eye, FileText, Filter, GraduationCap, Mail, MapPin, Phone, Plus, Search, ShieldCheck, UserRound, UsersRound, X } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { useAppContext } from '../app-context'
-import { studentProfiles, students as initialStudents, type StudentProfileData, type StudentRecord } from '../data'
+import { type StudentProfileData, type StudentRecord } from '../data'
+import { readStudentProfiles, readStudentRecords, writeStudentRecords } from '../demo-store'
 import { Badge, Button, Card, EmptyState, KpiCard } from './ui'
 import { ModalShell } from './ModuleWorkspace'
 
 type ProfileTab = 'overview' | 'documents'
 
+function isStudentRecord(value: unknown): value is StudentRecord {
+  if (!value || typeof value !== 'object') return false
+  const record = value as Partial<StudentRecord>
+  return typeof record.id === 'string'
+    && typeof record.name === 'string'
+    && typeof record.programme === 'string'
+    && typeof record.year === 'string'
+    && (record.status === 'Active' || record.status === 'On hold' || record.status === 'Graduating')
+    && typeof record.balance === 'string'
+    && typeof record.lastSeen === 'string'
+}
+
+function createPreviewProfile(student: StudentRecord): StudentProfileData {
+  return {
+    campus: 'Main campus',
+    faculty: 'Pending faculty assignment',
+    department: 'Pending department assignment',
+    semester: 'Current academic period',
+    intake: 'Imported record',
+    email: '',
+    phone: '',
+    dateOfBirth: '',
+    gender: 'Not specified',
+    address: '',
+    nextOfKin: { name: 'Not provided', relationship: 'Not provided', phone: '', email: '' },
+    statusHistory: [{ date: new Date().toLocaleDateString(), status: student.status, detail: 'Student record imported into the frontend preview.' }],
+    documents: [],
+  }
+}
+
+function downloadStudentJson(filename: string, value: unknown) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(value, null, 2)], { type: 'application/json' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 export function StudentInformation() {
   const { can } = useAppContext()
-  const [records, setRecords] = useState(initialStudents)
-  const [profiles, setProfiles] = useState(studentProfiles)
+  const [records, setRecords] = useState(readStudentRecords)
+  const [profiles, setProfiles] = useState(readStudentProfiles)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('All statuses')
   const [selectedStudent, setSelectedStudent] = useState<StudentRecord | null>(null)
   const [selectedStudentIds, setSelectedStudentIds] = useState<string[]>([])
+  const [bulkStatus, setBulkStatus] = useState<StudentRecord['status'] | ''>('')
   const [createOpen, setCreateOpen] = useState(false)
   const selectAllRef = useRef<HTMLInputElement>(null)
+  const importInputRef = useRef<HTMLInputElement>(null)
 
   if (!can('students.view')) return <Card className="permission-empty"><div className="permission-empty-icon"><ShieldCheck size={28} /></div><h2>Permission required</h2><p>Your current role does not have access to student records. Switch the RBAC preview role or ask an administrator to grant access.</p></Card>
 
@@ -41,6 +83,44 @@ export function StudentInformation() {
       ? current.filter((studentId) => !visibleIds.has(studentId))
       : [...new Set([...current, ...visibleIds])])
   }
+  const exportStudents = (selectedOnly: boolean) => {
+    const recordsToExport = selectedOnly ? selectedVisibleStudents : visibleRecords
+    downloadStudentJson('student-directory.json', { exportedAt: new Date().toISOString(), students: recordsToExport })
+    toast.success(`${recordsToExport.length} student records exported.`)
+  }
+  const applyBulkStatus = () => {
+    if (!bulkStatus || selectedVisibleStudents.length === 0) return
+    const ids = new Set(selectedVisibleStudents.map((student) => student.id))
+    const nextRecords = records.map((student) => ids.has(student.id) ? { ...student, status: bulkStatus } : student)
+    setRecords(nextRecords)
+    writeStudentRecords(nextRecords, profiles)
+    setSelectedStudentIds([])
+    setBulkStatus('')
+    toast.success(`${ids.size} student records updated in this preview.`)
+  }
+  const importStudents = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    try {
+      if (file.size > 2_000_000) throw new Error('Import files must be smaller than 2 MB.')
+      const parsed = JSON.parse(await file.text()) as { students?: unknown } | unknown[]
+      const incoming = Array.isArray(parsed) ? parsed : (parsed as { students?: unknown }).students
+      if (!Array.isArray(incoming) || !incoming.every(isStudentRecord)) throw new Error('Choose a JSON array of valid student records.')
+      const existing = new Set(records.map((student) => student.id.toLowerCase()))
+      const newRecords = (incoming as StudentRecord[]).filter((student) => !existing.has(student.id.toLowerCase()))
+      const nextRecords = [...newRecords, ...records]
+      const nextProfiles = { ...profiles }
+      for (const student of newRecords) nextProfiles[student.id] ??= createPreviewProfile(student)
+      writeStudentRecords(nextRecords, nextProfiles)
+      setRecords(nextRecords)
+      setProfiles(nextProfiles)
+      toast.success(`${newRecords.length} student records imported; duplicate IDs were skipped.`)
+    } catch (caught) {
+      toast.error(caught instanceof Error ? caught.message : 'The student import file could not be read.')
+    } finally {
+      event.target.value = ''
+    }
+  }
   const clearFilters = () => {
     setSearch('')
     setStatusFilter('All statuses')
@@ -51,8 +131,11 @@ export function StudentInformation() {
       toast.error('That student ID is already in use.')
       return false
     }
-    setRecords((current) => [student, ...current])
-    setProfiles((current) => ({ ...current, [student.id]: profile }))
+    const nextRecords = [student, ...records]
+    const nextProfiles = { ...profiles, [student.id]: profile }
+    writeStudentRecords(nextRecords, nextProfiles)
+    setRecords(nextRecords)
+    setProfiles(nextProfiles)
     toast.success('Student record added to this preview.')
     setCreateOpen(false)
     return true
@@ -70,15 +153,18 @@ export function StudentInformation() {
       <label className="toolbar-search"><Search size={16} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search name, student ID, or programme" aria-label="Search student records" /></label>
       <div className="toolbar-actions">
         <label className="student-status-filter"><Filter size={15} /><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Filter by student status"><option>All statuses</option><option>Active</option><option>On hold</option><option>Graduating</option></select></label>
+        <input ref={importInputRef} className="visually-hidden" type="file" accept="application/json,.json" onChange={(event) => void importStudents(event)} aria-label="Import student records JSON file" />
+        <Button variant="outline" size="sm" onClick={() => importInputRef.current?.click()}><FileText size={14} /> Import records</Button>
+        <Button variant="outline" size="sm" onClick={() => exportStudents(false)}><Download size={14} /> Export</Button>
         <Button size="sm" onClick={() => setCreateOpen(true)}><Plus size={15} /> Add student</Button>
       </div>
     </div>
-    {selectedVisibleStudents.length > 0 && <div className="bulk-selection-toolbar" aria-live="polite"><span>{selectedVisibleStudents.length} students selected</span><Button variant="outline" size="sm" onClick={() => toast.success(`Export queued for ${selectedVisibleStudents.length} selected students.`)}><Download size={14} /> Export selected</Button><Button variant="ghost" size="sm" onClick={() => setSelectedStudentIds([])}>Clear selection</Button></div>}
+    {selectedVisibleStudents.length > 0 && <div className="bulk-selection-toolbar" aria-live="polite"><span>{selectedVisibleStudents.length} students selected</span><label className="bulk-status-action"><span>Set status</span><select value={bulkStatus} onChange={(event) => setBulkStatus(event.target.value as StudentRecord['status'] | '')}><option value="">Choose status</option><option>Active</option><option>On hold</option><option>Graduating</option></select></label><Button variant="outline" size="sm" disabled={!bulkStatus} onClick={applyBulkStatus}>Apply</Button><Button variant="outline" size="sm" onClick={() => exportStudents(true)}><Download size={14} /> Export selected</Button><Button variant="ghost" size="sm" onClick={() => setSelectedStudentIds([])}>Clear selection</Button></div>}
 
     {visibleRecords.length === 0 ? <EmptyState title="No student records found" description="The current filters do not match any students. Clear the search or adjust the status filter to continue." actionLabel="Clear filters" onAction={clearFilters} /> : <Card className="module-table-card student-directory-card">
       <div className="table-card-head">
         <div className="module-title"><div className="module-title-icon module-icon-teal"><UsersRound size={19} /></div><div><h2>Student directory</h2><p>{visibleRecords.length} of {records.length} student records</p></div></div>
-        <Button variant="ghost" size="sm" onClick={() => toast.success('Student import workflow is ready for backend integration.')}><FileText size={14} /> Import records</Button>
+        <span className="student-directory-hint">Select rows for bulk actions</span>
       </div>
       <div className="table-responsive"><table className="data-table student-table">
         <thead><tr><th className="bulk-select-cell"><input ref={selectAllRef} type="checkbox" checked={allVisibleStudentsSelected} onChange={toggleAllVisibleStudents} aria-label="Select all visible students" /></th><th>Student</th><th>Programme</th><th>Year</th><th>Status</th><th>Account balance</th><th>Last activity</th><th aria-label="Actions" /></tr></thead>

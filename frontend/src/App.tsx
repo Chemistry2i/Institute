@@ -46,6 +46,7 @@ import { ModuleLanding, OperationalModuleRoute } from './components/OperationalM
 import { Sidebar } from './components/Sidebar'
 import { SettingsPage as SettingsWorkspace } from './components/SettingsPage'
 import { StudentInformation } from './components/StudentInformation'
+import { UsersRolesPage } from './components/UsersRolesPage'
 import {
   admissionsItems,
   attendanceItems,
@@ -148,7 +149,7 @@ function RoutesOutlet() {
     <Route path="/timetabling/*" element={<OperationalModuleRoute basePath="/timetabling" items={timetablingItems} />} />
     <Route path="/attendance/*" element={<OperationalModuleRoute basePath="/attendance" items={attendanceItems} />} />
     {genericOperationalGroups.map(({ basePath, items }) => <Route key={basePath} path={`${basePath}/*`} element={<OperationalModuleRoute basePath={basePath} items={items} />} />)}
-    <Route path="/users" element={<UsersPage />} />
+    <Route path="/users" element={<UsersRolesPage />} />
     <Route path="/settings/*" element={<SettingsWorkspace />} />
     <Route path="*" element={<Navigate to="/" replace />} />
   </Routes></div>
