@@ -9,7 +9,7 @@ import { addMatriculatedStudent, readMatriculatedStudents } from '../demo-store'
 import { Badge, Button, Card, EmptyState, KpiCard } from './ui'
 import { ModalShell } from './ModuleWorkspace'
 
-type ApplicationStage = 'Submitted' | 'Screening' | 'Faculty review' | 'Documents pending' | 'Offer issued' | 'Accepted' | 'Waitlisted' | 'Declined' | 'Rejected' | 'Enrolled'
+type ApplicationStage = 'Submitted' | 'Screening' | 'Faculty review' | 'Approved' | 'Documents pending' | 'Offer issued' | 'Accepted' | 'Waitlisted' | 'Declined' | 'Rejected' | 'Enrolled'
 type DocumentState = 'Missing' | 'Received' | 'Verified'
 type ApplicationDocument = { name: string; status: DocumentState; fileName: string; required: boolean }
 type AcademicResult = { subject: string; grade: string; examinationBody: string }
@@ -92,10 +92,14 @@ const ugandanDistricts = [
 ]
 const formatPhone = (country: CountryCode, number: string) => `+${getCountryCallingCode(country)} ${number.trim()}`
 const requiredDocuments = ['Identity document', 'Academic certificate', 'Academic transcript']
+const hasOutstandingDocuments = (application: Application) => application.documents.some(
+  (document) => document.status !== 'Verified' && (document.required || Boolean(document.fileName)),
+)
 const stageIcons: Record<ApplicationStage, LucideIcon> = {
   Submitted: Send,
   Screening: ScanSearch,
   'Faculty review': ClipboardCheck,
+  Approved: BadgeCheck,
   'Documents pending': FileClock,
   'Offer issued': BadgeCheck,
   Accepted: Check,
@@ -152,7 +156,7 @@ function readApplications(): Application[] {
 }
 
 function stageTone(stage: ApplicationStage): 'neutral' | 'success' | 'warning' | 'info' | 'danger' {
-  if (stage === 'Enrolled' || stage === 'Accepted') return 'success'
+  if (stage === 'Enrolled' || stage === 'Accepted' || stage === 'Approved') return 'success'
   if (stage === 'Rejected' || stage === 'Declined') return 'danger'
   if (stage === 'Documents pending' || stage === 'Waitlisted') return 'warning'
   if (stage === 'Faculty review' || stage === 'Offer issued' || stage === 'Screening') return 'info'
@@ -163,7 +167,8 @@ function allowedStageChanges(stage: ApplicationStage): ApplicationStage[] {
   const transitions: Partial<Record<ApplicationStage, ApplicationStage[]>> = {
     Submitted: ['Screening', 'Documents pending', 'Rejected'],
     Screening: ['Faculty review', 'Documents pending', 'Rejected'],
-    'Faculty review': ['Offer issued', 'Waitlisted', 'Documents pending', 'Rejected'],
+    'Faculty review': ['Approved', 'Waitlisted', 'Documents pending', 'Rejected'],
+    Approved: ['Offer issued', 'Waitlisted', 'Rejected'],
     'Documents pending': ['Screening', 'Faculty review', 'Rejected'],
     'Offer issued': ['Accepted', 'Declined', 'Waitlisted'],
     Waitlisted: ['Offer issued', 'Rejected'],
@@ -187,7 +192,7 @@ export function AdmissionsOverview() {
     <section className="stats-grid module-kpi-strip" aria-label="Admissions pipeline summary">
       <KpiCard label="Applications" value={`${applications.length}`} detail="In this local demo workflow" tone="blue" icon={UsersRound} />
       <KpiCard label="In review" value={`${applications.filter((app) => ['Submitted', 'Screening', 'Faculty review', 'Documents pending'].includes(app.stage)).length}`} detail="Screening, faculty, or documents" tone="amber" icon={ClipboardCheck} />
-      <KpiCard label="Offers & accepted" value={`${applications.filter((app) => ['Offer issued', 'Accepted'].includes(app.stage)).length}`} detail="Awaiting matriculation" tone="teal" icon={BadgeCheck} />
+      <KpiCard label="Approved & offered" value={`${applications.filter((app) => ['Approved', 'Offer issued', 'Accepted'].includes(app.stage)).length}`} detail="Ready for offer or matriculation" tone="teal" icon={BadgeCheck} />
       <KpiCard label="Enrolled" value={`${applications.filter((app) => app.stage === 'Enrolled').length}`} detail="Converted to student records" tone="purple" icon={GraduationCap} />
     </section>
     <Card className="admissions-flow-card">
@@ -235,7 +240,7 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
   const heading = headings[path] ?? headings['/admissions/application-pipeline']
   const searchTerm = search.trim().toLowerCase()
   const isPipeline = path === '/admissions/application-pipeline'
-  const pipelineStages: ApplicationStage[] = ['Submitted', 'Screening', 'Faculty review', 'Documents pending', 'Offer issued', 'Accepted', 'Waitlisted', 'Declined', 'Rejected', 'Enrolled']
+  const pipelineStages: ApplicationStage[] = ['Submitted', 'Screening', 'Faculty review', 'Approved', 'Documents pending', 'Offer issued', 'Accepted', 'Waitlisted', 'Declined', 'Rejected', 'Enrolled']
   const intakes = [...new Set(applications.map((application) => application.intake).filter(Boolean))].sort()
   const programmes = [...new Set(applications.map((application) => application.programme).filter(Boolean))].sort()
   const matchesPipelineSearch = (app: Application) => `${app.id} ${app.name} ${app.email} ${app.programme} ${app.stage}`.toLowerCase().includes(searchTerm)
@@ -249,12 +254,23 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     if (isPipeline && programmeFilter !== 'All' && app.programme !== programmeFilter) return false
     if (isPipeline && stageFilter !== 'All' && app.stage !== stageFilter) return false
     if (path === '/admissions/applicant-review') return ['Submitted', 'Screening', 'Faculty review'].includes(app.stage)
-    if (path === '/admissions/document-verification') return app.documents.some((doc) => doc.status !== 'Verified') || app.stage === 'Documents pending'
-    if (path === '/admissions/offers-decisions') return ['Faculty review', 'Offer issued', 'Accepted', 'Waitlisted', 'Declined'].includes(app.stage)
+    if (path === '/admissions/document-verification') return hasOutstandingDocuments(app) || app.stage === 'Documents pending'
+    if (path === '/admissions/offers-decisions') return ['Approved', 'Offer issued', 'Accepted', 'Waitlisted', 'Declined'].includes(app.stage)
     if (path === '/admissions/matriculation') return ['Accepted', 'Enrolled'].includes(app.stage)
     return true
   })
-  const needsAction = filtered.filter((app) => ['Submitted', 'Screening', 'Faculty review', 'Documents pending', 'Offer issued', 'Accepted', 'Waitlisted'].includes(app.stage)).length
+  const needsAction = filtered.filter((app) => {
+    if (path === '/admissions/applicant-review') return ['Submitted', 'Screening', 'Faculty review'].includes(app.stage)
+    if (path === '/admissions/document-verification') return hasOutstandingDocuments(app)
+    if (path === '/admissions/offers-decisions') return ['Approved', 'Offer issued', 'Waitlisted'].includes(app.stage)
+    if (path === '/admissions/matriculation') return app.stage === 'Accepted'
+    return ['Submitted', 'Screening', 'Faculty review', 'Approved', 'Documents pending', 'Offer issued', 'Accepted', 'Waitlisted'].includes(app.stage)
+  }).length
+  const nextActionApplication = path === '/admissions/matriculation'
+    ? filtered.find((app) => app.stage === 'Accepted')
+    : path === '/admissions/offers-decisions'
+      ? filtered.find((app) => ['Faculty review', 'Offer issued', 'Waitlisted'].includes(app.stage))
+      : filtered[0]
 
   const persist = (next: Application[]) => {
     try {
@@ -265,6 +281,13 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
       toast.error('Admissions changes could not be saved in this browser.')
       return false
     }
+  }
+  const changeWorkflowStage = (application: Application, stage: ApplicationStage, event: string) => {
+    if (application.stage === stage || !allowedStageChanges(application.stage).includes(stage)) {
+      toast.error('That action is not available from the current application stage.')
+      return
+    }
+    updateApplication(application.id, { stage }, event)
   }
   const updateApplication = (id: string, patch: Partial<Application>, event: string, closeDialog = true) => {
     const updatedApplication = applications.find((app) => app.id === id)
@@ -305,7 +328,8 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
     }
   }
   const matriculate = (app: Application) => {
-    if (!app.identityVerified || !app.feesCleared || !app.documents.filter((doc) => doc.required).every((doc) => doc.status === 'Verified')) {
+    const requiredDocs = app.documents.filter((doc) => doc.required)
+    if (!app.identityVerified || !app.feesCleared || requiredDocs.length === 0 || !requiredDocs.every((doc) => doc.status === 'Verified')) {
       toast.error('Complete identity, fee, and document clearance before enrollment.')
       return
     }
@@ -411,6 +435,10 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
         {(stageFilter !== 'All' || intakeFilter !== 'All' || programmeFilter !== 'All' || search) && <Button type="button" variant="ghost" size="sm" onClick={() => { setStageFilter('All'); setIntakeFilter('All'); setProgrammeFilter('All'); setSearch('') }}><X size={13} />Clear</Button>}
       </div>}
       <div className="toolbar-actions">
+        {path === '/admissions/applicant-review' && <Button type="button" size="sm" disabled={!nextActionApplication} onClick={() => nextActionApplication && setSelected(nextActionApplication)}><ClipboardCheck size={14} />Review next</Button>}
+        {path === '/admissions/document-verification' && <Button type="button" size="sm" disabled={!filtered[0]} onClick={() => filtered[0] && setDocumentsOpen(filtered[0])}><FileText size={14} />Verify next</Button>}
+        {path === '/admissions/offers-decisions' && <Button type="button" size="sm" disabled={!nextActionApplication} onClick={() => nextActionApplication && setSelected(nextActionApplication)}><BadgeCheck size={14} />Process next decision</Button>}
+        {path === '/admissions/matriculation' && <Button type="button" size="sm" disabled={!nextActionApplication} onClick={() => nextActionApplication && setSelected(nextActionApplication)}><GraduationCap size={14} />Open next clearance</Button>}
         {isPipeline && <Button type="button" variant="outline" size="sm" onClick={exportPipelineCsv}><Download size={14} /> Export CSV</Button>}
         <Button type="button" variant="outline" size="sm" onClick={exportApplications}><Download size={14} /> Export JSON</Button>
         {path === '/admissions/application-pipeline' && <Button type="button" size="sm" onClick={() => setCreateOpen(true)}><Plus size={14} /> Add application</Button>}
@@ -432,10 +460,19 @@ export function AdmissionsWorkflowPage({ path }: { path: string }) {
         </tr>)}</tbody>
       </table></div>
     </Card>}
-    {selected && <ApplicationActionDialog application={selected} path={path} onClose={() => setSelected(null)} onStageChange={(stage, history) => updateApplication(selected.id, { stage }, history)} onClearanceChange={(patch) => updateApplication(selected.id, patch, 'Matriculation clearance updated', false)} onMatriculate={() => matriculate(selected)} />}
+    {selected && <ApplicationActionDialog application={selected} path={path} onClose={() => setSelected(null)} onStageChange={(stage, history) => changeWorkflowStage(selected, stage, history)} onClearanceChange={(patch) => updateApplication(selected.id, patch, 'Matriculation clearance updated', false)} onMatriculate={() => matriculate(selected)} />}
     {documentsOpen && <ApplicationDocumentsDialog application={documentsOpen} onClose={() => setDocumentsOpen(null)} onSave={(documents) => {
-      const allVerified = documents.filter((doc) => doc.required).every((doc) => doc.status === 'Verified')
-      updateApplication(documentsOpen.id, { documents, stage: allVerified ? 'Faculty review' : 'Documents pending' }, allVerified ? 'All required documents verified' : 'Document verification updated')
+      const requiredDocs = documents.filter((doc) => doc.required)
+      const allVerified = requiredDocs.length > 0 && requiredDocs.every((doc) => doc.status === 'Verified')
+      const currentStage = documentsOpen.stage
+      const stage = allVerified
+        ? currentStage === 'Documents pending' ? 'Screening' : currentStage
+        : allowedStageChanges(currentStage).includes('Documents pending') ? 'Documents pending' : currentStage
+      updateApplication(documentsOpen.id, { documents, stage }, allVerified ? 'All required documents verified' : 'Document verification updated')
+    }} onRequestMissing={(documents) => {
+      const missingNames = documents.filter((document) => document.required && !document.fileName).map((document) => document.name)
+      const stage = allowedStageChanges(documentsOpen.stage).includes('Documents pending') ? 'Documents pending' : documentsOpen.stage
+      updateApplication(documentsOpen.id, { documents, stage }, `Document request recorded for: ${missingNames.join(', ')}`)
     }} />}
     {createOpen && <ApplicationCreateDialog onClose={() => setCreateOpen(false)} onSubmit={submitApplication} />}
   </>
@@ -685,16 +722,18 @@ function ApplicationActionDialog({ application, path, onClose, onStageChange, on
   const issueOffer = () => nextStage('Offer issued', 'Admission offer issued')
   const acceptOffer = () => nextStage('Accepted', 'Offer accepted by applicant')
   const decisionActions = isReview
-    ? <><Button type="button" variant="outline" onClick={() => nextStage('Documents pending', 'Requested outstanding documents')}><FileText size={14} />Request documents</Button><Button type="button" variant="outline" onClick={() => nextStage('Rejected', 'Application declined at review')}><X size={14} />Reject</Button><Button type="button" onClick={() => nextStage('Faculty review', 'Passed initial screening; sent to faculty')}><Check size={14} />Pass to faculty</Button></>
+    ? <><Button type="button" variant="outline" onClick={() => nextStage('Documents pending', 'Requested outstanding documents')}><FileText size={14} />Request documents</Button><Button type="button" variant="outline" onClick={() => nextStage('Rejected', 'Application declined at review')}><X size={14} />Reject</Button>{application.stage === 'Submitted' ? <Button type="button" onClick={() => nextStage('Screening', 'Initial application screening started')}><ScanSearch size={14} />Start screening</Button> : application.stage === 'Screening' ? <Button type="button" onClick={() => nextStage('Faculty review', 'Passed initial screening; sent to faculty')}><Check size={14} />Pass to faculty</Button> : application.stage === 'Faculty review' ? <Button type="button" onClick={() => nextStage('Approved', 'Faculty approved applicant for an admission offer')}><BadgeCheck size={14} />Approve for offer</Button> : null}</>
     : isOffer
-      ? ['Accepted', 'Declined'].includes(application.stage) ? null : <><Button type="button" variant="outline" onClick={() => nextStage('Waitlisted', 'Applicant added to waitlist')}><CalendarDays size={14} />Waitlist</Button>{application.stage === 'Offer issued' ? <><Button type="button" variant="outline" onClick={() => nextStage('Declined', 'Offer declined by applicant')}><X size={14} />Decline</Button><Button type="button" onClick={acceptOffer}><Check size={14} />Record acceptance</Button></> : <Button type="button" onClick={issueOffer}><BadgeCheck size={14} />Issue offer</Button>}</>
+      ? ['Accepted', 'Declined'].includes(application.stage) ? null : <>{['Approved', 'Offer issued'].includes(application.stage) && <Button type="button" variant="outline" onClick={() => nextStage('Waitlisted', 'Applicant added to waitlist')}><CalendarDays size={14} />Waitlist</Button>}{application.stage === 'Offer issued' ? <><Button type="button" variant="outline" onClick={() => nextStage('Declined', 'Applicant declined the offer')}><X size={14} />Record decline</Button><Button type="button" onClick={acceptOffer}><Check size={14} />Record acceptance</Button></> : application.stage === 'Waitlisted' ? <><Button type="button" variant="outline" onClick={() => nextStage('Rejected', 'Waitlist place closed')}><X size={14} />Close waitlist</Button><Button type="button" onClick={issueOffer}><BadgeCheck size={14} />Issue offer</Button></> : application.stage === 'Approved' ? <Button type="button" onClick={issueOffer}><BadgeCheck size={14} />Issue offer</Button> : null}</>
       : null
   const previousEducation = application.previousEducation ?? []
   const academicResults = application.academicResults ?? []
-  const documentsVerified = application.documents.filter((document) => document.required && document.status === 'Verified').length
-  const documentsRequired = application.documents.filter((document) => document.required).length
+  const requiredDocumentsForApplication = application.documents.filter((document) => document.required)
+  const documentsVerified = requiredDocumentsForApplication.filter((document) => document.status === 'Verified').length
+  const documentsRequired = requiredDocumentsForApplication.length
+  const canEnroll = application.identityVerified && application.feesCleared && documentsRequired > 0 && documentsVerified === documentsRequired
   const initials = application.name.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase()
-  return <ModalShell className="application-details-modal" title={isMatriculation ? 'Matriculation clearance' : isReview ? 'Applicant review' : isOffer ? 'Offer decision' : 'Application details'} description={`${application.id} · Submitted application record`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Close</Button>{decisionActions}{isMatriculation && application.stage !== 'Enrolled' && <Button type="button" onClick={onMatriculate}><GraduationCap size={14} />Enroll student</Button>}</>}>
+  return <ModalShell className="application-details-modal" title={isMatriculation ? 'Matriculation clearance' : isReview ? 'Applicant review' : isOffer ? 'Offer decision' : 'Application details'} description={`${application.id} · Submitted application record`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Close</Button>{decisionActions}{isMatriculation && application.stage !== 'Enrolled' && <Button type="button" disabled={!canEnroll} title={canEnroll ? 'Create the student record' : 'Complete identity, fee, and required-document clearance first'} onClick={onMatriculate}><GraduationCap size={14} />Enroll student</Button>}</>}>
     <div className="application-details">
       <section className="application-details-hero">
         <span className="application-details-avatar">{initials || <UserRound size={20} />}</span>
@@ -727,8 +766,9 @@ function ApplicationDetailField({ label, children }: { label: string; children: 
   return <div className="application-detail-field"><dt>{label}</dt><dd>{children}</dd></div>
 }
 
-function ApplicationDocumentsDialog({ application, onClose, onSave }: { application: Application; onClose: () => void; onSave: (documents: ApplicationDocument[]) => void }) {
+function ApplicationDocumentsDialog({ application, onClose, onSave, onRequestMissing }: { application: Application; onClose: () => void; onSave: (documents: ApplicationDocument[]) => void; onRequestMissing: (documents: ApplicationDocument[]) => void }) {
   const [documents, setDocuments] = useState(application.documents)
+  const filesMissing = documents.some((document) => document.required && !document.fileName)
   const update = (index: number, patch: Partial<ApplicationDocument>) => {
     const document = documents[index]
     if (patch.status === 'Verified' && !document.fileName) {
@@ -749,7 +789,7 @@ function ApplicationDocumentsDialog({ application, onClose, onSave }: { applicat
     event.target.value = ''
     toast.success(`${file.name} attached to the demo record.`)
   }
-  return <ModalShell title="Verify applicant documents" description={`${application.name} · ${application.id}`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Cancel</Button><Button type="button" onClick={() => onSave(documents)}><Check size={14} />Save verification</Button></>}>
-    <div className="admissions-document-list">{documents.map((doc, index) => <div className="admissions-document-row" key={doc.name}><div className="admissions-document-copy"><FileText size={16} /><span><strong>{doc.name}</strong><small>{doc.fileName || 'No file attached'}</small></span></div><select aria-label={`${doc.name} verification status`} value={doc.status} onChange={(event) => update(index, { status: event.target.value as DocumentState })}><option>Missing</option><option>Received</option><option>Verified</option></select><label className="student-action-button admissions-upload-button"><Upload size={12} />Upload<input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => upload(index, event)} /></label></div>)}<p className="modal-info"><ShieldCheck size={14} />Only file names and verification status are saved locally; the file contents are not uploaded or retained.</p></div>
+  return <ModalShell title="Verify applicant documents" description={`${application.name} · ${application.id}`} onClose={onClose} footer={<><Button type="button" variant="ghost" onClick={onClose}><X size={14} />Cancel</Button><Button type="button" variant="outline" disabled={!filesMissing} onClick={() => onRequestMissing(documents.map((document) => document.required && !document.fileName ? { ...document, status: 'Missing' } : document))}><Mail size={14} />Record missing-doc request</Button><Button type="button" onClick={() => onSave(documents)}><Check size={14} />Save verification</Button></>}>
+    <div className="admissions-document-list">{documents.map((doc, index) => <div className="admissions-document-row" key={doc.name}><div className="admissions-document-copy"><FileText size={16} /><span><strong>{doc.name}{doc.required && <small>Required</small>}</strong><small>{doc.fileName || 'No file attached'}</small></span></div><select aria-label={`${doc.name} verification status`} value={doc.status} onChange={(event) => update(index, { status: event.target.value as DocumentState })}><option>Missing</option><option>Received</option><option>Verified</option></select><label className="student-action-button admissions-upload-button"><Upload size={12} />Upload<input type="file" accept=".pdf,.jpg,.jpeg,.png" onChange={(event) => upload(index, event)} /></label></div>)}<p className="modal-info"><ShieldCheck size={14} />The request is recorded in local history only; files and applicant notifications are not sent or stored in this demo.</p></div>
   </ModalShell>
 }
